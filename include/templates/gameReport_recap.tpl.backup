@@ -1,0 +1,11 @@
+<table class="basic_bottom_table" align="center" width="80%">
+	<tr align="center"><td colspan=2><hr/></td></tr>
+	<tr><td class="right"><b>Scenario Table:</b></td><td class="left"><?php echo $scenario?></td></tr>
+        <tr><td class="right"><b>Fully Painted:</b></td><td class="left"><?php echo $fully_painted?></td></tr>
+        <tr><td class="right"><b>Out of State:</b></td><td class="left"><?php echo $outofstate?></td></tr>
+        <tr><td class="right"><b>Multiplayer Game:</b></td><td class="left"><?php echo $team_game?></td></tr>
+        <tr align="center"><td colspan=2><hr/></td></tr>
+	<tr align="center"><td colspan=2><a href="index.php?view=Report_Game">Report Another Game!</a></td></tr>
+	<tr align="center"><td colspan=2><hr/></td></tr>
+</table>
+</form>

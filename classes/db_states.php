@@ -5,6 +5,16 @@
 *    States Class
 *
 ***************************************************/
+
+/**************************************************
+*
+*   Table Description:
+*
+*	id - INT - PRIMARY KEY
+*	name - VARCHAR
+*	country_id - INT
+*
+**************************************************/
 require_once("query.php");
 
 class States {
@@ -33,8 +43,8 @@ Create Function
 public function createStates($name, $country_id){
 
 	//Validate the inputs
-	if(!Check::isString($name)){return false;}
-	if(!Check::isInt($country_id)){return false;}
+	if(Check::notString($name)){return false;}
+	if(Check::notInt($country_id)){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,47 +86,74 @@ public function deleteStates($id){
 
 /**************************************************
 
+Update Record By ID Function(s)
+
+**************************************************/
+private function updateStatesById($id, $columns){
+
+    //Values Array
+    $values = array(":id"=>$id);
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
+
+    //Generate the query
+    $sql = "UPDATE $this->table SET ";
+    foreach(array_keys($columns) as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($array_keys($columns))){
+            $sql.= ", ";
+        }
+    }
+    $sql.= " WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
+
+
+/**************************************************
+
 Query By Column Function(s)
 
 **************************************************/
 private function getStatesByColumn($column, $value){
 
-	//inputs are pre-verified by the mapping functions below, so we can trust them
+    //inputs are pre-verified by the mapping functions below, so we can trust them
 
-	//Values Array
-	$values = array(":$column"=>$value);
+    //Values Array
+    $values = array(":$column"=>$value);
 
-	//Generate the query
-	$sql = "SELECT * FROM $this->table WHERE $column=:$column";
+    //Generate the query
+    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
     
-	return $this->db->query($sql, $values);
+    return $this->db->query($sql, $values);
 }
 
 
 public function getStatesById($id){
 	
-	//Validate Inputs
-	if(!Check::isInt($id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($id)){return false;}
 
-	return getStatesByColumn("id", $id.);
+    return getStatesByColumn("id", $id.);
 }
 
 
 public function getStatesByName($name){
 	
-	//Validate Inputs
-	if(!Check::isString($name)){return false;}
+    //Validate Inputs
+    if(Check::notString($name)){return false;}
 
-	return getStatesByColumn("name", $name.);
+    return getStatesByColumn("name", $name.);
 }
 
 
-public function getStatesByCountry_id($country_id){
+public function getStatesByCountryId($country_id){
 	
-	//Validate Inputs
-	if(!Check::isInt($country_id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($country_id)){return false;}
 
-	return getStatesByColumn("country_id", $country_id.);
+    return getStatesByColumn("country_id", $country_id.);
 }
 
 }//close class

@@ -5,6 +5,16 @@
 *    Game_sizes Class
 *
 ***************************************************/
+
+/**************************************************
+*
+*   Table Description:
+*
+*	id - INT - PRIMARY KEY
+*	size - INT
+*	game_system_id - INT
+*
+**************************************************/
 require_once("query.php");
 
 class Game_sizes {
@@ -33,8 +43,8 @@ Create Function
 public function createGame_sizes($size, $game_system_id){
 
 	//Validate the inputs
-	if(!Check::isInt($size)){return false;}
-	if(!Check::isInt($game_system_id)){return false;}
+	if(Check::notInt($size)){return false;}
+	if(Check::notInt($game_system_id)){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,47 +86,74 @@ public function deleteGame_sizes($id){
 
 /**************************************************
 
+Update Record By ID Function(s)
+
+**************************************************/
+private function updateGame_sizesById($id, $columns){
+
+    //Values Array
+    $values = array(":id"=>$id);
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
+
+    //Generate the query
+    $sql = "UPDATE $this->table SET ";
+    foreach(array_keys($columns) as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($array_keys($columns))){
+            $sql.= ", ";
+        }
+    }
+    $sql.= " WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
+
+
+/**************************************************
+
 Query By Column Function(s)
 
 **************************************************/
 private function getGame_sizesByColumn($column, $value){
 
-	//inputs are pre-verified by the mapping functions below, so we can trust them
+    //inputs are pre-verified by the mapping functions below, so we can trust them
 
-	//Values Array
-	$values = array(":$column"=>$value);
+    //Values Array
+    $values = array(":$column"=>$value);
 
-	//Generate the query
-	$sql = "SELECT * FROM $this->table WHERE $column=:$column";
+    //Generate the query
+    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
     
-	return $this->db->query($sql, $values);
+    return $this->db->query($sql, $values);
 }
 
 
 public function getGame_sizesById($id){
 	
-	//Validate Inputs
-	if(!Check::isInt($id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($id)){return false;}
 
-	return getGame_sizesByColumn("id", $id.);
+    return getGame_sizesByColumn("id", $id.);
 }
 
 
 public function getGame_sizesBySize($size){
 	
-	//Validate Inputs
-	if(!Check::isInt($size)){return false;}
+    //Validate Inputs
+    if(Check::notInt($size)){return false;}
 
-	return getGame_sizesByColumn("size", $size.);
+    return getGame_sizesByColumn("size", $size.);
 }
 
 
-public function getGame_sizesByGame_system_id($game_system_id){
+public function getGame_sizesByGameSystemId($game_system_id){
 	
-	//Validate Inputs
-	if(!Check::isInt($game_system_id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($game_system_id)){return false;}
 
-	return getGame_sizesByColumn("game_system_id", $game_system_id.);
+    return getGame_sizesByColumn("game_system_id", $game_system_id.);
 }
 
 }//close class

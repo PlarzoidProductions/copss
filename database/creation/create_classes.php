@@ -107,6 +107,7 @@ $create_table_pattern = "~`[a-z]+`\.`([a-z_]+)`~";
 if(preg_match("~CREATE~", $line) && preg_match($create_table_pattern, $line, $matches)){
 
     $table_name = end($matches);
+    
     $table_Fn_name = ucfirst(strToLower($table_name));
 
     echo "\n======================================================================\n";
@@ -143,28 +144,35 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
     switch($type){
         case "INT":
         case "BIGINT":
-            $fn = "isInt";
+            $fn = "notInt";
             break;
         case "VARCHAR":
-            $fn = "isString";
+            $fn = "notString";
             break;
         case "TINYINT":
         case "BOOLEAN":
-            $fn = "isBool";
+            $fn = "notBool";
             break;
         case "FLOAT":
         case "DOUBLE":
-            $fn = "isFloat";
+            $fn = "notFloat";
             break;
         default :
-            $fn = "notNull";
+            $fn = "isNull";
     }
 
-    $validateFn="if(!Check::$fn($varname)){return false;}";
+    $validateFn="if(Check::$fn($varname)){return false;}";
+
+    $fnName = "";
+    $parts = preg_split("~_~", $name);
+    foreach($parts as $p){
+        $fnName.= ucfirst(strtolower($p));
+    }
 
     $columns[]=array(
         "name"=>$name,
         "varname"=>$varname,
+        "fnName"=>$fnName,
         "type"=>$type,
         "validateFn"=>$validateFn);
 
@@ -209,7 +217,7 @@ if($table_opened && preg_match($primary_key_pattern, $line, $matches)){
 if($table_opened && preg_match("~;$~", $line)){
 
     //Create and open the file
-    $file = $class_dir.strtoLower($table_name).".php";
+    $file = $class_dir."db_".strtoLower($table_name).".php";
     $class_fptr = fopen($file, 'w');
 
     //check for successful open
@@ -242,6 +250,20 @@ $class_header= '<?php
 *    '.$table_Fn_name.' Class
 *
 ***************************************************/
+
+/**************************************************
+*
+*   Table Description:
+*
+';
+
+foreach($columns as $c){
+    $class_header.= "*\t".$c[name]." - ".$c[type];
+    if($c[primary_key]) $class_header.= " - PRIMARY KEY";
+    $class_header.="\n";
+}
+$class_header.= '*
+**************************************************/
 require_once("query.php");
 
 class '.$table_Fn_name.' {
@@ -362,6 +384,43 @@ echo "Writing delete function...\n";
 fputs($class_fptr, $deleteFn);
 
 /**************************
+* Individual Update functions
+**************************/
+$masterUpdateFnHeader = '
+/**************************************************
+
+Update Record By ID Function(s)
+
+**************************************************/
+';
+fputs($class_fptr, $masterUpdateFnHeader);
+
+$masterUpdateFn='private function update'.$table_Fn_name.'ById($id, $columns){
+
+    //Values Array
+    $values = array(":id"=>$id);
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
+
+    //Generate the query
+    $sql = "UPDATE $this->table SET ";
+    foreach(array_keys($columns) as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($array_keys($columns))){
+            $sql.= ", ";
+        }
+    }
+    $sql.= " WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}';
+$masterUpdateFn.="\n\n";
+ 
+echo "Writing master update function...\n";
+fputs($class_fptr, $masterUpdateFn);
+                                                    
+/**************************
 * Individual 'getBy' functions
 **************************/
 $columnFnHeader = '
@@ -375,15 +434,15 @@ fputs($class_fptr, $columnFnHeader);
 
 $masterColumnFn='private function get'.$table_Fn_name.'ByColumn($column, $value){
 
-	//inputs are pre-verified by the mapping functions below, so we can trust them
+    //inputs are pre-verified by the mapping functions below, so we can trust them
 
-	//Values Array
-	$values = array(":$column"=>$value);
+    //Values Array
+    $values = array(":$column"=>$value);
 
-	//Generate the query
-	$sql = "SELECT * FROM $this->table WHERE $column=:$column";
+    //Generate the query
+    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
     
-	return $this->db->query($sql, $values);
+    return $this->db->query($sql, $values);
 }';
 $masterColumnFn.="\n\n";
 
@@ -393,12 +452,12 @@ fputs($class_fptr, $masterColumnFn);
 foreach($columns as $column){
 
 $columnFn = '
-public function get'.$table_Fn_name.'By'.ucfirst(strtolower($column[name])).'('.$column[varname].'){
+public function get'.$table_Fn_name.'By'.$column[fnName].'('.$column[varname].'){
 	
-	//Validate Inputs
-	'.$column[validateFn].'
+    //Validate Inputs
+    '.$column[validateFn].'
 
-	return get'.$table_Fn_name.'ByColumn("'.$column[name].'", '.$column[varname].'.);
+    return get'.$table_Fn_name.'ByColumn("'.$column[name].'", '.$column[varname].'.);
 }';
 $columnFn.="\n\n";
 

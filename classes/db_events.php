@@ -5,6 +5,15 @@
 *    Events Class
 *
 ***************************************************/
+
+/**************************************************
+*
+*   Table Description:
+*
+*	id - INT - PRIMARY KEY
+*	name - VARCHAR
+*
+**************************************************/
 require_once("query.php");
 
 class Events {
@@ -33,7 +42,7 @@ Create Function
 public function createEvents($name){
 
 	//Validate the inputs
-	if(!Check::isString($name)){return false;}
+	if(Check::notString($name)){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -72,38 +81,65 @@ public function deleteEvents($id){
 
 /**************************************************
 
+Update Record By ID Function(s)
+
+**************************************************/
+private function updateEventsById($id, $columns){
+
+    //Values Array
+    $values = array(":id"=>$id);
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
+
+    //Generate the query
+    $sql = "UPDATE $this->table SET ";
+    foreach(array_keys($columns) as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($array_keys($columns))){
+            $sql.= ", ";
+        }
+    }
+    $sql.= " WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
+
+
+/**************************************************
+
 Query By Column Function(s)
 
 **************************************************/
 private function getEventsByColumn($column, $value){
 
-	//inputs are pre-verified by the mapping functions below, so we can trust them
+    //inputs are pre-verified by the mapping functions below, so we can trust them
 
-	//Values Array
-	$values = array(":$column"=>$value);
+    //Values Array
+    $values = array(":$column"=>$value);
 
-	//Generate the query
-	$sql = "SELECT * FROM $this->table WHERE $column=:$column";
+    //Generate the query
+    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
     
-	return $this->db->query($sql, $values);
+    return $this->db->query($sql, $values);
 }
 
 
 public function getEventsById($id){
 	
-	//Validate Inputs
-	if(!Check::isInt($id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($id)){return false;}
 
-	return getEventsByColumn("id", $id.);
+    return getEventsByColumn("id", $id.);
 }
 
 
 public function getEventsByName($name){
 	
-	//Validate Inputs
-	if(!Check::isString($name)){return false;}
+    //Validate Inputs
+    if(Check::notString($name)){return false;}
 
-	return getEventsByColumn("name", $name.);
+    return getEventsByColumn("name", $name.);
 }
 
 }//close class

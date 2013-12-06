@@ -5,6 +5,16 @@
 *    Tournament_matches Class
 *
 ***************************************************/
+
+/**************************************************
+*
+*   Table Description:
+*
+*	id - INT - PRIMARY KEY
+*	tournament_id - INT
+*	round - INT
+*
+**************************************************/
 require_once("query.php");
 
 class Tournament_matches {
@@ -33,8 +43,8 @@ Create Function
 public function createTournament_matches($tournament_id, $round){
 
 	//Validate the inputs
-	if(!Check::isInt($tournament_id)){return false;}
-	if(!Check::isInt($round)){return false;}
+	if(Check::notInt($tournament_id)){return false;}
+	if(Check::notInt($round)){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,47 +86,74 @@ public function deleteTournament_matches($id){
 
 /**************************************************
 
+Update Record By ID Function(s)
+
+**************************************************/
+private function updateTournament_matchesById($id, $columns){
+
+    //Values Array
+    $values = array(":id"=>$id);
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
+
+    //Generate the query
+    $sql = "UPDATE $this->table SET ";
+    foreach(array_keys($columns) as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($array_keys($columns))){
+            $sql.= ", ";
+        }
+    }
+    $sql.= " WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
+
+
+/**************************************************
+
 Query By Column Function(s)
 
 **************************************************/
 private function getTournament_matchesByColumn($column, $value){
 
-	//inputs are pre-verified by the mapping functions below, so we can trust them
+    //inputs are pre-verified by the mapping functions below, so we can trust them
 
-	//Values Array
-	$values = array(":$column"=>$value);
+    //Values Array
+    $values = array(":$column"=>$value);
 
-	//Generate the query
-	$sql = "SELECT * FROM $this->table WHERE $column=:$column";
+    //Generate the query
+    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
     
-	return $this->db->query($sql, $values);
+    return $this->db->query($sql, $values);
 }
 
 
 public function getTournament_matchesById($id){
 	
-	//Validate Inputs
-	if(!Check::isInt($id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($id)){return false;}
 
-	return getTournament_matchesByColumn("id", $id.);
+    return getTournament_matchesByColumn("id", $id.);
 }
 
 
-public function getTournament_matchesByTournament_id($tournament_id){
+public function getTournament_matchesByTournamentId($tournament_id){
 	
-	//Validate Inputs
-	if(!Check::isInt($tournament_id)){return false;}
+    //Validate Inputs
+    if(Check::notInt($tournament_id)){return false;}
 
-	return getTournament_matchesByColumn("tournament_id", $tournament_id.);
+    return getTournament_matchesByColumn("tournament_id", $tournament_id.);
 }
 
 
 public function getTournament_matchesByRound($round){
 	
-	//Validate Inputs
-	if(!Check::isInt($round)){return false;}
+    //Validate Inputs
+    if(Check::notInt($round)){return false;}
 
-	return getTournament_matchesByColumn("round", $round.);
+    return getTournament_matchesByColumn("round", $round.);
 }
 
 }//close class

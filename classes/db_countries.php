@@ -28,7 +28,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -39,10 +39,10 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createCountries($name){
+public function create($name){
 
 	//Validate the inputs
-	if(Check::notString($name)){return false;}
+	if(!$this->checkName($name)){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -67,8 +67,7 @@ Delete Function
 public function deleteCountries($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkName($name)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -96,7 +95,7 @@ private function updateCountriesById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -111,7 +110,7 @@ private function updateCountriesById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getCountriesByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -125,22 +124,58 @@ private function getCountriesByColumn($column, $value){
 }
 
 
-public function getCountriesById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getCountriesByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getCountriesByName($name){
+public function getByName($name){
 	
     //Validate Inputs
-    if(Check::notString($name)){return false;}
+    if(!$this->checkName($name)){return false;}
 
-    return getCountriesByColumn("name", $name.);
+    return $this->getByColumn("name", $name);
 }
+
+
+/**************************************************
+ 
+Column Validation Function(s)
+
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkName($name){
+    //Not allowed to be null
+    if(Check::isNull($name)){
+        echo "name cannot be null!"; return false;
+    }
+
+    if(Check::notString($name)){
+        echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

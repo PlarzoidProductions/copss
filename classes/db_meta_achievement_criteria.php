@@ -2,7 +2,7 @@
 
 /**************************************************
 *
-*    Events Class
+*    Meta_achievement_criteria Class
 *
 ***************************************************/
 
@@ -11,15 +11,17 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
-*	name - VARCHAR
+*	parent_achievement - INT
+*	child_achievement - INT
+*	count - INT
 *
 **************************************************/
 require_once("query.php");
 
-class Events {
+class Meta_achievement_criteria {
 
 var $db=NULL;
-var $table="events";
+var $table="meta_achievement_criteria";
 
 
 /***************************************************
@@ -39,21 +41,29 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name){
+public function create($parent_achievement, $child_achievement, $count){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
+	if(!$this->checkParentAchievement($parent_achievement)){return false;}
+	if(!$this->checkChildAchievement($child_achievement)){return false;}
+	if(!$this->checkCount($count)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":name"=>$name
+		":parent_achievement"=>$parent_achievement,
+ 		":child_achievement"=>$child_achievement,
+ 		":count"=>$count
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				name
+				parent_achievement,
+				child_achievement,
+				count
 			) VALUES (
-				:name)";
+				:parent_achievement,
+				:child_achievement,
+				:count)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -64,10 +74,12 @@ public function create($name){
 Delete Function
 
 **************************************************/
-public function deleteEvents($id){
+public function deleteMeta_achievement_criteria($id){
 
 	//Validate the input
-	if(!$this->checkName($name)){return false;}
+	if(!$this->checkParentAchievement($parent_achievement)){return false;}
+	if(!$this->checkChildAchievement($child_achievement)){return false;}
+	if(!$this->checkCount($count)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -83,7 +95,7 @@ public function deleteEvents($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateEventsById($id, $columns){
+private function updateMeta_achievement_criteriaById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);
@@ -133,12 +145,30 @@ public function getById($id){
 }
 
 
-public function getByName($name){
+public function getByParentAchievement($parent_achievement){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    if(!$this->checkParentAchievement($parent_achievement)){return false;}
 
-    return $this->getByColumn("name", $name);
+    return $this->getByColumn("parent_achievement", $parent_achievement);
+}
+
+
+public function getByChildAchievement($child_achievement){
+	
+    //Validate Inputs
+    if(!$this->checkChildAchievement($child_achievement)){return false;}
+
+    return $this->getByColumn("child_achievement", $child_achievement);
+}
+
+
+public function getByCount($count){
+	
+    //Validate Inputs
+    if(!$this->checkCount($count)){return false;}
+
+    return $this->getByColumn("count", $count);
 }
 
 
@@ -162,14 +192,44 @@ function checkId($id){
 
 
 
-function checkName($name){
+function checkParentAchievement($parent_achievement){
     //Not allowed to be null
-    if(Check::isNull($name)){
-        echo "name cannot be null!"; return false;
+    if(Check::isNull($parent_achievement)){
+        echo "parent_achievement cannot be null!"; return false;
     }
 
-    if(Check::notString($name)){
-        echo "name was invalid!"; return false;
+    if(Check::notInt($parent_achievement)){
+        echo "parent_achievement was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkChildAchievement($child_achievement){
+    //Not allowed to be null
+    if(Check::isNull($child_achievement)){
+        echo "child_achievement cannot be null!"; return false;
+    }
+
+    if(Check::notInt($child_achievement)){
+        echo "child_achievement was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkCount($count){
+    //Not allowed to be null
+    if(Check::isNull($count)){
+        echo "count cannot be null!"; return false;
+    }
+
+    if(Check::notInt($count)){
+        echo "count was invalid!"; return false;
     }
 
     return true;

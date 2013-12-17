@@ -1,7 +1,6 @@
 <?php
 
-require_once("player.php");
-require_once("settings.php");
+require_once("db_players.php");
 
 class Choices {
 

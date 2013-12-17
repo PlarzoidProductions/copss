@@ -1,6 +1,6 @@
 <?php
 
-//include_once('user.php');
+include_once('db_users.php');
 
 class Session {
 
@@ -20,17 +20,20 @@ class Session {
 		return !$_SESSION[is_logged_in];
 	}
 
-/*	function isAdmin() {
-		if(Session::isLoggedIn()){
-			$u = new User();
-			$u = $u->findUserbyUserID($_SESSION[userid]);
-			if($u){
-				if($u->isAdmin()) {
-					return true;
-				} 
-			}
+	function isAdmin() {
+            if(isset($_SESSION[is_admin])) return $_SESSION[is_admin];
+
+	    if(Session::isLoggedIn()){
+		$u = new Users();
+		$u = $u->getbyId($_SESSION[userid]);
+
+		if($u){
+		    if($u[0][admin]) {
+			return true;
+		    } 
 		}
-		return false;
+	    }
+	    return false;
 	}
 
 	function isNotAdmin() {
@@ -39,11 +42,11 @@ class Session {
 
         function getUsername() {
                 if(Session::isLoggedIn()){
-                        $u = new User();
-                        $u = $u->findUserbyUserID($_SESSION[userid]);
-
+                        $u = new Users();
+                        $u = $u->getById($_SESSION[userid]);
+                        
                         if($u){
-                		return $u->getUsername();
+                		return $u[0][username];
 			} else {
 		
                 		return "Failed to find user in database!";
@@ -52,6 +55,13 @@ class Session {
 			return false;
 		}
         }	
+
+	function getUserID() {
+		if(Session::isLoggedIn()){
+			return $_SESSION[userid];
+		}
+		return false;
+	}
 
 	function isAuthorized($level) {
 		//Firstly, everyone is authorized to see public pages
@@ -62,7 +72,7 @@ class Session {
 			if(Session::isAdmin()){return true;}
 
 			$u = new User();
-			$u = $u->findUserbyUserID($_SESSION[userid]);
+			$u = $u->getById($_SESSION[userid]);
 			
 			if($u){
 
@@ -76,10 +86,14 @@ class Session {
 	}
 	
 	function authenticate($uname, $upass) {
-		$u = new User();
-		$u = $u->findUserByUsernamePassword($uname, $upass);
+                $u = new Users();
+		$u = $u->getByUsername($uname);
+
+                //strip wrapper
+                if(is_array($u)) $u = $u[0];
+
 		if ($u){
-			if($u->idValid()){
+			if(!strcmp($upass, $u[password])){
 				Session::login($u);
 				return $u;
 			}
@@ -88,9 +102,9 @@ class Session {
 	}
 
 	function login($u) {
-		$_SESSION[userid] = $u->getUserId();
+		$_SESSION[userid] = $u[id];
 		$_SESSION[is_logged_in] = true;
-		$_SESSION[is_admin] = $u->isAdmin();
+		$_SESSION[is_admin] = $u[admin];
 	}
 
 	function logout() {
@@ -98,7 +112,7 @@ class Session {
 		unset($_SESSION[is_logged_in]);
 		unset($_SESSION[is_admin]);
 	}
-*/
+
 }
 
 ?>

@@ -2,7 +2,7 @@
 
 /**************************************************
 *
-*    Events Class
+*    User_shifts Class
 *
 ***************************************************/
 
@@ -11,15 +11,18 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
-*	name - VARCHAR
+*	user_id - INT
+*	shift_id - INT
+*	checked_in - TINYINT
+*	completed - TINYINT
 *
 **************************************************/
 require_once("query.php");
 
-class Events {
+class User_shifts {
 
 var $db=NULL;
-var $table="events";
+var $table="user_shifts";
 
 
 /***************************************************
@@ -39,21 +42,33 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name){
+public function create($user_id, $shift_id, $checked_in, $completed){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
+	if(!$this->checkUserId($user_id)){return false;}
+	if(!$this->checkShiftId($shift_id)){return false;}
+	if(!$this->checkCheckedIn($checked_in)){return false;}
+	if(!$this->checkCompleted($completed)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":name"=>$name
+		":user_id"=>$user_id,
+ 		":shift_id"=>$shift_id,
+ 		":checked_in"=>$checked_in,
+ 		":completed"=>$completed
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				name
+				user_id,
+				shift_id,
+				checked_in,
+				completed
 			) VALUES (
-				:name)";
+				:user_id,
+				:shift_id,
+				:checked_in,
+				:completed)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -64,10 +79,13 @@ public function create($name){
 Delete Function
 
 **************************************************/
-public function deleteEvents($id){
+public function deleteUser_shifts($id){
 
 	//Validate the input
-	if(!$this->checkName($name)){return false;}
+	if(!$this->checkUserId($user_id)){return false;}
+	if(!$this->checkShiftId($shift_id)){return false;}
+	if(!$this->checkCheckedIn($checked_in)){return false;}
+	if(!$this->checkCompleted($completed)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -83,7 +101,7 @@ public function deleteEvents($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateEventsById($id, $columns){
+private function updateUser_shiftsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);
@@ -133,12 +151,39 @@ public function getById($id){
 }
 
 
-public function getByName($name){
+public function getByUserId($user_id){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    if(!$this->checkUserId($user_id)){return false;}
 
-    return $this->getByColumn("name", $name);
+    return $this->getByColumn("user_id", $user_id);
+}
+
+
+public function getByShiftId($shift_id){
+	
+    //Validate Inputs
+    if(!$this->checkShiftId($shift_id)){return false;}
+
+    return $this->getByColumn("shift_id", $shift_id);
+}
+
+
+public function getByCheckedIn($checked_in){
+	
+    //Validate Inputs
+    if(!$this->checkCheckedIn($checked_in)){return false;}
+
+    return $this->getByColumn("checked_in", $checked_in);
+}
+
+
+public function getByCompleted($completed){
+	
+    //Validate Inputs
+    if(!$this->checkCompleted($completed)){return false;}
+
+    return $this->getByColumn("completed", $completed);
 }
 
 
@@ -162,14 +207,59 @@ function checkId($id){
 
 
 
-function checkName($name){
+function checkUserId($user_id){
     //Not allowed to be null
-    if(Check::isNull($name)){
-        echo "name cannot be null!"; return false;
+    if(Check::isNull($user_id)){
+        echo "user_id cannot be null!"; return false;
     }
 
-    if(Check::notString($name)){
-        echo "name was invalid!"; return false;
+    if(Check::notInt($user_id)){
+        echo "user_id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkShiftId($shift_id){
+    //Not allowed to be null
+    if(Check::isNull($shift_id)){
+        echo "shift_id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($shift_id)){
+        echo "shift_id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkCheckedIn($checked_in){
+    //Not allowed to be null
+    if(Check::isNull($checked_in)){
+        echo "checked_in cannot be null!"; return false;
+    }
+
+    if(Check::notBool($checked_in)){
+        echo "checked_in was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkCompleted($completed){
+    //Not allowed to be null
+    if(Check::isNull($completed)){
+        echo "completed cannot be null!"; return false;
+    }
+
+    if(Check::notBool($completed)){
+        echo "completed was invalid!"; return false;
     }
 
     return true;

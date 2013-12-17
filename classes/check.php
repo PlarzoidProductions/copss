@@ -11,26 +11,26 @@ class Check
     }
 
     function notInt($v) {
-        if (!preg_match("/^[0-9]+$/", $v)) {
-            return true;
+        if (preg_match("/^[0-9]+$/", $v)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     function notFloat($v){
-        if(preg_match("~^[0-9.]+$~", $v)) return true;
-        return false;
+        if(preg_match("~^[0-9.]+$~", $v)) return false;
+        return true;
     }
 
     function notString($str) {
-        return isNull($str);
+        return Check::isNull($str);
     }
 
     function notBool($b) {
-        if(preg_match("~^[01]$~", $b)) return true;
-        if(($b == true) || ($b == false)) return true;
-        if(!strcmp(strtolower($b), "true") || !strcmp(strtolower($b), "false")) return true;
-        return false;
+        if(preg_match("~^[01]$~", $b)) return false;
+        if(($b == true) || ($b == false)) return false;
+        if(!strcmp(strtolower($b), "true") || !strcmp(strtolower($b), "false")) return false;
+        return true;
     }
 
     function isNull($v){

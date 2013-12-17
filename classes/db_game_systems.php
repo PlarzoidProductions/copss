@@ -12,7 +12,6 @@
 *
 *	id - INT - PRIMARY KEY
 *	name - VARCHAR
-*	max_num_players - INT
 *
 **************************************************/
 require_once("query.php");
@@ -29,7 +28,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -40,25 +39,21 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createGame_systems($name, $max_num_players){
+public function create($name){
 
 	//Validate the inputs
-	if(Check::notString($name)){return false;}
-	if(Check::notInt($max_num_players)){return false;}
+	if(!$this->checkName($name)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":name"=>$name,
- 		":max_num_players"=>$max_num_players
+		":name"=>$name
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				name,
-				max_num_players
+				name
 			) VALUES (
-				:name,
-				:max_num_players)";
+				:name)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -72,8 +67,7 @@ Delete Function
 public function deleteGame_systems($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkName($name)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -101,7 +95,7 @@ private function updateGame_systemsById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -116,7 +110,7 @@ private function updateGame_systemsById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getGame_systemsByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -130,31 +124,58 @@ private function getGame_systemsByColumn($column, $value){
 }
 
 
-public function getGame_systemsById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getGame_systemsByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getGame_systemsByName($name){
+public function getByName($name){
 	
     //Validate Inputs
-    if(Check::notString($name)){return false;}
+    if(!$this->checkName($name)){return false;}
 
-    return getGame_systemsByColumn("name", $name.);
+    return $this->getByColumn("name", $name);
 }
 
 
-public function getGame_systemsByMaxNumPlayers($max_num_players){
-	
-    //Validate Inputs
-    if(Check::notInt($max_num_players)){return false;}
+/**************************************************
+ 
+Column Validation Function(s)
 
-    return getGame_systemsByColumn("max_num_players", $max_num_players.);
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
 }
+
+
+
+function checkName($name){
+    //Not allowed to be null
+    if(Check::isNull($name)){
+        echo "name cannot be null!"; return false;
+    }
+
+    if(Check::notString($name)){
+        echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

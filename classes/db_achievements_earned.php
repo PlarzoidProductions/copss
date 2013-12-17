@@ -12,7 +12,6 @@
 *
 *	id - INT - PRIMARY KEY
 *	player_id - INT
-*	game_id - INT
 *	achievement_id - INT
 *
 **************************************************/
@@ -30,7 +29,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -41,28 +40,24 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createAchievements_earned($player_id, $game_id, $achievement_id){
+public function create($player_id, $achievement_id){
 
 	//Validate the inputs
-	if(Check::notInt($player_id)){return false;}
-	if(Check::notInt($game_id)){return false;}
-	if(Check::notInt($achievement_id)){return false;}
+	if(!$this->checkPlayerId($player_id)){return false;}
+	if(!$this->checkAchievementId($achievement_id)){return false;}
 
 	//Create the values Array
 	$values = array(
 		":player_id"=>$player_id,
- 		":game_id"=>$game_id,
  		":achievement_id"=>$achievement_id
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
 				player_id,
-				game_id,
 				achievement_id
 			) VALUES (
 				:player_id,
-				:game_id,
 				:achievement_id)";
 
 	return $this->db->insert($sql, $values);
@@ -77,8 +72,8 @@ Delete Function
 public function deleteAchievements_earned($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkPlayerId($player_id)){return false;}
+	if(!$this->checkAchievementId($achievement_id)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -106,7 +101,7 @@ private function updateAchievements_earnedById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -121,7 +116,7 @@ private function updateAchievements_earnedById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getAchievements_earnedByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -135,40 +130,82 @@ private function getAchievements_earnedByColumn($column, $value){
 }
 
 
-public function getAchievements_earnedById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getAchievements_earnedByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getAchievements_earnedByPlayerId($player_id){
+public function getByPlayerId($player_id){
 	
     //Validate Inputs
-    if(Check::notInt($player_id)){return false;}
+    if(!$this->checkPlayerId($player_id)){return false;}
 
-    return getAchievements_earnedByColumn("player_id", $player_id.);
+    return $this->getByColumn("player_id", $player_id);
 }
 
 
-public function getAchievements_earnedByGameId($game_id){
+public function getByAchievementId($achievement_id){
 	
     //Validate Inputs
-    if(Check::notInt($game_id)){return false;}
+    if(!$this->checkAchievementId($achievement_id)){return false;}
 
-    return getAchievements_earnedByColumn("game_id", $game_id.);
+    return $this->getByColumn("achievement_id", $achievement_id);
 }
 
 
-public function getAchievements_earnedByAchievementId($achievement_id){
-	
-    //Validate Inputs
-    if(Check::notInt($achievement_id)){return false;}
+/**************************************************
+ 
+Column Validation Function(s)
 
-    return getAchievements_earnedByColumn("achievement_id", $achievement_id.);
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
 }
+
+
+
+function checkPlayerId($player_id){
+    //Not allowed to be null
+    if(Check::isNull($player_id)){
+        echo "player_id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($player_id)){
+        echo "player_id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkAchievementId($achievement_id){
+    //Not allowed to be null
+    if(Check::isNull($achievement_id)){
+        echo "achievement_id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($achievement_id)){
+        echo "achievement_id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

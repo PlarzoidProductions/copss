@@ -1,0 +1,12 @@
+<section id="main_section">
+    <header>
+        <h1><? echo $title?></h1>
+    </header>
+    <section id="inputs_section">
+        <form method="<?=$form_method?>" action="<?=$form_action?>">
+        <? foreach($inputs as $i){?>
+            <? echo $page->displayVar($i)?>
+        <?}?>
+        </form>
+    </section>
+</section>

@@ -1,102 +1,128 @@
 <?php
 
-/***************************************************************************
+/***************************************
 *
-*	Query Class for handling direct database interactions
+*   Query class
 *
-***************************************************************************/
+*   Part of the Data Abstraction Layer
+*
+****************************************/
 
 class Query{
 
-var $mysql_user="novaopen";
-var $mysql_host="localhost";
-var $mysql_password="c0nv3nt!0n";
+/***********************
+    Variables
+***********************/
 
-var $mysql_database="NoVaOpen";
+var $mysql_user = "asterdial";
+var $mysql_host = "localhost";
+var $mysql_password = "d4t4b4s3";
 
-var $connection=NULL;//database connection object
+var $mysql_database = "asterdial";
 
-/***************
-*	Constuctor
-***************/
-public function __construct(){
+var $connection = null; //database object holder
 
-	//build the failure message wile it's convenient
-	$die_str = "MySQL connection failed!<br/>'$this->mysql_host'@'$this->mysql_user', '$this->mysql_password'";
+static $instance;
 
-	//attempt to establish the connection
-	$this->connection = mysql_connect($this->mysql_host, $this->mysql_user, $this->mysql_password) or die($die_str);
 
-	//select the desired database
-	mysql_select_db($this->mysql_database) or die("MySQL database ($this->mysql_database) selection failed!");
+
+/************************
+    Constructor
+************************/
+
+private function __construct(){
+    //make the connection
+
+    $this->connection = new PDO("mysql:host=$this->mysql_host;dbname=$this->mysql_database",
+                                $this->mysql_user, $this->mysql_password);
+    $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 }
 
-/***************
-*   Destructor
-***************/
-public function __destruct(){
-	mysql_close($this->connection);//see if this works this time
-}
-
-
-/***************
-*   query(string) retrieves data from the database, or returns false if nothing found
-***************/
-public function query($sql){
-	$result = mysql_query($sql) or die(mysql_error());
-
-	//if the database returns empty (false), kick it back now
-	if(is_bool($result)){return $result;}
-
-	//fetch the individual rows from the query
-	$row = mysql_fetch_row($result);
-	while($row){
-		$ret[]=$row;
-		$row = mysql_fetch_row($result);
-	}
-
-	if(is_array($ret)){
-		return $ret;
-	}
-
-	//if everything else fails, pass a false back
-	return false;
+public static function getInstance(){
+    if(self::$instance == null){self::$instance = new Query();}
+    return self::$instance;
 }
 
 
-/***************
-*   update(string) changes data in the database, returns true/false based on success of the operation
-***************/
-public function update($sql){
-	$result = mysql_query($sql) or die(mysql_error());
 
-	//return the result if it's a boolean
-	if(is_bool($result)){return $result;}
+/***********************
+    Destructor
+***********************/
 
-	//return false if everything else fails
-	return false;
+public function __destruct(){}
+
+
+/***********************
+    Query
+
+    Returns data in an array, or false if an error occurred
+
+***********************/
+
+public function query($sql, $values){
+    $pdo_query = $this->connection->prepare($sql);
+    $pdo_query->execute($values);
+
+    return $pdo_query->fetchAll();
+}
+
+/***********************
+    Update
+
+    Returns true if success, false if an error occurred
+
+***********************/
+
+public function update($sql, $values){
+    $pdo_update = $this->connection->prepare($sql);
+    $pdo_update->execute($values);
+
+    return $pdo_update->rowCount();
+}
+
+public function updateGroup($sql, $value_sets){
+    $pdo_update = $this->connection->prepare($sql);
+
+    foreach($value_sets as $k=>$set){
+        $pdo_update->execute($set);
+        if($pdo_update->rowCount() <= 0){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/***********************
+    Insert
+
+    returns the ID of the inserted row, or false if an error occurred
+
+***********************/
+
+public function insert($sql, $values){
+    $pdo_insert = $this->connection->prepare($sql);
+    $pdo_insert->execute($values);
+
+    return $pdo_insert->lastInsertId();
+}
+
+public function insertGroup($sql, $value_sets){
+    $pdo_insert = $this->connection->prepare($sql);
+    
+    $new_ids = array();
+
+    foreach($value_sets as $k=>$set){
+        $pdo_insert->execute($set);
+        $new_ids[] = $pdo_insert->lastInsertId();
+    }
+
+    return $new_ids;
 }
 
 
-/***************
-*   insert(string) puts data in the database, returns the new row id or false based on success of the operation
-***************/
-public function insert($sql){
-	$result = mysql_query($sql) or die(mysql_error());
+}//class declaration
 
-	//if a boolean, fetch the row id, or return false
-	if(is_bool($result)){
-		if($result){
-			return mysql_insert_id();
-		} else {
-			return $result;//false
-		}
-	}
-
-	//return false is all else fails
-	return false;
-}
-
-
-}//close the class
 ?>

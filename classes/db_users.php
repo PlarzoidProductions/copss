@@ -2,7 +2,7 @@
 
 /**************************************************
 *
-*    Players Class
+*    Users Class
 *
 ***************************************************/
 
@@ -11,20 +11,19 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
-*	first_name - VARCHAR
-*	last_name - VARCHAR
-*	email - VARCHAR
-*	country - INT
-*	state - INT
+*	username - VARCHAR
+*	password - CHAR
 *	creation_date - DATETIME
+*	last_login - TIMESTAMP
+*	admin - TINYINT
 *
 **************************************************/
 require_once("query.php");
 
-class Players {
+class Users {
 
 var $db=NULL;
-var $table="players";
+var $table="users";
 
 
 /***************************************************
@@ -44,41 +43,37 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($first_name, $last_name, $email, $country, $state, $creation_date){
+public function create($username, $password, $creation_date, $last_login, $admin){
 
 	//Validate the inputs
-	if(!$this->checkFirstName($first_name)){return false;}
-	if(!$this->checkLastName($last_name)){return false;}
-	if(!$this->checkEmail($email)){return false;}
-	if(!$this->checkCountry($country)){return false;}
-	if(!$this->checkState($state)){return false;}
+	if(!$this->checkUsername($username)){return false;}
+	if(!$this->checkPassword($password)){return false;}
 	if(!$this->checkCreationDate($creation_date)){return false;}
+	if(!$this->checkLastLogin($last_login)){return false;}
+	if(!$this->checkAdmin($admin)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":first_name"=>$first_name,
- 		":last_name"=>$last_name,
- 		":email"=>$email,
- 		":country"=>$country,
- 		":state"=>$state,
- 		":creation_date"=>$creation_date
+		":username"=>$username,
+ 		":password"=>$password,
+ 		":creation_date"=>$creation_date,
+ 		":last_login"=>$last_login,
+ 		":admin"=>$admin
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				first_name,
-				last_name,
-				email,
-				country,
-				state,
-				creation_date
+				username,
+				password,
+				creation_date,
+				last_login,
+				admin
 			) VALUES (
-				:first_name,
-				:last_name,
-				:email,
-				:country,
-				:state,
-				:creation_date)";
+				:username,
+				:password,
+				:creation_date,
+				:last_login,
+				:admin)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -89,15 +84,14 @@ public function create($first_name, $last_name, $email, $country, $state, $creat
 Delete Function
 
 **************************************************/
-public function deletePlayers($id){
+public function deleteUsers($id){
 
 	//Validate the input
-	if(!$this->checkFirstName($first_name)){return false;}
-	if(!$this->checkLastName($last_name)){return false;}
-	if(!$this->checkEmail($email)){return false;}
-	if(!$this->checkCountry($country)){return false;}
-	if(!$this->checkState($state)){return false;}
+	if(!$this->checkUsername($username)){return false;}
+	if(!$this->checkPassword($password)){return false;}
 	if(!$this->checkCreationDate($creation_date)){return false;}
+	if(!$this->checkLastLogin($last_login)){return false;}
+	if(!$this->checkAdmin($admin)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -113,7 +107,7 @@ public function deletePlayers($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updatePlayersById($id, $columns){
+private function updateUsersById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);
@@ -163,48 +157,21 @@ public function getById($id){
 }
 
 
-public function getByFirstName($first_name){
+public function getByUsername($username){
 	
     //Validate Inputs
-    if(!$this->checkFirstName($first_name)){return false;}
+    if(!$this->checkUsername($username)){return false;}
 
-    return $this->getByColumn("first_name", $first_name);
+    return $this->getByColumn("username", $username);
 }
 
 
-public function getByLastName($last_name){
+public function getByPassword($password){
 	
     //Validate Inputs
-    if(!$this->checkLastName($last_name)){return false;}
+    if(!$this->checkPassword($password)){return false;}
 
-    return $this->getByColumn("last_name", $last_name);
-}
-
-
-public function getByEmail($email){
-	
-    //Validate Inputs
-    if(!$this->checkEmail($email)){return false;}
-
-    return $this->getByColumn("email", $email);
-}
-
-
-public function getByCountry($country){
-	
-    //Validate Inputs
-    if(!$this->checkCountry($country)){return false;}
-
-    return $this->getByColumn("country", $country);
-}
-
-
-public function getByState($state){
-	
-    //Validate Inputs
-    if(!$this->checkState($state)){return false;}
-
-    return $this->getByColumn("state", $state);
+    return $this->getByColumn("password", $password);
 }
 
 
@@ -214,6 +181,24 @@ public function getByCreationDate($creation_date){
     if(!$this->checkCreationDate($creation_date)){return false;}
 
     return $this->getByColumn("creation_date", $creation_date);
+}
+
+
+public function getByLastLogin($last_login){
+	
+    //Validate Inputs
+    if(!$this->checkLastLogin($last_login)){return false;}
+
+    return $this->getByColumn("last_login", $last_login);
+}
+
+
+public function getByAdmin($admin){
+	
+    //Validate Inputs
+    if(!$this->checkAdmin($admin)){return false;}
+
+    return $this->getByColumn("admin", $admin);
 }
 
 
@@ -237,14 +222,14 @@ function checkId($id){
 
 
 
-function checkFirstName($first_name){
+function checkUsername($username){
     //Not allowed to be null
-    if(Check::isNull($first_name)){
-        echo "first_name cannot be null!"; return false;
+    if(Check::isNull($username)){
+        echo "username cannot be null!"; return false;
     }
 
-    if(Check::notString($first_name)){
-        echo "first_name was invalid!"; return false;
+    if(Check::notString($username)){
+        echo "username was invalid!"; return false;
     }
 
     return true;
@@ -252,49 +237,14 @@ function checkFirstName($first_name){
 
 
 
-function checkLastName($last_name){
+function checkPassword($password){
     //Not allowed to be null
-    if(Check::isNull($last_name)){
-        echo "last_name cannot be null!"; return false;
+    if(Check::isNull($password)){
+        echo "password cannot be null!"; return false;
     }
 
-    if(Check::notString($last_name)){
-        echo "last_name was invalid!"; return false;
-    }
-
-    return true;
-}
-
-
-
-function checkEmail($email){
-    if(Check::notString($email)){
-        echo "email was invalid!"; return false;
-    }
-
-    return true;
-}
-
-
-
-function checkCountry($country){
-    //Not allowed to be null
-    if(Check::isNull($country)){
-        echo "country cannot be null!"; return false;
-    }
-
-    if(Check::notInt($country)){
-        echo "country was invalid!"; return false;
-    }
-
-    return true;
-}
-
-
-
-function checkState($state){
-    if(Check::notInt($state)){
-        echo "state was invalid!"; return false;
+    if(Check::isNull($password)){
+        echo "password was invalid!"; return false;
     }
 
     return true;
@@ -310,6 +260,31 @@ function checkCreationDate($creation_date){
 
     if(Check::isNull($creation_date)){
         echo "creation_date was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkLastLogin($last_login){
+    if(Check::isNull($last_login)){
+        echo "last_login was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkAdmin($admin){
+    //Not allowed to be null
+    if(Check::isNull($admin)){
+        echo "admin cannot be null!"; return false;
+    }
+
+    if(Check::notBool($admin)){
+        echo "admin was invalid!"; return false;
     }
 
     return true;

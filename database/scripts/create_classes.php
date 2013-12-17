@@ -9,14 +9,6 @@ error_reporting(E_ERROR & ~E_NOTICE);
 Test Zone
 
 *************************************************/
-$pattern = "";
-$string = "CREATE  TABLE IF NOT EXISTS `asterdial`.`project_channels` (";
-
-echo preg_match($pattern, $string, $matches);
-echo "\n";
-
-echo $matches[1]."\n";
-//return;
 
 /*************************************************
 //END Test Zone
@@ -102,7 +94,7 @@ $line = fgets($sql_fptr);
 /************************************************
 1. Detect and capture the name of the table
 */
-$create_table_pattern = "~`[a-z]+`\.`([a-z_]+)`~";
+$create_table_pattern = "~`[a-z_]+`\.`([a-z_]+)`~";
 
 if(preg_match("~CREATE~", $line) && preg_match($create_table_pattern, $line, $matches)){
 
@@ -141,6 +133,8 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
     
     $type = $matches[2];
 
+    $notNull = preg_match("~NOT\sNULL~", $line);
+
     switch($type){
         case "INT":
         case "BIGINT":
@@ -161,20 +155,34 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
             $fn = "isNull";
     }
 
-    $validateFn="if(Check::$fn($varname)){return false;}";
-
     $fnName = "";
     $parts = preg_split("~_~", $name);
     foreach($parts as $p){
         $fnName.= ucfirst(strtolower($p));
     }
 
+    $validateFn = "function check".$fnName."($varname){\n";
+    if($notNull){ 
+        $validateFn.= "    //Not allowed to be null\n";
+        $validateFn.= "    if(Check::isNull($varname)){\n";
+        $validateFn.= "        echo \"$name cannot be null!\"; return false;\n";
+        $validateFn.= "    }\n\n";
+    }
+    $validateFn.= "    if(Check::$fn($varname)){\n";
+    $validateFn.= "        echo \"$name was invalid!\"; return false;\n";
+    $validateFn.= "    }\n\n";
+    $validateFn.= "    return true;\n";
+    $validateFn.= "}\n\n";
+
+    $validateMe = "if(!\$this->check$fnName($varname)){return false;}";
+
     $columns[]=array(
         "name"=>$name,
         "varname"=>$varname,
         "fnName"=>$fnName,
         "type"=>$type,
-        "validateFn"=>$validateFn);
+        "validateFn"=>$validateMe,
+        "selfValidation"=>$validateFn);
 
     echo "Found Column: $name\n";
 
@@ -278,7 +286,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -299,7 +307,7 @@ Create Function
 
 **************************************************/
 ';
-$createFn.= "public function create$table_Fn_name(";
+$createFn.= "public function create(";
 foreach($columns as $k=>$c){
     //Exclude from create if it's the primary key
     if(!$c[primary_key]){
@@ -370,7 +378,11 @@ Delete Function
 $deleteFn.= "public function delete".$table_Fn_name."(".$primary_key[varname]."){\n\n";
 
 $deleteFn.= "\t//Validate the input\n";
-$deleteFn.= "\tif(Check::isInt(".$primary_key[varname].")){return false;}\n\n";
+foreach($columns as $c){
+    if(!$c[primary_key] && (strlen($c[validateFn]) > 0)){
+         $deleteFn.="\t".$c[validateFn]."\n";
+    }
+}
 
 $deleteFn.= "\t//Create the values array\n";
 $deleteFn.= "\t\$values = array(\":".$primary_key[name]."\"=>".$primary_key[varname].");\n\n";
@@ -407,7 +419,7 @@ $masterUpdateFn='private function update'.$table_Fn_name.'ById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -432,7 +444,7 @@ Query By Column Function(s)
 ';
 fputs($class_fptr, $columnFnHeader);
 
-$masterColumnFn='private function get'.$table_Fn_name.'ByColumn($column, $value){
+$masterColumnFn='private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -452,20 +464,35 @@ fputs($class_fptr, $masterColumnFn);
 foreach($columns as $column){
 
 $columnFn = '
-public function get'.$table_Fn_name.'By'.$column[fnName].'('.$column[varname].'){
+public function getBy'.$column[fnName].'('.$column[varname].'){
 	
     //Validate Inputs
     '.$column[validateFn].'
 
-    return get'.$table_Fn_name.'ByColumn("'.$column[name].'", '.$column[varname].'.);
+    return $this->getByColumn("'.$column[name].'", '.$column[varname].');
 }';
 $columnFn.="\n\n";
 
 echo "Writing column function for $column[name]...\n";
 fputs($class_fptr, $columnFn);
 
-
 }
+
+/*************************
+* ValidationFunctions
+*************************/
+$validationFnHeader = '
+/**************************************************
+ 
+Column Validation Function(s)
+
+**************************************************/
+';
+fputs($class_fptr, $validationFnHeader);
+foreach($columns as $c){
+    fputs($class_fptr, $c[selfValidation]."\n\n");
+}
+
 
 /**************************
 *  Write the class footer

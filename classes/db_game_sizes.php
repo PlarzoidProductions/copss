@@ -11,8 +11,9 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
+*	parent_game_system - INT
 *	size - INT
-*	game_system_id - INT
+*	name - VARCHAR
 *
 **************************************************/
 require_once("query.php");
@@ -29,7 +30,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -40,25 +41,29 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createGame_sizes($size, $game_system_id){
+public function create($parent_game_system, $size, $name){
 
 	//Validate the inputs
-	if(Check::notInt($size)){return false;}
-	if(Check::notInt($game_system_id)){return false;}
+	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
+	if(!$this->checkSize($size)){return false;}
+	if(!$this->checkName($name)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":size"=>$size,
- 		":game_system_id"=>$game_system_id
+		":parent_game_system"=>$parent_game_system,
+ 		":size"=>$size,
+ 		":name"=>$name
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
+				parent_game_system,
 				size,
-				game_system_id
+				name
 			) VALUES (
+				:parent_game_system,
 				:size,
-				:game_system_id)";
+				:name)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -72,8 +77,9 @@ Delete Function
 public function deleteGame_sizes($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
+	if(!$this->checkSize($size)){return false;}
+	if(!$this->checkName($name)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -101,7 +107,7 @@ private function updateGame_sizesById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -116,7 +122,7 @@ private function updateGame_sizesById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getGame_sizesByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -130,31 +136,101 @@ private function getGame_sizesByColumn($column, $value){
 }
 
 
-public function getGame_sizesById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getGame_sizesByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getGame_sizesBySize($size){
+public function getByParentGameSystem($parent_game_system){
 	
     //Validate Inputs
-    if(Check::notInt($size)){return false;}
+    if(!$this->checkParentGameSystem($parent_game_system)){return false;}
 
-    return getGame_sizesByColumn("size", $size.);
+    return $this->getByColumn("parent_game_system", $parent_game_system);
 }
 
 
-public function getGame_sizesByGameSystemId($game_system_id){
+public function getBySize($size){
 	
     //Validate Inputs
-    if(Check::notInt($game_system_id)){return false;}
+    if(!$this->checkSize($size)){return false;}
 
-    return getGame_sizesByColumn("game_system_id", $game_system_id.);
+    return $this->getByColumn("size", $size);
 }
+
+
+public function getByName($name){
+	
+    //Validate Inputs
+    if(!$this->checkName($name)){return false;}
+
+    return $this->getByColumn("name", $name);
+}
+
+
+/**************************************************
+ 
+Column Validation Function(s)
+
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkParentGameSystem($parent_game_system){
+    //Not allowed to be null
+    if(Check::isNull($parent_game_system)){
+        echo "parent_game_system cannot be null!"; return false;
+    }
+
+    if(Check::notInt($parent_game_system)){
+        echo "parent_game_system was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkSize($size){
+    //Not allowed to be null
+    if(Check::isNull($size)){
+        echo "size cannot be null!"; return false;
+    }
+
+    if(Check::notInt($size)){
+        echo "size was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkName($name){
+    if(Check::notString($name)){
+        echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

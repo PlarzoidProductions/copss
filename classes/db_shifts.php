@@ -2,7 +2,7 @@
 
 /**************************************************
 *
-*    Events Class
+*    Shifts Class
 *
 ***************************************************/
 
@@ -12,14 +12,16 @@
 *
 *	id - INT - PRIMARY KEY
 *	name - VARCHAR
+*	start - DATETIME
+*	stop - DATETIME
 *
 **************************************************/
 require_once("query.php");
 
-class Events {
+class Shifts {
 
 var $db=NULL;
-var $table="events";
+var $table="shifts";
 
 
 /***************************************************
@@ -39,21 +41,29 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name){
+public function create($name, $start, $stop){
 
 	//Validate the inputs
 	if(!$this->checkName($name)){return false;}
+	if(!$this->checkStart($start)){return false;}
+	if(!$this->checkStop($stop)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":name"=>$name
+		":name"=>$name,
+ 		":start"=>$start,
+ 		":stop"=>$stop
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				name
+				name,
+				start,
+				stop
 			) VALUES (
-				:name)";
+				:name,
+				:start,
+				:stop)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -64,10 +74,12 @@ public function create($name){
 Delete Function
 
 **************************************************/
-public function deleteEvents($id){
+public function deleteShifts($id){
 
 	//Validate the input
 	if(!$this->checkName($name)){return false;}
+	if(!$this->checkStart($start)){return false;}
+	if(!$this->checkStop($stop)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -83,7 +95,7 @@ public function deleteEvents($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateEventsById($id, $columns){
+private function updateShiftsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);
@@ -142,6 +154,24 @@ public function getByName($name){
 }
 
 
+public function getByStart($start){
+	
+    //Validate Inputs
+    if(!$this->checkStart($start)){return false;}
+
+    return $this->getByColumn("start", $start);
+}
+
+
+public function getByStop($stop){
+	
+    //Validate Inputs
+    if(!$this->checkStop($stop)){return false;}
+
+    return $this->getByColumn("stop", $stop);
+}
+
+
 /**************************************************
  
 Column Validation Function(s)
@@ -170,6 +200,36 @@ function checkName($name){
 
     if(Check::notString($name)){
         echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkStart($start){
+    //Not allowed to be null
+    if(Check::isNull($start)){
+        echo "start cannot be null!"; return false;
+    }
+
+    if(Check::isNull($start)){
+        echo "start was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkStop($stop){
+    //Not allowed to be null
+    if(Check::isNull($stop)){
+        echo "stop cannot be null!"; return false;
+    }
+
+    if(Check::isNull($stop)){
+        echo "stop was invalid!"; return false;
     }
 
     return true;

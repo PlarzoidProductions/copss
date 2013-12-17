@@ -2,7 +2,7 @@
 
 /**************************************************
 *
-*    Events Class
+*    Game_system_factions Class
 *
 ***************************************************/
 
@@ -11,15 +11,17 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
+*	parent_game_system - INT
 *	name - VARCHAR
+*	acronym - VARCHAR
 *
 **************************************************/
 require_once("query.php");
 
-class Events {
+class Game_system_factions {
 
 var $db=NULL;
-var $table="events";
+var $table="game_system_factions";
 
 
 /***************************************************
@@ -39,21 +41,29 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name){
+public function create($parent_game_system, $name, $acronym){
 
 	//Validate the inputs
+	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
 	if(!$this->checkName($name)){return false;}
+	if(!$this->checkAcronym($acronym)){return false;}
 
 	//Create the values Array
 	$values = array(
-		":name"=>$name
+		":parent_game_system"=>$parent_game_system,
+ 		":name"=>$name,
+ 		":acronym"=>$acronym
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				name
+				parent_game_system,
+				name,
+				acronym
 			) VALUES (
-				:name)";
+				:parent_game_system,
+				:name,
+				:acronym)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -64,10 +74,12 @@ public function create($name){
 Delete Function
 
 **************************************************/
-public function deleteEvents($id){
+public function deleteGame_system_factions($id){
 
 	//Validate the input
+	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
 	if(!$this->checkName($name)){return false;}
+	if(!$this->checkAcronym($acronym)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -83,7 +95,7 @@ public function deleteEvents($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateEventsById($id, $columns){
+private function updateGame_system_factionsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);
@@ -133,12 +145,30 @@ public function getById($id){
 }
 
 
+public function getByParentGameSystem($parent_game_system){
+	
+    //Validate Inputs
+    if(!$this->checkParentGameSystem($parent_game_system)){return false;}
+
+    return $this->getByColumn("parent_game_system", $parent_game_system);
+}
+
+
 public function getByName($name){
 	
     //Validate Inputs
     if(!$this->checkName($name)){return false;}
 
     return $this->getByColumn("name", $name);
+}
+
+
+public function getByAcronym($acronym){
+	
+    //Validate Inputs
+    if(!$this->checkAcronym($acronym)){return false;}
+
+    return $this->getByColumn("acronym", $acronym);
 }
 
 
@@ -162,6 +192,21 @@ function checkId($id){
 
 
 
+function checkParentGameSystem($parent_game_system){
+    //Not allowed to be null
+    if(Check::isNull($parent_game_system)){
+        echo "parent_game_system cannot be null!"; return false;
+    }
+
+    if(Check::notInt($parent_game_system)){
+        echo "parent_game_system was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
 function checkName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
@@ -170,6 +215,16 @@ function checkName($name){
 
     if(Check::notString($name)){
         echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkAcronym($acronym){
+    if(Check::notString($acronym)){
+        echo "acronym was invalid!"; return false;
     }
 
     return true;

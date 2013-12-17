@@ -12,8 +12,7 @@
 *
 *	id - INT - PRIMARY KEY
 *	time - TIMESTAMP
-*	game_system_id - INT
-*	game_size_id - INT
+*	game_system - INT
 *	scenario - TINYINT
 *
 **************************************************/
@@ -31,7 +30,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -42,32 +41,28 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createGames($time, $game_system_id, $game_size_id, $scenario){
+public function create($time, $game_system, $scenario){
 
 	//Validate the inputs
-	if(Check::isNull($time)){return false;}
-	if(Check::notInt($game_system_id)){return false;}
-	if(Check::notInt($game_size_id)){return false;}
-	if(Check::notBool($scenario)){return false;}
+	if(!$this->checkTime($time)){return false;}
+	if(!$this->checkGameSystem($game_system)){return false;}
+	if(!$this->checkScenario($scenario)){return false;}
 
 	//Create the values Array
 	$values = array(
 		":time"=>$time,
- 		":game_system_id"=>$game_system_id,
- 		":game_size_id"=>$game_size_id,
+ 		":game_system"=>$game_system,
  		":scenario"=>$scenario
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
 				time,
-				game_system_id,
-				game_size_id,
+				game_system,
 				scenario
 			) VALUES (
 				:time,
-				:game_system_id,
-				:game_size_id,
+				:game_system,
 				:scenario)";
 
 	return $this->db->insert($sql, $values);
@@ -82,8 +77,9 @@ Delete Function
 public function deleteGames($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkTime($time)){return false;}
+	if(!$this->checkGameSystem($game_system)){return false;}
+	if(!$this->checkScenario($scenario)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -111,7 +107,7 @@ private function updateGamesById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -126,7 +122,7 @@ private function updateGamesById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getGamesByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -140,49 +136,106 @@ private function getGamesByColumn($column, $value){
 }
 
 
-public function getGamesById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getGamesByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getGamesByTime($time){
+public function getByTime($time){
 	
     //Validate Inputs
-    if(Check::isNull($time)){return false;}
+    if(!$this->checkTime($time)){return false;}
 
-    return getGamesByColumn("time", $time.);
+    return $this->getByColumn("time", $time);
 }
 
 
-public function getGamesByGameSystemId($game_system_id){
+public function getByGameSystem($game_system){
 	
     //Validate Inputs
-    if(Check::notInt($game_system_id)){return false;}
+    if(!$this->checkGameSystem($game_system)){return false;}
 
-    return getGamesByColumn("game_system_id", $game_system_id.);
+    return $this->getByColumn("game_system", $game_system);
 }
 
 
-public function getGamesByGameSizeId($game_size_id){
+public function getByScenario($scenario){
 	
     //Validate Inputs
-    if(Check::notInt($game_size_id)){return false;}
+    if(!$this->checkScenario($scenario)){return false;}
 
-    return getGamesByColumn("game_size_id", $game_size_id.);
+    return $this->getByColumn("scenario", $scenario);
 }
 
 
-public function getGamesByScenario($scenario){
-	
-    //Validate Inputs
-    if(Check::notBool($scenario)){return false;}
+/**************************************************
+ 
+Column Validation Function(s)
 
-    return getGamesByColumn("scenario", $scenario.);
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
 }
+
+
+
+function checkTime($time){
+    //Not allowed to be null
+    if(Check::isNull($time)){
+        echo "time cannot be null!"; return false;
+    }
+
+    if(Check::isNull($time)){
+        echo "time was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkGameSystem($game_system){
+    //Not allowed to be null
+    if(Check::isNull($game_system)){
+        echo "game_system cannot be null!"; return false;
+    }
+
+    if(Check::notInt($game_system)){
+        echo "game_system was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkScenario($scenario){
+    //Not allowed to be null
+    if(Check::isNull($scenario)){
+        echo "scenario cannot be null!"; return false;
+    }
+
+    if(Check::notBool($scenario)){
+        echo "scenario was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

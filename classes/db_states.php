@@ -12,7 +12,7 @@
 *
 *	id - INT - PRIMARY KEY
 *	name - VARCHAR
-*	country_id - INT
+*	parent - INT
 *
 **************************************************/
 require_once("query.php");
@@ -29,7 +29,7 @@ Constructor & Destructor
 
 ***************************************************/
 public function __construct(){
-    $this->db = new Query();
+    $this->db = Query::getInstance();
 }
 
 public function __destruct(){}
@@ -40,25 +40,25 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function createStates($name, $country_id){
+public function create($name, $parent){
 
 	//Validate the inputs
-	if(Check::notString($name)){return false;}
-	if(Check::notInt($country_id)){return false;}
+	if(!$this->checkName($name)){return false;}
+	if(!$this->checkParent($parent)){return false;}
 
 	//Create the values Array
 	$values = array(
 		":name"=>$name,
- 		":country_id"=>$country_id
+ 		":parent"=>$parent
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
 				name,
-				country_id
+				parent
 			) VALUES (
 				:name,
-				:country_id)";
+				:parent)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -72,8 +72,8 @@ Delete Function
 public function deleteStates($id){
 
 	//Validate the input
-	if(Check::isInt($id)){return false;}
-
+	if(!$this->checkName($name)){return false;}
+	if(!$this->checkParent($parent)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -101,7 +101,7 @@ private function updateStatesById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns))){
+        if(strcmp($column, end($array_keys($columns)))){
             $sql.= ", ";
         }
     }
@@ -116,7 +116,7 @@ private function updateStatesById($id, $columns){
 Query By Column Function(s)
 
 **************************************************/
-private function getStatesByColumn($column, $value){
+private function getByColumn($column, $value){
 
     //inputs are pre-verified by the mapping functions below, so we can trust them
 
@@ -130,31 +130,82 @@ private function getStatesByColumn($column, $value){
 }
 
 
-public function getStatesById($id){
+public function getById($id){
 	
     //Validate Inputs
-    if(Check::notInt($id)){return false;}
+    if(!$this->checkId($id)){return false;}
 
-    return getStatesByColumn("id", $id.);
+    return $this->getByColumn("id", $id);
 }
 
 
-public function getStatesByName($name){
+public function getByName($name){
 	
     //Validate Inputs
-    if(Check::notString($name)){return false;}
+    if(!$this->checkName($name)){return false;}
 
-    return getStatesByColumn("name", $name.);
+    return $this->getByColumn("name", $name);
 }
 
 
-public function getStatesByCountryId($country_id){
+public function getByParent($parent){
 	
     //Validate Inputs
-    if(Check::notInt($country_id)){return false;}
+    if(!$this->checkParent($parent)){return false;}
 
-    return getStatesByColumn("country_id", $country_id.);
+    return $this->getByColumn("parent", $parent);
 }
+
+
+/**************************************************
+ 
+Column Validation Function(s)
+
+**************************************************/
+function checkId($id){
+    //Not allowed to be null
+    if(Check::isNull($id)){
+        echo "id cannot be null!"; return false;
+    }
+
+    if(Check::notInt($id)){
+        echo "id was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkName($name){
+    //Not allowed to be null
+    if(Check::isNull($name)){
+        echo "name cannot be null!"; return false;
+    }
+
+    if(Check::notString($name)){
+        echo "name was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
+
+function checkParent($parent){
+    //Not allowed to be null
+    if(Check::isNull($parent)){
+        echo "parent cannot be null!"; return false;
+    }
+
+    if(Check::notInt($parent)){
+        echo "parent was invalid!"; return false;
+    }
+
+    return true;
+}
+
+
 
 }//close class
 

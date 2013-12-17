@@ -1,5 +1,3 @@
-
-
 <?php
 
 require_once("session.php");
@@ -89,9 +87,35 @@ class Page {
 
     function startTemplate($meta=NULL) {
 
-        include("include/templates/default_header.html");
+        include("templates/default_header.html");
     }
 
+    function doTabs(){
+
+        $tabs = array(
+            "Home"=>"home",
+            "Register Player"=>"register_player",
+            "View Player Profile"=>"view_player",
+            "Report Game"=>"report_game",
+            "Edit a Game"=>"edit_game",
+            "Redeem Skulls"=>"redeem",
+            "Leaderboard"=>"leaderboard"
+            );
+
+        
+        if(Session::isAdmin()){
+            //TODO Add admin functions
+            $admin_tabs = array(
+                "Add User"=>"add_user",
+                "Configuration"=>"configuration"
+            );
+
+        }
+
+        $view = $_REQUEST[view];
+
+        include("templates/default_aside.html");
+    }
 
 
     function close($noheader=false) {
@@ -101,7 +125,7 @@ class Page {
     
     function displayFooter($noheader=false) {
 
-        include("include/templates/default_footer.html");
+        include("templates/default_footer.html");
 
     }
     
@@ -114,6 +138,10 @@ class Page {
 
     //HTML FORM Functions
     function register($varname, $type, $attributes=array()) {
+
+        //first, first, add the damn use_post
+        $attributes[use_post]=1;
+
         //first, check that $type and $attributes are set up correctly
         //optional attr args: check_func (can be "none")
         //              check_func_args (additional args passed to ceck_func)
@@ -133,6 +161,7 @@ class Page {
                 break;
             case "checkbox":
                 if(!Check::arrayKeysFormat(array("on_text", "off_text"), $attributes)) return false;
+                $attributes[value]=1;
                 break;
             case "checkbox_array";
             case "radio":    
@@ -531,9 +560,6 @@ class Page {
             $units = $attrs[units];
         }
         
-        //Add the label
-        $str.= '<div class="label"><label for="'.$v.'">'.$label.':</label></div>';
-
         //generate the input header
         $str.= '<input type="'.$type.'" name="'.$v.'" ';
        
@@ -542,9 +568,12 @@ class Page {
             switch($attr){
 
                 //Skip these
+                case "use_post":
                 case "default_val":
                 case "label":
                 case "units":
+                case "on_text":
+                case "off_text":
                 case "check_func":
                 case "check_func_args";
                 case "get_choices_array_func":
@@ -576,9 +605,9 @@ class Page {
     }
 
     function printComplexInput($name, $label, $input){
-        $str = "<div class=\"input\">";
-        $str.=     "<div class=\"input_label\"><label for=\"$v\">$label</label></div>";
-        $str.=     "<div class=\"input_form\">$input</div>";
+        $str = "<div class=\"input_container\">";
+        $str.=     "<div class=\"label\"><label for=\"$v\">$label:</label></div>";
+        $str.=     "<div class=\"input\">$input</div>";
         $str.= "</div>";
 
         echo $str;
@@ -597,7 +626,7 @@ class Page {
     }
 
     function printSimpleInput($input){
-        echo "<div class=\"input\"><div class=\"simple_input\">$input</div></div>";
+        echo "<div class=\"input_container\"><div class=\"simple\">$input</div></div>";
     }
 
     function printHidden($v, $attr, $disp_type = "form") {
@@ -648,8 +677,8 @@ class Page {
             //Toss in the choices
             foreach($choices as $c) {
 
-                $selected = ""
-                if($_REQUEST[$v] == $c[value])) $selected = " SELECTED";
+                $selected = "";
+                if($_REQUEST[$v] == $c[value]) $selected = " SELECTED";
             
                 $str.= "<option value=\"".$c[value]."\"$selected>".$c[text]."</option>";
             }

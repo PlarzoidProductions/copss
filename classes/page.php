@@ -93,7 +93,7 @@ class Page {
     function doTabs(){
 
         $tabs = array(
-            "Home"=>"home",
+//            "Home"=>"home",
             "Register Player"=>"register_player",
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
@@ -107,7 +107,10 @@ class Page {
             //TODO Add admin functions
             $admin_tabs = array(
                 "Add User"=>"add_user",
-                "Configuration"=>"configuration"
+                "Shift Management"=>"shifts",
+                "General Configuration"=>"general_config",
+                "Achievement Configuration"=>"achievement_config",
+                "Event Batch Processing"=>"batch_processing"
             );
 
         }

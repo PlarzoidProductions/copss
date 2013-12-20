@@ -24,7 +24,8 @@ if(empty($view)){
     $view = "register_player";
 }
 
-include ("acumen/$view.php");
-
+if((@include("acumen/$view.php")) == false){;
+    include ("acumen/404.php");
+}
 ?>
 

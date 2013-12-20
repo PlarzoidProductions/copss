@@ -1,0 +1,29 @@
+<section id="main_section">
+    <header>
+        <h1><? echo $title?></h1>
+    </header>
+    <section id="inputs_section">
+        <form method="<?=$form_method?>" action="<?=$form_action?>">
+        <? foreach($inputs as $i){?>
+            <? echo $page->displayVar($i)?>
+        <?}?>
+        </form>
+    </section>
+</section>
+<section id="only_section">
+    <header>
+        <hgroup>
+            <h2>Please Log In!</h2>
+        </hgroup>
+    </header>
+    <?if($login_error){?>
+        <h2 class="warning"><?=$login_error?></h2>
+    <?}?>
+    <section id="inputs_section">
+        <form action="<?=$form_action?>" method="<?=$form_method?>">
+            <? echo $page->displayVar("user_name")?>
+            <? echo $page->displayVar("password")?>
+            <? echo $page->displayVar("login_submit")?>
+        </form>
+    </section>
+</section>

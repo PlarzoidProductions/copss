@@ -14,11 +14,11 @@ class Query{
     Variables
 ***********************/
 
-var $mysql_user = "asterdial";
+var $mysql_user = "ironarena";
 var $mysql_host = "localhost";
-var $mysql_password = "d4t4b4s3";
+var $mysql_password = "iwantskullz";
 
-var $mysql_database = "asterdial";
+var $mysql_database = "iron_arena";
 
 var $connection = null; //database object holder
 

@@ -87,7 +87,7 @@ class Session {
 	
 	function authenticate($uname, $upass) {
                 $u = new Users();
-		$u = $u->getByUsername($uname);
+                $u = $u->getByUsername($uname);
 
                 //strip wrapper
                 if(is_array($u)) $u = $u[0];

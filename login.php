@@ -29,14 +29,13 @@ $form_method = "post";
 /* -- Process the inputs -- */
 //User clicked the Log In button..
 if($page->submitIsSet("login_submit")) {
-
+    
     //assume failure to login
     $success = 0;
 
     //get username / password from $_POST
     $username = $page->getVar("user_name");
     $password = $page->getVar("password");
-
 
     //attempte to authenticate
     $user = Session::authenticate($username, md5($password));
@@ -45,10 +44,10 @@ if($page->submitIsSet("login_submit")) {
     if($user){
 	$template="templates/welcome.html";
 	$success = 1; 	
+    } else {
+	//generate error string on failure to login
+        $login_error = "Invalid Username or Password.  Please try again!";
     }
-	
-    //generate error string on failure to login
-    if(!$success){$login_error = "Invalid Username or Password.  Please try again!";}
 }
 
 

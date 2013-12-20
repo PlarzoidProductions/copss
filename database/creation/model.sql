@@ -78,8 +78,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_sizes` (
   `size` INT NOT NULL ,
   `name` VARCHAR(255) NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_game_system_id` (`parent_game_system` ASC) ,
-  CONSTRAINT `fk_game_system_id`
+  INDEX `fk_size_parent_game_system_id` (`parent_game_system` ASC) ,
+  CONSTRAINT `fk_size_parent_game_system_id`
     FOREIGN KEY (`parent_game_system` )
     REFERENCES `iron_arena`.`game_systems` (`id` )
     ON DELETE NO ACTION
@@ -96,8 +96,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_system_factions` (
   `name` VARCHAR(255) NOT NULL ,
   `acronym` VARCHAR(45) NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_game_system_id` (`parent_game_system` ASC) ,
-  CONSTRAINT `fk_game_system_id`
+  INDEX `fk_faction_parent_game_system_id` (`parent_game_system` ASC) ,
+  CONSTRAINT `fk_faction_parent_game_system_id`
     FOREIGN KEY (`parent_game_system` )
     REFERENCES `iron_arena`.`game_systems` (`id` )
     ON DELETE NO ACTION
@@ -114,8 +114,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
   `game_system` INT UNSIGNED NOT NULL ,
   `scenario` TINYINT(1) NOT NULL DEFAULT false ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_game_system_id` (`game_system` ASC) ,
-  CONSTRAINT `fk_game_system_id`
+  INDEX `fk_parent_game_system_id` (`game_system` ASC) ,
+  CONSTRAINT `fk_parent_game_system_id`
     FOREIGN KEY (`game_system` )
     REFERENCES `iron_arena`.`game_systems` (`id` )
     ON DELETE NO ACTION
@@ -136,26 +136,26 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_players` (
   `fully_painted` TINYINT(1) NOT NULL DEFAULT false ,
   `winner` TINYINT(1) NOT NULL DEFAULT false ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_game_id` (`game_id` ASC) ,
-  INDEX `fk_player_id` (`player_id` ASC) ,
-  INDEX `fk_faction_id` (`faction_id` ASC) ,
-  INDEX `fk_game_size_id` (`game_size` ASC) ,
-  CONSTRAINT `fk_game_id`
+  INDEX `fk_game_players_game_id` (`game_id` ASC) ,
+  INDEX `fk_game_players_player_id` (`player_id` ASC) ,
+  INDEX `fk_game_players_faction_id` (`faction_id` ASC) ,
+  INDEX `fk_game_players_game_size_id` (`game_size` ASC) ,
+  CONSTRAINT `fk_game_players_game_id`
     FOREIGN KEY (`game_id` )
     REFERENCES `iron_arena`.`games` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_player_id`
+  CONSTRAINT `fk_game_players_player_id`
     FOREIGN KEY (`player_id` )
     REFERENCES `iron_arena`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_faction_id`
+  CONSTRAINT `fk_game_players_faction_id`
     FOREIGN KEY (`faction_id` )
     REFERENCES `iron_arena`.`game_system_factions` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_game_size_id`
+  CONSTRAINT `fk_game_players_game_size_id`
     FOREIGN KEY (`game_size` )
     REFERENCES `iron_arena`.`game_sizes` (`id` )
     ON DELETE NO ACTION
@@ -193,26 +193,26 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
   `fully_painted_battle` TINYINT(1) NULL DEFAULT NULL ,
   `event_id` INT UNSIGNED NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_game_system_id` (`game_system_id` ASC) ,
-  INDEX `fk_game_size_id` (`game_size_id` ASC) ,
-  INDEX `fk_faction_id` (`faction_id` ASC) ,
-  INDEX `fk_event_id` (`event_id` ASC) ,
-  CONSTRAINT `fk_game_system_id`
+  INDEX `fk_ach_game_system_id` (`game_system_id` ASC) ,
+  INDEX `fk_ach_game_size_id` (`game_size_id` ASC) ,
+  INDEX `fk_ach_faction_id` (`faction_id` ASC) ,
+  INDEX `fk_ach_event_id` (`event_id` ASC) ,
+  CONSTRAINT `fk_ach_game_system_id`
     FOREIGN KEY (`game_system_id` )
     REFERENCES `iron_arena`.`game_systems` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_game_size_id`
+  CONSTRAINT `fk_ach_game_size_id`
     FOREIGN KEY (`game_size_id` )
     REFERENCES `iron_arena`.`game_sizes` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_faction_id`
+  CONSTRAINT `fk_ach_faction_id`
     FOREIGN KEY (`faction_id` )
     REFERENCES `iron_arena`.`game_system_factions` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_event_id`
+  CONSTRAINT `fk_ach_event_id`
     FOREIGN KEY (`event_id` )
     REFERENCES `iron_arena`.`events` (`id` )
     ON DELETE NO ACTION
@@ -228,14 +228,14 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
   `player_id` INT UNSIGNED NOT NULL ,
   `achievement_id` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_player_id` (`player_id` ASC) ,
-  INDEX `fk_achievement_id` (`achievement_id` ASC) ,
-  CONSTRAINT `fk_player_id`
+  INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
+  INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
+  CONSTRAINT `fk_ach_earned_player_id`
     FOREIGN KEY (`player_id` )
     REFERENCES `iron_arena`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_achievement_id`
+  CONSTRAINT `fk_ach_earned_achievement_id`
     FOREIGN KEY (`achievement_id` )
     REFERENCES `iron_arena`.`achievements` (`id` )
     ON DELETE NO ACTION
@@ -252,14 +252,14 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`meta_achievement_criteria` (
   `child_achievement` INT UNSIGNED NOT NULL ,
   `count` INT UNSIGNED NOT NULL DEFAULT 1 ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_parent_id` (`parent_achievement` ASC) ,
-  INDEX `fk_child_id` (`child_achievement` ASC) ,
-  CONSTRAINT `fk_parent_id`
+  INDEX `fk_parent_ach_id` (`parent_achievement` ASC) ,
+  INDEX `fk_child_ach_id` (`child_achievement` ASC) ,
+  CONSTRAINT `fk_parent_ach_id`
     FOREIGN KEY (`parent_achievement` )
     REFERENCES `iron_arena`.`achievements` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_child_id`
+  CONSTRAINT `fk_child_ach_id`
     FOREIGN KEY (`child_achievement` )
     REFERENCES `iron_arena`.`achievements` (`id` )
     ON DELETE NO ACTION

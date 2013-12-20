@@ -107,6 +107,20 @@ private function updateEventsById($id, $columns){
 
 /**************************************************
 
+Query Everything
+
+**************************************************/
+public function getAll(){
+
+    //Generate the query
+    $sql = "SELECT * FROM $this->table";
+
+    return $this->db->query($sql, array());
+}
+
+
+/**************************************************
+
 Query By Column Function(s)
 
 **************************************************/

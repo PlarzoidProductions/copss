@@ -431,7 +431,31 @@ $masterUpdateFn.="\n\n";
  
 echo "Writing master update function...\n";
 fputs($class_fptr, $masterUpdateFn);
-                                                    
+
+/**************************
+* Individual 'getBy' functions
+**************************/
+$allHeader = '
+/**************************************************
+
+Query Everything
+
+**************************************************/
+';
+fputs($class_fptr, $allHeader);
+
+$allFn='public function getAll(){
+
+    //Generate the query
+    $sql = "SELECT * FROM $this->table";
+
+    return $this->db->query($sql, array());
+}
+
+';
+fputs($class_fptr, $allFn);
+
+
 /**************************
 * Individual 'getBy' functions
 **************************/

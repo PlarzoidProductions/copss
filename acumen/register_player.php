@@ -15,14 +15,18 @@
     $page->register("last_name", "textbox", array("required"=>true));
     $page->register("e_mail", "email", array("label"=>"eMail"));
 
-    $page->register("country", "select", array("get_choices_array_func"=>"getCountries"));
-    $page->register("state", "select", array("get_choices_array_func"=>"getStatesByCountryId",
-                                            "get_choices_array_func_args"=>$page->getVar("country")));
+    $page->register("country", "select", array("get_choices_array_func"=>"getCountries", "reloading"=>1));
+
+    $country_id=$page->getVar("country");
+    if(empty($country_id)) $country_id=1;
+    $page->register("state", "select", array("get_choices_array_func"=>"getStates",
+                                            "get_choices_array_func_args"=>array($country_id)));
 
     $page->register("vip", "checkbox", array("on_text"=>"VIP", "off_text"=>""));
 
     $page->register("register", "submit", array("value"=>"Register!"));
 
+    $page->getChoices();
 
     /***************************************
 
@@ -61,7 +65,7 @@
 
     $form_method="post";
     $form_action=$_SERVER[PHP_SELF]."?view=$view";
-
+    
     //display it
     $page->startTemplate();
     $page->doTabs();

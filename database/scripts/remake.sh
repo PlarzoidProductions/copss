@@ -1,5 +1,6 @@
 #!/bin/bash
-./create_classes.php ../creation/create_model.sql ../../classes/
+rm ../../classes/db_*
+./create_classes.php ../creation/model.sql ../../classes/
 
 echo ""
 echo "Populating Database with default values..."

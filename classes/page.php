@@ -496,7 +496,7 @@ class Page {
     function getChoices() {
         foreach ($this->vars as $v=>$attr) {
             if($attr["type"]=="select" || $attr["type"]=="checkbox_array" || $attr["type"]=="radio"){
-                 
+
                 if(strlen($attr["choices_array_var"]) > 0){
                     $cname = $attr["choices_array_var"];
                 } else {

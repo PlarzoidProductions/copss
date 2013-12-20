@@ -44,9 +44,9 @@ Create Function
 public function create($time, $game_system, $scenario){
 
 	//Validate the inputs
-	if(!$this->checkTime($time)){return false;}
-	if(!$this->checkGameSystem($game_system)){return false;}
-	if(!$this->checkScenario($scenario)){return false;}
+	$time = $this->filterTime($time); if($time === false){return false;}
+	$game_system = $this->filterGameSystem($game_system); if($game_system === false){return false;}
+	$scenario = $this->filterScenario($scenario); if($scenario === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,10 +76,6 @@ Delete Function
 **************************************************/
 public function deleteGames($id){
 
-	//Validate the input
-	if(!$this->checkTime($time)){return false;}
-	if(!$this->checkGameSystem($game_system)){return false;}
-	if(!$this->checkScenario($scenario)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -153,7 +149,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -162,7 +158,7 @@ public function getById($id){
 public function getByTime($time){
 	
     //Validate Inputs
-    if(!$this->checkTime($time)){return false;}
+    $time = $this->filterTime($time); if($time === false){return false;}
 
     return $this->getByColumn("time", $time);
 }
@@ -171,7 +167,7 @@ public function getByTime($time){
 public function getByGameSystem($game_system){
 	
     //Validate Inputs
-    if(!$this->checkGameSystem($game_system)){return false;}
+    $game_system = $this->filterGameSystem($game_system); if($game_system === false){return false;}
 
     return $this->getByColumn("game_system", $game_system);
 }
@@ -180,7 +176,7 @@ public function getByGameSystem($game_system){
 public function getByScenario($scenario){
 	
     //Validate Inputs
-    if(!$this->checkScenario($scenario)){return false;}
+    $scenario = $this->filterScenario($scenario); if($scenario === false){return false;}
 
     return $this->getByColumn("scenario", $scenario);
 }
@@ -191,7 +187,7 @@ public function getByScenario($scenario){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -201,12 +197,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkTime($time){
+function filterTime($time){
     //Not allowed to be null
     if(Check::isNull($time)){
         echo "time cannot be null!"; return false;
@@ -216,12 +212,12 @@ function checkTime($time){
         echo "time was invalid!"; return false;
     }
 
-    return true;
+    return $time;
 }
 
 
 
-function checkGameSystem($game_system){
+function filterGameSystem($game_system){
     //Not allowed to be null
     if(Check::isNull($game_system)){
         echo "game_system cannot be null!"; return false;
@@ -231,12 +227,12 @@ function checkGameSystem($game_system){
         echo "game_system was invalid!"; return false;
     }
 
-    return true;
+    return $game_system;
 }
 
 
 
-function checkScenario($scenario){
+function filterScenario($scenario){
     //Not allowed to be null
     if(Check::isNull($scenario)){
         echo "scenario cannot be null!"; return false;
@@ -246,7 +242,7 @@ function checkScenario($scenario){
         echo "scenario was invalid!"; return false;
     }
 
-    return true;
+    return $scenario;
 }
 
 

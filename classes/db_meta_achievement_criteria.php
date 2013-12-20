@@ -44,9 +44,9 @@ Create Function
 public function create($parent_achievement, $child_achievement, $count){
 
 	//Validate the inputs
-	if(!$this->checkParentAchievement($parent_achievement)){return false;}
-	if(!$this->checkChildAchievement($child_achievement)){return false;}
-	if(!$this->checkCount($count)){return false;}
+	$parent_achievement = $this->filterParentAchievement($parent_achievement); if($parent_achievement === false){return false;}
+	$child_achievement = $this->filterChildAchievement($child_achievement); if($child_achievement === false){return false;}
+	$count = $this->filterCount($count); if($count === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,10 +76,6 @@ Delete Function
 **************************************************/
 public function deleteMeta_achievement_criteria($id){
 
-	//Validate the input
-	if(!$this->checkParentAchievement($parent_achievement)){return false;}
-	if(!$this->checkChildAchievement($child_achievement)){return false;}
-	if(!$this->checkCount($count)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -153,7 +149,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -162,7 +158,7 @@ public function getById($id){
 public function getByParentAchievement($parent_achievement){
 	
     //Validate Inputs
-    if(!$this->checkParentAchievement($parent_achievement)){return false;}
+    $parent_achievement = $this->filterParentAchievement($parent_achievement); if($parent_achievement === false){return false;}
 
     return $this->getByColumn("parent_achievement", $parent_achievement);
 }
@@ -171,7 +167,7 @@ public function getByParentAchievement($parent_achievement){
 public function getByChildAchievement($child_achievement){
 	
     //Validate Inputs
-    if(!$this->checkChildAchievement($child_achievement)){return false;}
+    $child_achievement = $this->filterChildAchievement($child_achievement); if($child_achievement === false){return false;}
 
     return $this->getByColumn("child_achievement", $child_achievement);
 }
@@ -180,7 +176,7 @@ public function getByChildAchievement($child_achievement){
 public function getByCount($count){
 	
     //Validate Inputs
-    if(!$this->checkCount($count)){return false;}
+    $count = $this->filterCount($count); if($count === false){return false;}
 
     return $this->getByColumn("count", $count);
 }
@@ -191,7 +187,7 @@ public function getByCount($count){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -201,12 +197,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkParentAchievement($parent_achievement){
+function filterParentAchievement($parent_achievement){
     //Not allowed to be null
     if(Check::isNull($parent_achievement)){
         echo "parent_achievement cannot be null!"; return false;
@@ -216,12 +212,12 @@ function checkParentAchievement($parent_achievement){
         echo "parent_achievement was invalid!"; return false;
     }
 
-    return true;
+    return $parent_achievement;
 }
 
 
 
-function checkChildAchievement($child_achievement){
+function filterChildAchievement($child_achievement){
     //Not allowed to be null
     if(Check::isNull($child_achievement)){
         echo "child_achievement cannot be null!"; return false;
@@ -231,12 +227,12 @@ function checkChildAchievement($child_achievement){
         echo "child_achievement was invalid!"; return false;
     }
 
-    return true;
+    return $child_achievement;
 }
 
 
 
-function checkCount($count){
+function filterCount($count){
     //Not allowed to be null
     if(Check::isNull($count)){
         echo "count cannot be null!"; return false;
@@ -246,7 +242,7 @@ function checkCount($count){
         echo "count was invalid!"; return false;
     }
 
-    return true;
+    return $count;
 }
 
 

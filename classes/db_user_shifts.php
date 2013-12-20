@@ -45,10 +45,10 @@ Create Function
 public function create($user_id, $shift_id, $checked_in, $completed){
 
 	//Validate the inputs
-	if(!$this->checkUserId($user_id)){return false;}
-	if(!$this->checkShiftId($shift_id)){return false;}
-	if(!$this->checkCheckedIn($checked_in)){return false;}
-	if(!$this->checkCompleted($completed)){return false;}
+	$user_id = $this->filterUserId($user_id); if($user_id === false){return false;}
+	$shift_id = $this->filterShiftId($shift_id); if($shift_id === false){return false;}
+	$checked_in = $this->filterCheckedIn($checked_in); if($checked_in === false){return false;}
+	$completed = $this->filterCompleted($completed); if($completed === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -81,11 +81,6 @@ Delete Function
 **************************************************/
 public function deleteUser_shifts($id){
 
-	//Validate the input
-	if(!$this->checkUserId($user_id)){return false;}
-	if(!$this->checkShiftId($shift_id)){return false;}
-	if(!$this->checkCheckedIn($checked_in)){return false;}
-	if(!$this->checkCompleted($completed)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -159,7 +154,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -168,7 +163,7 @@ public function getById($id){
 public function getByUserId($user_id){
 	
     //Validate Inputs
-    if(!$this->checkUserId($user_id)){return false;}
+    $user_id = $this->filterUserId($user_id); if($user_id === false){return false;}
 
     return $this->getByColumn("user_id", $user_id);
 }
@@ -177,7 +172,7 @@ public function getByUserId($user_id){
 public function getByShiftId($shift_id){
 	
     //Validate Inputs
-    if(!$this->checkShiftId($shift_id)){return false;}
+    $shift_id = $this->filterShiftId($shift_id); if($shift_id === false){return false;}
 
     return $this->getByColumn("shift_id", $shift_id);
 }
@@ -186,7 +181,7 @@ public function getByShiftId($shift_id){
 public function getByCheckedIn($checked_in){
 	
     //Validate Inputs
-    if(!$this->checkCheckedIn($checked_in)){return false;}
+    $checked_in = $this->filterCheckedIn($checked_in); if($checked_in === false){return false;}
 
     return $this->getByColumn("checked_in", $checked_in);
 }
@@ -195,7 +190,7 @@ public function getByCheckedIn($checked_in){
 public function getByCompleted($completed){
 	
     //Validate Inputs
-    if(!$this->checkCompleted($completed)){return false;}
+    $completed = $this->filterCompleted($completed); if($completed === false){return false;}
 
     return $this->getByColumn("completed", $completed);
 }
@@ -206,7 +201,7 @@ public function getByCompleted($completed){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -216,12 +211,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkUserId($user_id){
+function filterUserId($user_id){
     //Not allowed to be null
     if(Check::isNull($user_id)){
         echo "user_id cannot be null!"; return false;
@@ -231,12 +226,12 @@ function checkUserId($user_id){
         echo "user_id was invalid!"; return false;
     }
 
-    return true;
+    return $user_id;
 }
 
 
 
-function checkShiftId($shift_id){
+function filterShiftId($shift_id){
     //Not allowed to be null
     if(Check::isNull($shift_id)){
         echo "shift_id cannot be null!"; return false;
@@ -246,12 +241,12 @@ function checkShiftId($shift_id){
         echo "shift_id was invalid!"; return false;
     }
 
-    return true;
+    return $shift_id;
 }
 
 
 
-function checkCheckedIn($checked_in){
+function filterCheckedIn($checked_in){
     //Not allowed to be null
     if(Check::isNull($checked_in)){
         echo "checked_in cannot be null!"; return false;
@@ -261,12 +256,12 @@ function checkCheckedIn($checked_in){
         echo "checked_in was invalid!"; return false;
     }
 
-    return true;
+    return $checked_in;
 }
 
 
 
-function checkCompleted($completed){
+function filterCompleted($completed){
     //Not allowed to be null
     if(Check::isNull($completed)){
         echo "completed cannot be null!"; return false;
@@ -276,7 +271,7 @@ function checkCompleted($completed){
         echo "completed was invalid!"; return false;
     }
 
-    return true;
+    return $completed;
 }
 
 

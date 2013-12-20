@@ -200,23 +200,20 @@ class Page {
                 break;
         }
         
-        //set default value if one wasn't chosen already
-        if($attributes[default_val]===NULL){$attributes[default_val]="";}
-        
-        //if we're using post, pull variable from post array
-        if(array_key_exists("use_post", $attributes) && $attributes[use_post]) {
-                    //use if getting array from html
-            $_REQUEST[$varname] = $_POST[$varname];
+        //set default value to the returned value if one wasn't specified manually
+        if($attributes[default_val]===NULL){
+            if(array_key_exists("use_post", $attributes) && $attributes[use_post]){
+                $attributes[default_val] = $_REQUEST[$varname] = $_POST[$varname];
+            } else {
+                $attributes[default_val] = $_POST[$varname] = $_REQUEST[$varname];
+            }
         }
-
-        //if variable wasn't returned, at all, set to default
-        if(empty($_REQUEST[$varname]) && !is_numeric($_REQUEST[$varname])){
-            $_REQUEST[$varname] = $_POST[$varname] = $attributes[default_val];
-        }
+            
 
         if($type == "select" || $type == "radio") { //check_func is always validSelect
             $attributes[check_func] = "validSelect";
-            $attributes[check_func_args] = array($attributes[get_choices_array_func], $attributes[get_choices_array_func_args]);
+            $attributes[check_func_args] = array($attributes[get_choices_array_func], 
+                                                 $attributes[get_choices_array_func_args]);
         }
         
         //$attributes[type] = $type;
@@ -572,7 +569,6 @@ class Page {
 
                 //Skip these
                 case "use_post":
-                case "default_val":
                 case "label":
                 case "units":
                 case "on_text":
@@ -593,6 +589,16 @@ class Page {
                     $str.= "$attr ";
                     break;
 
+                case "default_val":
+                    if($attr[default_val]){
+                        if(!strcmp($type, "checkbox")){
+                            $str.= "CHECKED ";
+                        } else {
+                            $str.= "value=\"$value\" ";
+                        }
+                    }
+                    break;
+                
                 //Everything else
                 default:
                     $str.= "$attr=\"$value\" ";

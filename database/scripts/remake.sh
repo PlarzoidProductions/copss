@@ -1,7 +1,10 @@
 #!/bin/bash
+echo "Building new PHP Class Files from model..."
 rm ../../classes/db_*
-./create_classes.php ../creation/model.sql ../../classes/
-
+./create_classes.php ../creation/model.sql ../../classes/ >> /dev/null
+echo "Done!"
 echo ""
-echo "Populating Database with default values..."
-mysql -u root -p < populate.sql
+echo "Ready to build the database"
+mysql -u root -p < build.sql
+
+echo "Done!"

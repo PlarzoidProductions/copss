@@ -4,23 +4,23 @@ include_once('db_users.php');
 
 class Session {
 
-	function init () {
+	public static function init () {
 		session_start();
 	}
 
-	function userid() {
+	public static function userid() {
 		return $_SESSION[userid];
 	}
 
-	function isLoggedIn() {
+	public static function isLoggedIn() {
 		return $_SESSION[is_logged_in];
 	}
 
-	function isNotLoggedIn() {
+	public static function isNotLoggedIn() {
 		return !$_SESSION[is_logged_in];
 	}
 
-	function isAdmin() {
+	public static function isAdmin() {
             if(isset($_SESSION[is_admin])) return $_SESSION[is_admin];
 
 	    if(Session::isLoggedIn()){
@@ -36,11 +36,11 @@ class Session {
 	    return false;
 	}
 
-	function isNotAdmin() {
+	public static function isNotAdmin() {
 		return !Session::isAdmin();
 	}
 
-        function getUsername() {
+        public static function getUsername() {
                 if(Session::isLoggedIn()){
                         $u = new Users();
                         $u = $u->getById($_SESSION[userid]);
@@ -56,14 +56,14 @@ class Session {
 		}
         }	
 
-	function getUserID() {
+	public static function getUserID() {
 		if(Session::isLoggedIn()){
 			return $_SESSION[userid];
 		}
 		return false;
 	}
 
-	function isAuthorized($level) {
+	public static function isAuthorized($level) {
 		//Firstly, everyone is authorized to see public pages
                 if(!strcmp($level, "PUBLIC")){return true;}//remember, strcmp returns 0 on match :p
 
@@ -85,7 +85,7 @@ class Session {
 		return false;
 	}
 	
-	function authenticate($uname, $upass) {
+	public static function authenticate($uname, $upass) {
                 $u = new Users();
                 $u = $u->getByUsername($uname);
 
@@ -101,13 +101,13 @@ class Session {
 		return false;
 	}
 
-	function login($u) {
+	public static function login($u) {
 		$_SESSION[userid] = $u[id];
 		$_SESSION[is_logged_in] = true;
 		$_SESSION[is_admin] = $u[admin];
 	}
 
-	function logout() {
+	public static function logout() {
 		unset($_SESSION[userid]);
 		unset($_SESSION[is_logged_in]);
 		unset($_SESSION[is_admin]);

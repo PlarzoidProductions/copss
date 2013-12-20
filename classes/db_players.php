@@ -16,6 +16,7 @@
 *	email - VARCHAR
 *	country - INT
 *	state - INT
+*	vip - TINYINT
 *	creation_date - DATETIME
 *
 **************************************************/
@@ -44,15 +45,15 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($first_name, $last_name, $email, $country, $state, $creation_date){
+public function create($first_name, $last_name, $email, $country, $state, $vip, $creation_date){
 
 	//Validate the inputs
-	if(!$this->checkFirstName($first_name)){return false;}
-	if(!$this->checkLastName($last_name)){return false;}
-	if(!$this->checkEmail($email)){return false;}
-	if(!$this->checkCountry($country)){return false;}
-	if(!$this->checkState($state)){return false;}
-	if(!$this->checkCreationDate($creation_date)){return false;}
+	$first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
+	$last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
+	$email = $this->filterEmail($email); if($email === false){return false;}
+	$country = $this->filterCountry($country); if($country === false){return false;}
+	$state = $this->filterState($state); if($state === false){return false;}
+	$vip = $this->filterVip($vip); if($vip === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -61,7 +62,7 @@ public function create($first_name, $last_name, $email, $country, $state, $creat
  		":email"=>$email,
  		":country"=>$country,
  		":state"=>$state,
- 		":creation_date"=>$creation_date
+ 		":vip"=>$vip
 	);
 
 	//Build the query
@@ -71,6 +72,7 @@ public function create($first_name, $last_name, $email, $country, $state, $creat
 				email,
 				country,
 				state,
+				vip,
 				creation_date
 			) VALUES (
 				:first_name,
@@ -78,7 +80,8 @@ public function create($first_name, $last_name, $email, $country, $state, $creat
 				:email,
 				:country,
 				:state,
-				:creation_date)";
+				:vip,
+				NOW())";
 
 	return $this->db->insert($sql, $values);
 }
@@ -91,13 +94,6 @@ Delete Function
 **************************************************/
 public function deletePlayers($id){
 
-	//Validate the input
-	if(!$this->checkFirstName($first_name)){return false;}
-	if(!$this->checkLastName($last_name)){return false;}
-	if(!$this->checkEmail($email)){return false;}
-	if(!$this->checkCountry($country)){return false;}
-	if(!$this->checkState($state)){return false;}
-	if(!$this->checkCreationDate($creation_date)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -171,7 +167,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -180,7 +176,7 @@ public function getById($id){
 public function getByFirstName($first_name){
 	
     //Validate Inputs
-    if(!$this->checkFirstName($first_name)){return false;}
+    $first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
 
     return $this->getByColumn("first_name", $first_name);
 }
@@ -189,7 +185,7 @@ public function getByFirstName($first_name){
 public function getByLastName($last_name){
 	
     //Validate Inputs
-    if(!$this->checkLastName($last_name)){return false;}
+    $last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
 
     return $this->getByColumn("last_name", $last_name);
 }
@@ -198,7 +194,7 @@ public function getByLastName($last_name){
 public function getByEmail($email){
 	
     //Validate Inputs
-    if(!$this->checkEmail($email)){return false;}
+    $email = $this->filterEmail($email); if($email === false){return false;}
 
     return $this->getByColumn("email", $email);
 }
@@ -207,7 +203,7 @@ public function getByEmail($email){
 public function getByCountry($country){
 	
     //Validate Inputs
-    if(!$this->checkCountry($country)){return false;}
+    $country = $this->filterCountry($country); if($country === false){return false;}
 
     return $this->getByColumn("country", $country);
 }
@@ -216,16 +212,25 @@ public function getByCountry($country){
 public function getByState($state){
 	
     //Validate Inputs
-    if(!$this->checkState($state)){return false;}
+    $state = $this->filterState($state); if($state === false){return false;}
 
     return $this->getByColumn("state", $state);
+}
+
+
+public function getByVip($vip){
+	
+    //Validate Inputs
+    $vip = $this->filterVip($vip); if($vip === false){return false;}
+
+    return $this->getByColumn("vip", $vip);
 }
 
 
 public function getByCreationDate($creation_date){
 	
     //Validate Inputs
-    if(!$this->checkCreationDate($creation_date)){return false;}
+    $creation_date = $this->filterCreationDate($creation_date); if($creation_date === false){return false;}
 
     return $this->getByColumn("creation_date", $creation_date);
 }
@@ -236,7 +241,7 @@ public function getByCreationDate($creation_date){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -246,12 +251,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkFirstName($first_name){
+function filterFirstName($first_name){
     //Not allowed to be null
     if(Check::isNull($first_name)){
         echo "first_name cannot be null!"; return false;
@@ -261,12 +266,12 @@ function checkFirstName($first_name){
         echo "first_name was invalid!"; return false;
     }
 
-    return true;
+    return $first_name;
 }
 
 
 
-function checkLastName($last_name){
+function filterLastName($last_name){
     //Not allowed to be null
     if(Check::isNull($last_name)){
         echo "last_name cannot be null!"; return false;
@@ -276,22 +281,25 @@ function checkLastName($last_name){
         echo "last_name was invalid!"; return false;
     }
 
-    return true;
+    return $last_name;
 }
 
 
 
-function checkEmail($email){
+function filterEmail($email){
+    //Allowed to be null, catch that first
+    if(Check::isNull($email)){ return null; }
+
     if(Check::notString($email)){
         echo "email was invalid!"; return false;
     }
 
-    return true;
+    return $email;
 }
 
 
 
-function checkCountry($country){
+function filterCountry($country){
     //Not allowed to be null
     if(Check::isNull($country)){
         echo "country cannot be null!"; return false;
@@ -301,22 +309,40 @@ function checkCountry($country){
         echo "country was invalid!"; return false;
     }
 
-    return true;
+    return $country;
 }
 
 
 
-function checkState($state){
+function filterState($state){
+    //Allowed to be null, catch that first
+    if(Check::isNull($state)){ return null; }
+
     if(Check::notInt($state)){
         echo "state was invalid!"; return false;
     }
 
-    return true;
+    return $state;
 }
 
 
 
-function checkCreationDate($creation_date){
+function filterVip($vip){
+    //Not allowed to be null
+    if(Check::isNull($vip)){
+        echo "vip cannot be null!"; return false;
+    }
+
+    if(Check::notBool($vip)){
+        echo "vip was invalid!"; return false;
+    }
+
+    return $vip;
+}
+
+
+
+function filterCreationDate($creation_date){
     //Not allowed to be null
     if(Check::isNull($creation_date)){
         echo "creation_date cannot be null!"; return false;
@@ -326,7 +352,7 @@ function checkCreationDate($creation_date){
         echo "creation_date was invalid!"; return false;
     }
 
-    return true;
+    return $creation_date;
 }
 
 

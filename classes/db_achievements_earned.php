@@ -43,8 +43,8 @@ Create Function
 public function create($player_id, $achievement_id){
 
 	//Validate the inputs
-	if(!$this->checkPlayerId($player_id)){return false;}
-	if(!$this->checkAchievementId($achievement_id)){return false;}
+	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
+	$achievement_id = $this->filterAchievementId($achievement_id); if($achievement_id === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -71,9 +71,6 @@ Delete Function
 **************************************************/
 public function deleteAchievements_earned($id){
 
-	//Validate the input
-	if(!$this->checkPlayerId($player_id)){return false;}
-	if(!$this->checkAchievementId($achievement_id)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -147,7 +144,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -156,7 +153,7 @@ public function getById($id){
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
-    if(!$this->checkPlayerId($player_id)){return false;}
+    $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
     return $this->getByColumn("player_id", $player_id);
 }
@@ -165,7 +162,7 @@ public function getByPlayerId($player_id){
 public function getByAchievementId($achievement_id){
 	
     //Validate Inputs
-    if(!$this->checkAchievementId($achievement_id)){return false;}
+    $achievement_id = $this->filterAchievementId($achievement_id); if($achievement_id === false){return false;}
 
     return $this->getByColumn("achievement_id", $achievement_id);
 }
@@ -176,7 +173,7 @@ public function getByAchievementId($achievement_id){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -186,12 +183,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkPlayerId($player_id){
+function filterPlayerId($player_id){
     //Not allowed to be null
     if(Check::isNull($player_id)){
         echo "player_id cannot be null!"; return false;
@@ -201,12 +198,12 @@ function checkPlayerId($player_id){
         echo "player_id was invalid!"; return false;
     }
 
-    return true;
+    return $player_id;
 }
 
 
 
-function checkAchievementId($achievement_id){
+function filterAchievementId($achievement_id){
     //Not allowed to be null
     if(Check::isNull($achievement_id)){
         echo "achievement_id cannot be null!"; return false;
@@ -216,7 +213,7 @@ function checkAchievementId($achievement_id){
         echo "achievement_id was invalid!"; return false;
     }
 
-    return true;
+    return $achievement_id;
 }
 
 

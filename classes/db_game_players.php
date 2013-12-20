@@ -48,13 +48,13 @@ Create Function
 public function create($game_id, $player_id, $faction_id, $game_size, $theme_force, $fully_painted, $winner){
 
 	//Validate the inputs
-	if(!$this->checkGameId($game_id)){return false;}
-	if(!$this->checkPlayerId($player_id)){return false;}
-	if(!$this->checkFactionId($faction_id)){return false;}
-	if(!$this->checkGameSize($game_size)){return false;}
-	if(!$this->checkThemeForce($theme_force)){return false;}
-	if(!$this->checkFullyPainted($fully_painted)){return false;}
-	if(!$this->checkWinner($winner)){return false;}
+	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
+	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
+	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
+	$game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
+	$theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
+	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
+	$winner = $this->filterWinner($winner); if($winner === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -96,14 +96,6 @@ Delete Function
 **************************************************/
 public function deleteGame_players($id){
 
-	//Validate the input
-	if(!$this->checkGameId($game_id)){return false;}
-	if(!$this->checkPlayerId($player_id)){return false;}
-	if(!$this->checkFactionId($faction_id)){return false;}
-	if(!$this->checkGameSize($game_size)){return false;}
-	if(!$this->checkThemeForce($theme_force)){return false;}
-	if(!$this->checkFullyPainted($fully_painted)){return false;}
-	if(!$this->checkWinner($winner)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -177,7 +169,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -186,7 +178,7 @@ public function getById($id){
 public function getByGameId($game_id){
 	
     //Validate Inputs
-    if(!$this->checkGameId($game_id)){return false;}
+    $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
     return $this->getByColumn("game_id", $game_id);
 }
@@ -195,7 +187,7 @@ public function getByGameId($game_id){
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
-    if(!$this->checkPlayerId($player_id)){return false;}
+    $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
     return $this->getByColumn("player_id", $player_id);
 }
@@ -204,7 +196,7 @@ public function getByPlayerId($player_id){
 public function getByFactionId($faction_id){
 	
     //Validate Inputs
-    if(!$this->checkFactionId($faction_id)){return false;}
+    $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
     return $this->getByColumn("faction_id", $faction_id);
 }
@@ -213,7 +205,7 @@ public function getByFactionId($faction_id){
 public function getByGameSize($game_size){
 	
     //Validate Inputs
-    if(!$this->checkGameSize($game_size)){return false;}
+    $game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
 
     return $this->getByColumn("game_size", $game_size);
 }
@@ -222,7 +214,7 @@ public function getByGameSize($game_size){
 public function getByThemeForce($theme_force){
 	
     //Validate Inputs
-    if(!$this->checkThemeForce($theme_force)){return false;}
+    $theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
 
     return $this->getByColumn("theme_force", $theme_force);
 }
@@ -231,7 +223,7 @@ public function getByThemeForce($theme_force){
 public function getByFullyPainted($fully_painted){
 	
     //Validate Inputs
-    if(!$this->checkFullyPainted($fully_painted)){return false;}
+    $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
     return $this->getByColumn("fully_painted", $fully_painted);
 }
@@ -240,7 +232,7 @@ public function getByFullyPainted($fully_painted){
 public function getByWinner($winner){
 	
     //Validate Inputs
-    if(!$this->checkWinner($winner)){return false;}
+    $winner = $this->filterWinner($winner); if($winner === false){return false;}
 
     return $this->getByColumn("winner", $winner);
 }
@@ -251,7 +243,7 @@ public function getByWinner($winner){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -261,12 +253,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkGameId($game_id){
+function filterGameId($game_id){
     //Not allowed to be null
     if(Check::isNull($game_id)){
         echo "game_id cannot be null!"; return false;
@@ -276,12 +268,12 @@ function checkGameId($game_id){
         echo "game_id was invalid!"; return false;
     }
 
-    return true;
+    return $game_id;
 }
 
 
 
-function checkPlayerId($player_id){
+function filterPlayerId($player_id){
     //Not allowed to be null
     if(Check::isNull($player_id)){
         echo "player_id cannot be null!"; return false;
@@ -291,32 +283,38 @@ function checkPlayerId($player_id){
         echo "player_id was invalid!"; return false;
     }
 
-    return true;
+    return $player_id;
 }
 
 
 
-function checkFactionId($faction_id){
+function filterFactionId($faction_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($faction_id)){ return null; }
+
     if(Check::notInt($faction_id)){
         echo "faction_id was invalid!"; return false;
     }
 
-    return true;
+    return $faction_id;
 }
 
 
 
-function checkGameSize($game_size){
+function filterGameSize($game_size){
+    //Allowed to be null, catch that first
+    if(Check::isNull($game_size)){ return null; }
+
     if(Check::notInt($game_size)){
         echo "game_size was invalid!"; return false;
     }
 
-    return true;
+    return $game_size;
 }
 
 
 
-function checkThemeForce($theme_force){
+function filterThemeForce($theme_force){
     //Not allowed to be null
     if(Check::isNull($theme_force)){
         echo "theme_force cannot be null!"; return false;
@@ -326,12 +324,12 @@ function checkThemeForce($theme_force){
         echo "theme_force was invalid!"; return false;
     }
 
-    return true;
+    return $theme_force;
 }
 
 
 
-function checkFullyPainted($fully_painted){
+function filterFullyPainted($fully_painted){
     //Not allowed to be null
     if(Check::isNull($fully_painted)){
         echo "fully_painted cannot be null!"; return false;
@@ -341,12 +339,12 @@ function checkFullyPainted($fully_painted){
         echo "fully_painted was invalid!"; return false;
     }
 
-    return true;
+    return $fully_painted;
 }
 
 
 
-function checkWinner($winner){
+function filterWinner($winner){
     //Not allowed to be null
     if(Check::isNull($winner)){
         echo "winner cannot be null!"; return false;
@@ -356,7 +354,7 @@ function checkWinner($winner){
         echo "winner was invalid!"; return false;
     }
 
-    return true;
+    return $winner;
 }
 
 

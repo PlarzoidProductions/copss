@@ -147,10 +147,10 @@ div.simple {
 
 
 
-/* -- Warning class -- */
+/* -- Status classes -- */
 
 .warning{color: #FF0000;}
-
+.success{color: #00DD00;}
 
 /* -- Link Colors -- */
 

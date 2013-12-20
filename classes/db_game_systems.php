@@ -42,7 +42,7 @@ Create Function
 public function create($name){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
+	$name = $this->filterName($name); if($name === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -66,8 +66,6 @@ Delete Function
 **************************************************/
 public function deleteGame_systems($id){
 
-	//Validate the input
-	if(!$this->checkName($name)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -141,7 +139,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -150,7 +148,7 @@ public function getById($id){
 public function getByName($name){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    $name = $this->filterName($name); if($name === false){return false;}
 
     return $this->getByColumn("name", $name);
 }
@@ -161,7 +159,7 @@ public function getByName($name){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -171,12 +169,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkName($name){
+function filterName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
         echo "name cannot be null!"; return false;
@@ -186,7 +184,7 @@ function checkName($name){
         echo "name was invalid!"; return false;
     }
 
-    return true;
+    return $name;
 }
 
 

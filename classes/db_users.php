@@ -46,17 +46,15 @@ Create Function
 public function create($username, $password, $creation_date, $last_login, $admin){
 
 	//Validate the inputs
-	if(!$this->checkUsername($username)){return false;}
-	if(!$this->checkPassword($password)){return false;}
-	if(!$this->checkCreationDate($creation_date)){return false;}
-	if(!$this->checkLastLogin($last_login)){return false;}
-	if(!$this->checkAdmin($admin)){return false;}
+	$username = $this->filterUsername($username); if($username === false){return false;}
+	$password = $this->filterPassword($password); if($password === false){return false;}
+	$last_login = $this->filterLastLogin($last_login); if($last_login === false){return false;}
+	$admin = $this->filterAdmin($admin); if($admin === false){return false;}
 
 	//Create the values Array
 	$values = array(
 		":username"=>$username,
  		":password"=>$password,
- 		":creation_date"=>$creation_date,
  		":last_login"=>$last_login,
  		":admin"=>$admin
 	);
@@ -71,7 +69,7 @@ public function create($username, $password, $creation_date, $last_login, $admin
 			) VALUES (
 				:username,
 				:password,
-				:creation_date,
+				NOW(),
 				:last_login,
 				:admin)";
 
@@ -86,12 +84,6 @@ Delete Function
 **************************************************/
 public function deleteUsers($id){
 
-	//Validate the input
-	if(!$this->checkUsername($username)){return false;}
-	if(!$this->checkPassword($password)){return false;}
-	if(!$this->checkCreationDate($creation_date)){return false;}
-	if(!$this->checkLastLogin($last_login)){return false;}
-	if(!$this->checkAdmin($admin)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -165,7 +157,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -174,7 +166,7 @@ public function getById($id){
 public function getByUsername($username){
 	
     //Validate Inputs
-    if(!$this->checkUsername($username)){return false;}
+    $username = $this->filterUsername($username); if($username === false){return false;}
 
     return $this->getByColumn("username", $username);
 }
@@ -183,7 +175,7 @@ public function getByUsername($username){
 public function getByPassword($password){
 	
     //Validate Inputs
-    if(!$this->checkPassword($password)){return false;}
+    $password = $this->filterPassword($password); if($password === false){return false;}
 
     return $this->getByColumn("password", $password);
 }
@@ -192,7 +184,7 @@ public function getByPassword($password){
 public function getByCreationDate($creation_date){
 	
     //Validate Inputs
-    if(!$this->checkCreationDate($creation_date)){return false;}
+    $creation_date = $this->filterCreationDate($creation_date); if($creation_date === false){return false;}
 
     return $this->getByColumn("creation_date", $creation_date);
 }
@@ -201,7 +193,7 @@ public function getByCreationDate($creation_date){
 public function getByLastLogin($last_login){
 	
     //Validate Inputs
-    if(!$this->checkLastLogin($last_login)){return false;}
+    $last_login = $this->filterLastLogin($last_login); if($last_login === false){return false;}
 
     return $this->getByColumn("last_login", $last_login);
 }
@@ -210,7 +202,7 @@ public function getByLastLogin($last_login){
 public function getByAdmin($admin){
 	
     //Validate Inputs
-    if(!$this->checkAdmin($admin)){return false;}
+    $admin = $this->filterAdmin($admin); if($admin === false){return false;}
 
     return $this->getByColumn("admin", $admin);
 }
@@ -221,7 +213,7 @@ public function getByAdmin($admin){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -231,12 +223,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkUsername($username){
+function filterUsername($username){
     //Not allowed to be null
     if(Check::isNull($username)){
         echo "username cannot be null!"; return false;
@@ -246,12 +238,12 @@ function checkUsername($username){
         echo "username was invalid!"; return false;
     }
 
-    return true;
+    return $username;
 }
 
 
 
-function checkPassword($password){
+function filterPassword($password){
     //Not allowed to be null
     if(Check::isNull($password)){
         echo "password cannot be null!"; return false;
@@ -261,12 +253,12 @@ function checkPassword($password){
         echo "password was invalid!"; return false;
     }
 
-    return true;
+    return $password;
 }
 
 
 
-function checkCreationDate($creation_date){
+function filterCreationDate($creation_date){
     //Not allowed to be null
     if(Check::isNull($creation_date)){
         echo "creation_date cannot be null!"; return false;
@@ -276,22 +268,25 @@ function checkCreationDate($creation_date){
         echo "creation_date was invalid!"; return false;
     }
 
-    return true;
+    return $creation_date;
 }
 
 
 
-function checkLastLogin($last_login){
+function filterLastLogin($last_login){
+    //Allowed to be null, catch that first
+    if(Check::isNull($last_login)){ return null; }
+
     if(Check::isNull($last_login)){
         echo "last_login was invalid!"; return false;
     }
 
-    return true;
+    return $last_login;
 }
 
 
 
-function checkAdmin($admin){
+function filterAdmin($admin){
     //Not allowed to be null
     if(Check::isNull($admin)){
         echo "admin cannot be null!"; return false;
@@ -301,7 +296,7 @@ function checkAdmin($admin){
         echo "admin was invalid!"; return false;
     }
 
-    return true;
+    return $admin;
 }
 
 

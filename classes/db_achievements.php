@@ -55,20 +55,20 @@ Create Function
 public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $event_id){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkPoints($points)){return false;}
-	if(!$this->checkPerGame($per_game)){return false;}
-	if(!$this->checkIsMeta($is_meta)){return false;}
-	if(!$this->checkGameCount($game_count)){return false;}
-	if(!$this->checkGameSystemId($game_system_id)){return false;}
-	if(!$this->checkGameSizeId($game_size_id)){return false;}
-	if(!$this->checkFactionId($faction_id)){return false;}
-	if(!$this->checkUniqueOpponent($unique_opponent)){return false;}
-	if(!$this->checkUniqueOpponentLocations($unique_opponent_locations)){return false;}
-	if(!$this->checkPlayedThemeForce($played_theme_force)){return false;}
-	if(!$this->checkFullyPainted($fully_painted)){return false;}
-	if(!$this->checkFullyPaintedBattle($fully_painted_battle)){return false;}
-	if(!$this->checkEventId($event_id)){return false;}
+	$name = $this->filterName($name); if($name === false){return false;}
+	$points = $this->filterPoints($points); if($points === false){return false;}
+	$per_game = $this->filterPerGame($per_game); if($per_game === false){return false;}
+	$is_meta = $this->filterIsMeta($is_meta); if($is_meta === false){return false;}
+	$game_count = $this->filterGameCount($game_count); if($game_count === false){return false;}
+	$game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
+	$game_size_id = $this->filterGameSizeId($game_size_id); if($game_size_id === false){return false;}
+	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
+	$unique_opponent = $this->filterUniqueOpponent($unique_opponent); if($unique_opponent === false){return false;}
+	$unique_opponent_locations = $this->filterUniqueOpponentLocations($unique_opponent_locations); if($unique_opponent_locations === false){return false;}
+	$played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
+	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
+	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
+	$event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -131,21 +131,6 @@ Delete Function
 **************************************************/
 public function deleteAchievements($id){
 
-	//Validate the input
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkPoints($points)){return false;}
-	if(!$this->checkPerGame($per_game)){return false;}
-	if(!$this->checkIsMeta($is_meta)){return false;}
-	if(!$this->checkGameCount($game_count)){return false;}
-	if(!$this->checkGameSystemId($game_system_id)){return false;}
-	if(!$this->checkGameSizeId($game_size_id)){return false;}
-	if(!$this->checkFactionId($faction_id)){return false;}
-	if(!$this->checkUniqueOpponent($unique_opponent)){return false;}
-	if(!$this->checkUniqueOpponentLocations($unique_opponent_locations)){return false;}
-	if(!$this->checkPlayedThemeForce($played_theme_force)){return false;}
-	if(!$this->checkFullyPainted($fully_painted)){return false;}
-	if(!$this->checkFullyPaintedBattle($fully_painted_battle)){return false;}
-	if(!$this->checkEventId($event_id)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -219,7 +204,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -228,7 +213,7 @@ public function getById($id){
 public function getByName($name){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    $name = $this->filterName($name); if($name === false){return false;}
 
     return $this->getByColumn("name", $name);
 }
@@ -237,7 +222,7 @@ public function getByName($name){
 public function getByPoints($points){
 	
     //Validate Inputs
-    if(!$this->checkPoints($points)){return false;}
+    $points = $this->filterPoints($points); if($points === false){return false;}
 
     return $this->getByColumn("points", $points);
 }
@@ -246,7 +231,7 @@ public function getByPoints($points){
 public function getByPerGame($per_game){
 	
     //Validate Inputs
-    if(!$this->checkPerGame($per_game)){return false;}
+    $per_game = $this->filterPerGame($per_game); if($per_game === false){return false;}
 
     return $this->getByColumn("per_game", $per_game);
 }
@@ -255,7 +240,7 @@ public function getByPerGame($per_game){
 public function getByIsMeta($is_meta){
 	
     //Validate Inputs
-    if(!$this->checkIsMeta($is_meta)){return false;}
+    $is_meta = $this->filterIsMeta($is_meta); if($is_meta === false){return false;}
 
     return $this->getByColumn("is_meta", $is_meta);
 }
@@ -264,7 +249,7 @@ public function getByIsMeta($is_meta){
 public function getByGameCount($game_count){
 	
     //Validate Inputs
-    if(!$this->checkGameCount($game_count)){return false;}
+    $game_count = $this->filterGameCount($game_count); if($game_count === false){return false;}
 
     return $this->getByColumn("game_count", $game_count);
 }
@@ -273,7 +258,7 @@ public function getByGameCount($game_count){
 public function getByGameSystemId($game_system_id){
 	
     //Validate Inputs
-    if(!$this->checkGameSystemId($game_system_id)){return false;}
+    $game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
 
     return $this->getByColumn("game_system_id", $game_system_id);
 }
@@ -282,7 +267,7 @@ public function getByGameSystemId($game_system_id){
 public function getByGameSizeId($game_size_id){
 	
     //Validate Inputs
-    if(!$this->checkGameSizeId($game_size_id)){return false;}
+    $game_size_id = $this->filterGameSizeId($game_size_id); if($game_size_id === false){return false;}
 
     return $this->getByColumn("game_size_id", $game_size_id);
 }
@@ -291,7 +276,7 @@ public function getByGameSizeId($game_size_id){
 public function getByFactionId($faction_id){
 	
     //Validate Inputs
-    if(!$this->checkFactionId($faction_id)){return false;}
+    $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
     return $this->getByColumn("faction_id", $faction_id);
 }
@@ -300,7 +285,7 @@ public function getByFactionId($faction_id){
 public function getByUniqueOpponent($unique_opponent){
 	
     //Validate Inputs
-    if(!$this->checkUniqueOpponent($unique_opponent)){return false;}
+    $unique_opponent = $this->filterUniqueOpponent($unique_opponent); if($unique_opponent === false){return false;}
 
     return $this->getByColumn("unique_opponent", $unique_opponent);
 }
@@ -309,7 +294,7 @@ public function getByUniqueOpponent($unique_opponent){
 public function getByUniqueOpponentLocations($unique_opponent_locations){
 	
     //Validate Inputs
-    if(!$this->checkUniqueOpponentLocations($unique_opponent_locations)){return false;}
+    $unique_opponent_locations = $this->filterUniqueOpponentLocations($unique_opponent_locations); if($unique_opponent_locations === false){return false;}
 
     return $this->getByColumn("unique_opponent_locations", $unique_opponent_locations);
 }
@@ -318,7 +303,7 @@ public function getByUniqueOpponentLocations($unique_opponent_locations){
 public function getByPlayedThemeForce($played_theme_force){
 	
     //Validate Inputs
-    if(!$this->checkPlayedThemeForce($played_theme_force)){return false;}
+    $played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
 
     return $this->getByColumn("played_theme_force", $played_theme_force);
 }
@@ -327,7 +312,7 @@ public function getByPlayedThemeForce($played_theme_force){
 public function getByFullyPainted($fully_painted){
 	
     //Validate Inputs
-    if(!$this->checkFullyPainted($fully_painted)){return false;}
+    $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
     return $this->getByColumn("fully_painted", $fully_painted);
 }
@@ -336,7 +321,7 @@ public function getByFullyPainted($fully_painted){
 public function getByFullyPaintedBattle($fully_painted_battle){
 	
     //Validate Inputs
-    if(!$this->checkFullyPaintedBattle($fully_painted_battle)){return false;}
+    $fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 
     return $this->getByColumn("fully_painted_battle", $fully_painted_battle);
 }
@@ -345,7 +330,7 @@ public function getByFullyPaintedBattle($fully_painted_battle){
 public function getByEventId($event_id){
 	
     //Validate Inputs
-    if(!$this->checkEventId($event_id)){return false;}
+    $event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
     return $this->getByColumn("event_id", $event_id);
 }
@@ -356,7 +341,7 @@ public function getByEventId($event_id){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -366,12 +351,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkName($name){
+function filterName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
         echo "name cannot be null!"; return false;
@@ -381,12 +366,12 @@ function checkName($name){
         echo "name was invalid!"; return false;
     }
 
-    return true;
+    return $name;
 }
 
 
 
-function checkPoints($points){
+function filterPoints($points){
     //Not allowed to be null
     if(Check::isNull($points)){
         echo "points cannot be null!"; return false;
@@ -396,12 +381,12 @@ function checkPoints($points){
         echo "points was invalid!"; return false;
     }
 
-    return true;
+    return $points;
 }
 
 
 
-function checkPerGame($per_game){
+function filterPerGame($per_game){
     //Not allowed to be null
     if(Check::isNull($per_game)){
         echo "per_game cannot be null!"; return false;
@@ -411,12 +396,12 @@ function checkPerGame($per_game){
         echo "per_game was invalid!"; return false;
     }
 
-    return true;
+    return $per_game;
 }
 
 
 
-function checkIsMeta($is_meta){
+function filterIsMeta($is_meta){
     //Not allowed to be null
     if(Check::isNull($is_meta)){
         echo "is_meta cannot be null!"; return false;
@@ -426,107 +411,137 @@ function checkIsMeta($is_meta){
         echo "is_meta was invalid!"; return false;
     }
 
-    return true;
+    return $is_meta;
 }
 
 
 
-function checkGameCount($game_count){
+function filterGameCount($game_count){
+    //Allowed to be null, catch that first
+    if(Check::isNull($game_count)){ return null; }
+
     if(Check::notInt($game_count)){
         echo "game_count was invalid!"; return false;
     }
 
-    return true;
+    return $game_count;
 }
 
 
 
-function checkGameSystemId($game_system_id){
+function filterGameSystemId($game_system_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($game_system_id)){ return null; }
+
     if(Check::notInt($game_system_id)){
         echo "game_system_id was invalid!"; return false;
     }
 
-    return true;
+    return $game_system_id;
 }
 
 
 
-function checkGameSizeId($game_size_id){
+function filterGameSizeId($game_size_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($game_size_id)){ return null; }
+
     if(Check::notInt($game_size_id)){
         echo "game_size_id was invalid!"; return false;
     }
 
-    return true;
+    return $game_size_id;
 }
 
 
 
-function checkFactionId($faction_id){
+function filterFactionId($faction_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($faction_id)){ return null; }
+
     if(Check::notInt($faction_id)){
         echo "faction_id was invalid!"; return false;
     }
 
-    return true;
+    return $faction_id;
 }
 
 
 
-function checkUniqueOpponent($unique_opponent){
+function filterUniqueOpponent($unique_opponent){
+    //Allowed to be null, catch that first
+    if(Check::isNull($unique_opponent)){ return null; }
+
     if(Check::notBool($unique_opponent)){
         echo "unique_opponent was invalid!"; return false;
     }
 
-    return true;
+    return $unique_opponent;
 }
 
 
 
-function checkUniqueOpponentLocations($unique_opponent_locations){
+function filterUniqueOpponentLocations($unique_opponent_locations){
+    //Allowed to be null, catch that first
+    if(Check::isNull($unique_opponent_locations)){ return null; }
+
     if(Check::notBool($unique_opponent_locations)){
         echo "unique_opponent_locations was invalid!"; return false;
     }
 
-    return true;
+    return $unique_opponent_locations;
 }
 
 
 
-function checkPlayedThemeForce($played_theme_force){
+function filterPlayedThemeForce($played_theme_force){
+    //Allowed to be null, catch that first
+    if(Check::isNull($played_theme_force)){ return null; }
+
     if(Check::notBool($played_theme_force)){
         echo "played_theme_force was invalid!"; return false;
     }
 
-    return true;
+    return $played_theme_force;
 }
 
 
 
-function checkFullyPainted($fully_painted){
+function filterFullyPainted($fully_painted){
+    //Allowed to be null, catch that first
+    if(Check::isNull($fully_painted)){ return null; }
+
     if(Check::notBool($fully_painted)){
         echo "fully_painted was invalid!"; return false;
     }
 
-    return true;
+    return $fully_painted;
 }
 
 
 
-function checkFullyPaintedBattle($fully_painted_battle){
+function filterFullyPaintedBattle($fully_painted_battle){
+    //Allowed to be null, catch that first
+    if(Check::isNull($fully_painted_battle)){ return null; }
+
     if(Check::notBool($fully_painted_battle)){
         echo "fully_painted_battle was invalid!"; return false;
     }
 
-    return true;
+    return $fully_painted_battle;
 }
 
 
 
-function checkEventId($event_id){
+function filterEventId($event_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($event_id)){ return null; }
+
     if(Check::notInt($event_id)){
         echo "event_id was invalid!"; return false;
     }
 
-    return true;
+    return $event_id;
 }
 
 

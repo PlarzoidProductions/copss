@@ -44,9 +44,9 @@ Create Function
 public function create($name, $start, $stop){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkStart($start)){return false;}
-	if(!$this->checkStop($stop)){return false;}
+	$name = $this->filterName($name); if($name === false){return false;}
+	$start = $this->filterStart($start); if($start === false){return false;}
+	$stop = $this->filterStop($stop); if($stop === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,10 +76,6 @@ Delete Function
 **************************************************/
 public function deleteShifts($id){
 
-	//Validate the input
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkStart($start)){return false;}
-	if(!$this->checkStop($stop)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -153,7 +149,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -162,7 +158,7 @@ public function getById($id){
 public function getByName($name){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    $name = $this->filterName($name); if($name === false){return false;}
 
     return $this->getByColumn("name", $name);
 }
@@ -171,7 +167,7 @@ public function getByName($name){
 public function getByStart($start){
 	
     //Validate Inputs
-    if(!$this->checkStart($start)){return false;}
+    $start = $this->filterStart($start); if($start === false){return false;}
 
     return $this->getByColumn("start", $start);
 }
@@ -180,7 +176,7 @@ public function getByStart($start){
 public function getByStop($stop){
 	
     //Validate Inputs
-    if(!$this->checkStop($stop)){return false;}
+    $stop = $this->filterStop($stop); if($stop === false){return false;}
 
     return $this->getByColumn("stop", $stop);
 }
@@ -191,7 +187,7 @@ public function getByStop($stop){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -201,12 +197,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkName($name){
+function filterName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
         echo "name cannot be null!"; return false;
@@ -216,12 +212,12 @@ function checkName($name){
         echo "name was invalid!"; return false;
     }
 
-    return true;
+    return $name;
 }
 
 
 
-function checkStart($start){
+function filterStart($start){
     //Not allowed to be null
     if(Check::isNull($start)){
         echo "start cannot be null!"; return false;
@@ -231,12 +227,12 @@ function checkStart($start){
         echo "start was invalid!"; return false;
     }
 
-    return true;
+    return $start;
 }
 
 
 
-function checkStop($stop){
+function filterStop($stop){
     //Not allowed to be null
     if(Check::isNull($stop)){
         echo "stop cannot be null!"; return false;
@@ -246,7 +242,7 @@ function checkStop($stop){
         echo "stop was invalid!"; return false;
     }
 
-    return true;
+    return $stop;
 }
 
 

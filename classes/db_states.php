@@ -43,8 +43,8 @@ Create Function
 public function create($name, $parent){
 
 	//Validate the inputs
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkParent($parent)){return false;}
+	$name = $this->filterName($name); if($name === false){return false;}
+	$parent = $this->filterParent($parent); if($parent === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -71,9 +71,6 @@ Delete Function
 **************************************************/
 public function deleteStates($id){
 
-	//Validate the input
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkParent($parent)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -147,7 +144,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -156,7 +153,7 @@ public function getById($id){
 public function getByName($name){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    $name = $this->filterName($name); if($name === false){return false;}
 
     return $this->getByColumn("name", $name);
 }
@@ -165,7 +162,7 @@ public function getByName($name){
 public function getByParent($parent){
 	
     //Validate Inputs
-    if(!$this->checkParent($parent)){return false;}
+    $parent = $this->filterParent($parent); if($parent === false){return false;}
 
     return $this->getByColumn("parent", $parent);
 }
@@ -176,7 +173,7 @@ public function getByParent($parent){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -186,12 +183,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkName($name){
+function filterName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
         echo "name cannot be null!"; return false;
@@ -201,12 +198,12 @@ function checkName($name){
         echo "name was invalid!"; return false;
     }
 
-    return true;
+    return $name;
 }
 
 
 
-function checkParent($parent){
+function filterParent($parent){
     //Not allowed to be null
     if(Check::isNull($parent)){
         echo "parent cannot be null!"; return false;
@@ -216,7 +213,7 @@ function checkParent($parent){
         echo "parent was invalid!"; return false;
     }
 
-    return true;
+    return $parent;
 }
 
 

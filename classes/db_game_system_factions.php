@@ -44,9 +44,9 @@ Create Function
 public function create($parent_game_system, $name, $acronym){
 
 	//Validate the inputs
-	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkAcronym($acronym)){return false;}
+	$parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
+	$name = $this->filterName($name); if($name === false){return false;}
+	$acronym = $this->filterAcronym($acronym); if($acronym === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -76,10 +76,6 @@ Delete Function
 **************************************************/
 public function deleteGame_system_factions($id){
 
-	//Validate the input
-	if(!$this->checkParentGameSystem($parent_game_system)){return false;}
-	if(!$this->checkName($name)){return false;}
-	if(!$this->checkAcronym($acronym)){return false;}
 	//Create the values array
 	$values = array(":id"=>$id);
 
@@ -153,7 +149,7 @@ private function getByColumn($column, $value){
 public function getById($id){
 	
     //Validate Inputs
-    if(!$this->checkId($id)){return false;}
+    $id = $this->filterId($id); if($id === false){return false;}
 
     return $this->getByColumn("id", $id);
 }
@@ -162,7 +158,7 @@ public function getById($id){
 public function getByParentGameSystem($parent_game_system){
 	
     //Validate Inputs
-    if(!$this->checkParentGameSystem($parent_game_system)){return false;}
+    $parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
 
     return $this->getByColumn("parent_game_system", $parent_game_system);
 }
@@ -171,7 +167,7 @@ public function getByParentGameSystem($parent_game_system){
 public function getByName($name){
 	
     //Validate Inputs
-    if(!$this->checkName($name)){return false;}
+    $name = $this->filterName($name); if($name === false){return false;}
 
     return $this->getByColumn("name", $name);
 }
@@ -180,7 +176,7 @@ public function getByName($name){
 public function getByAcronym($acronym){
 	
     //Validate Inputs
-    if(!$this->checkAcronym($acronym)){return false;}
+    $acronym = $this->filterAcronym($acronym); if($acronym === false){return false;}
 
     return $this->getByColumn("acronym", $acronym);
 }
@@ -191,7 +187,7 @@ public function getByAcronym($acronym){
 Column Validation Function(s)
 
 **************************************************/
-function checkId($id){
+function filterId($id){
     //Not allowed to be null
     if(Check::isNull($id)){
         echo "id cannot be null!"; return false;
@@ -201,12 +197,12 @@ function checkId($id){
         echo "id was invalid!"; return false;
     }
 
-    return true;
+    return $id;
 }
 
 
 
-function checkParentGameSystem($parent_game_system){
+function filterParentGameSystem($parent_game_system){
     //Not allowed to be null
     if(Check::isNull($parent_game_system)){
         echo "parent_game_system cannot be null!"; return false;
@@ -216,12 +212,12 @@ function checkParentGameSystem($parent_game_system){
         echo "parent_game_system was invalid!"; return false;
     }
 
-    return true;
+    return $parent_game_system;
 }
 
 
 
-function checkName($name){
+function filterName($name){
     //Not allowed to be null
     if(Check::isNull($name)){
         echo "name cannot be null!"; return false;
@@ -231,17 +227,20 @@ function checkName($name){
         echo "name was invalid!"; return false;
     }
 
-    return true;
+    return $name;
 }
 
 
 
-function checkAcronym($acronym){
+function filterAcronym($acronym){
+    //Allowed to be null, catch that first
+    if(Check::isNull($acronym)){ return null; }
+
     if(Check::notString($acronym)){
         echo "acronym was invalid!"; return false;
     }
 
-    return true;
+    return $acronym;
 }
 
 

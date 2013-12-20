@@ -161,20 +161,23 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
         $fnName.= ucfirst(strtolower($p));
     }
 
-    $validateFn = "function check".$fnName."($varname){\n";
+    $validateFn = "function filter".$fnName."($varname){\n";
     if($notNull){ 
         $validateFn.= "    //Not allowed to be null\n";
         $validateFn.= "    if(Check::isNull($varname)){\n";
         $validateFn.= "        echo \"$name cannot be null!\"; return false;\n";
         $validateFn.= "    }\n\n";
+    } else {
+        $validateFn.= "    //Allowed to be null, catch that first\n";
+        $validateFn.= "    if(Check::isNull($varname)){ return null; }\n\n";
     }
     $validateFn.= "    if(Check::$fn($varname)){\n";
     $validateFn.= "        echo \"$name was invalid!\"; return false;\n";
     $validateFn.= "    }\n\n";
-    $validateFn.= "    return true;\n";
+    $validateFn.= "    return $varname;\n";
     $validateFn.= "}\n\n";
 
-    $validateMe = "if(!\$this->check$fnName($varname)){return false;}";
+    $validateMe = "$varname = \$this->filter$fnName($varname); if($varname === false){return false;}";
 
     $columns[]=array(
         "name"=>$name,
@@ -320,7 +323,7 @@ $createFn.="){\n";
 
 $createFn.="\n\t//Validate the inputs\n";
 foreach($columns as $c){
-    if(!$c[primary_key] && (strlen($c[validateFn]) > 0)){
+    if(!$c[primary_key] && (strlen($c[validateFn]) > 0) && !preg_match("~creation~", $c[name])){
          $createFn.="\t".$c[validateFn]."\n";
     }
 }
@@ -329,11 +332,14 @@ $createFn.="\n";
 
 $createFn.="\t//Create the values Array\n";
 $createFn.="\t\$values = array(\n";
+$started=false;
 foreach($columns as $k=>$c){
-    if($c[primary_key]){continue;}
+    if($c[primary_key] || preg_match("~creation~", $c[name])){continue;}
+    
+    if($started){$createFn.=",\n ";}
 
     $createFn.="\t\t\":".$c[name]."\"=>".$c[varname];
-    if($k != end(array_keys($columns))){$createFn.=",\n ";}
+    $started=true;
 }
 $createFn.="\n\t);\n\n";
 
@@ -350,9 +356,12 @@ $createFn.="\n";
 $createFn.="\t\t\t) VALUES (\n";
 foreach($columns as $k=>$c){
     if($c[primary_key]){continue;}
-
-     $createFn.="\t\t\t\t:".$c[name];
-     if($k != end(array_keys($columns))){$createFn.=",\n";}
+    if(preg_match("~creation~", $c[name])){
+        $createFn.="\t\t\t\tNOW()";
+    } else {
+        $createFn.="\t\t\t\t:".$c[name];
+    }
+    if($k != end(array_keys($columns))){$createFn.=",\n";}
     
 }
 $createFn.=')";';
@@ -376,13 +385,6 @@ Delete Function
 **************************************************/
 ';
 $deleteFn.= "public function delete".$table_Fn_name."(".$primary_key[varname]."){\n\n";
-
-$deleteFn.= "\t//Validate the input\n";
-foreach($columns as $c){
-    if(!$c[primary_key] && (strlen($c[validateFn]) > 0)){
-         $deleteFn.="\t".$c[validateFn]."\n";
-    }
-}
 
 $deleteFn.= "\t//Create the values array\n";
 $deleteFn.= "\t\$values = array(\":".$primary_key[name]."\"=>".$primary_key[varname].");\n\n";

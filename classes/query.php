@@ -105,8 +105,8 @@ public function updateGroup($sql, $value_sets){
 public function insert($sql, $values){
     $pdo_insert = $this->connection->prepare($sql);
     $pdo_insert->execute($values);
-
-    return $pdo_insert->lastInsertId();
+    
+    return $this->connection->lastInsertId();
 }
 
 public function insertGroup($sql, $value_sets){

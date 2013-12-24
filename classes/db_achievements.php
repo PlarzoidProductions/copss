@@ -158,7 +158,7 @@ private function updateAchievementsById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns)))){
+        if(strcmp($column, end(array_keys($columns)))){
             $sql.= ", ";
         }
     }

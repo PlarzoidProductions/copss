@@ -45,7 +45,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($first_name, $last_name, $email, $country, $state, $vip, $creation_date){
+public function create($first_name, $last_name, $email, $country, $state, $vip){
 
 	//Validate the inputs
 	$first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
@@ -121,7 +121,7 @@ private function updatePlayersById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns)))){
+        if(strcmp($column, end(array_keys($columns)))){
             $sql.= ", ";
         }
     }

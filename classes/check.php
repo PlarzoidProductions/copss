@@ -34,7 +34,7 @@ class Check
     }
 
     function isNull($v){
-        if($v == null) return true;
+        if($v === null) return true;
         if(empty($v) && !is_numeric($v)) return true;
         return false;
     }

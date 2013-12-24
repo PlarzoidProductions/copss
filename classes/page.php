@@ -93,7 +93,6 @@ class Page {
     function doTabs(){
 
         $tabs = array(
-//            "Home"=>"home",
             "Register Player"=>"register_player",
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
@@ -104,9 +103,8 @@ class Page {
 
         
         if(Session::isAdmin()){
-            //TODO Add admin functions
             $admin_tabs = array(
-                "Add User"=>"add_user",
+                "Manage Users"=>"manage_users",
                 "Shift Management"=>"shifts",
                 "General Configuration"=>"general_config",
                 "Achievement Configuration"=>"achievement_config",
@@ -590,7 +588,7 @@ class Page {
                     break;
 
                 case "default_val":
-                    if($attr[default_val]){
+                    if($value){
                         if(!strcmp($type, "checkbox")){
                             $str.= "CHECKED ";
                         } else {

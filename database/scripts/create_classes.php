@@ -311,12 +311,16 @@ Create Function
 **************************************************/
 ';
 $createFn.= "public function create(";
+$started=false;
 foreach($columns as $k=>$c){
     //Exclude from create if it's the primary key
-    if(!$c[primary_key]){
-        $createFn.=$c[varname];
-        if($k != end(array_keys($columns))){$createFn.=", ";}
-    }
+    if($c[primary_key] || preg_match("~creation~", $c[name])){continue;}
+    
+    if($started){$createFn.=", ";}
+
+    $createFn.=$c[varname];
+               
+    $started=true;
 }
 $createFn.="){\n";
 
@@ -421,7 +425,7 @@ $masterUpdateFn='private function update'.$table_Fn_name.'ById($id, $columns){
     $sql = "UPDATE $this->table SET ";
     foreach(array_keys($columns) as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end($array_keys($columns)))){
+        if(strcmp($column, end(array_keys($columns)))){
             $sql.= ", ";
         }
     }

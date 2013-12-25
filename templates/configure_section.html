@@ -1,0 +1,9 @@
+    <header>
+        <h1><? echo $subtitle?></h1>
+    </header>
+    <? echo $page->displayVar("edit_select")?>
+    <? echo $page->displayVar("edit_submit")?>
+    <hr>
+    <? foreach($inputs as $i){?>
+        <? echo $page->displayVar($i)?>
+    <?}?>

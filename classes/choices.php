@@ -13,6 +13,20 @@ class Choices {
 		//do nothing, really
 	}
 
+        function getConfigureModes(){
+            //$modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes");
+            $ret = array(   array("text"=>"Countries", "value"=>"countries"),
+                            array("text"=>"States", "value"=>"States"),
+                            array("text"=>"Game Systems", "value"=>"game_systems"),
+                            array("text"=>"Factions", "value"=>"game_system_factions"),
+                            array("text"=>"Game Sizes", "value"=>"game_sizes")
+                        );
+
+            return $ret;
+        }
+
+
+/*
 	function getRedeemFunctionChoices(){
 		return array(array("text"=>"Spend Points", "value"=>"SPEND"),array("text"=>"Add Points", "value"=>"ADD"));
 	}
@@ -82,7 +96,7 @@ class Choices {
 		}
 		return $ret;
 	}
-
+*/
 	function getStates($parent_id){
                 $s = new States();
 

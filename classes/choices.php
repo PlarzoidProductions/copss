@@ -1,5 +1,6 @@
 <?php
 
+require_once("check.php");
 require_once("db_players.php");
 require_once("db_countries.php");
 require_once("db_states.php");
@@ -98,21 +99,26 @@ class Choices {
 	}
 */
 	function getStates($parent_id){
-                $s = new States();
 
-                $states = $s->getByParent($parent_id);
+            if(Check::isNull($parent_id)){
+                return array(array("text"=>"No States Exist", "value"=>"null"));
+            }
 
-                if($states){
-                    $ret = array();
+            $s = new States();
 
-                    foreach($states as $state){
-                        $ret[] = array("value"=>$state[id], "text"=>$state[name]);
-                    }
+            $states = $s->getByParent($parent_id);
 
-		    return $ret;
+            if($states){
+                $ret = array();
+
+                foreach($states as $state){
+                    $ret[] = array("value"=>$state[id], "text"=>$state[name]);
                 }
 
-                return null;
+		return $ret;
+            }
+
+            return null;
 	}
 
 	function getCountries(){

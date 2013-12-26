@@ -36,6 +36,7 @@ class Check
     function isNull($v){
         if($v === null) return true;
         if(empty($v) && !is_numeric($v)) return true;
+        if(!strcmp($v, "null")) return true;
         return false;
     }
 

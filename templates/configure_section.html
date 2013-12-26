@@ -1,14 +1,15 @@
     <header>
         <h3><? echo $subtitle?></h3>
     </header>
-    <? echo $page->displayVar("edit_select")?>
-    <? echo $page->displayVar("edit_submit")?>
+    <? foreach($inputs as $i){?>
+        <? echo $page->displayVar($i)?>
+    <?}?>
     <hr>
     <header>
         <h3><? echo $subtitle2?></h3>
     </header>
     <form method="<?=$form_method?>" action="<?=$form_action?>">
-    <? foreach($inputs as $i){?>
+    <? foreach($inputs2 as $i){?>
         <? echo $page->displayVar($i)?>
     <?}?>
     </form>

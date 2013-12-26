@@ -1,7 +1,7 @@
 <?php
 
 //  $page is already ready for us
-require_once("classes/db_countries.php");
+require_once("classes/db_states.php");
 
 /**************************************
 
@@ -9,13 +9,19 @@ Edit Selector
 
 **************************************/
 $page->register("edit_submit", "submit", array("value"=>"Select for Editing"));
-$page->register("edit_select", "select", array( "label"=>"Edit a Country",
-                                                "get_choices_array_func"=>"getCountries",
-                                                "get_choices_array_func_args"=>array()));
+$page->register("parent_country", "select", array(  "label"=>"Parent Country",
+                                                    "get_choices_array_func"=>"getCountries",
+                                                    "get_choices_array_func_args"=>array()));
 $page->getChoices();
+
+$page->register("edit_select", "select", array( "label"=>"Edit a State",
+                                                "get_choices_array_func"=>"getStates",
+                                                "get_choices_array_func_args"=>array($page->getVar("parent_country"))));
+$page->getChoices();
+
 $selected = $page->getVar("edit_select");
 
-$inputs = array("edit_select", "edit_submit");
+$inputs = array("parent_country", "edit_select", "edit_submit");
 
 /**************************************
 
@@ -23,7 +29,7 @@ Retrieve defaults accordingly
 
 **************************************/
 if($page->submitIsSet("edit_submit")){
-    $db = new Countries();
+    $db = new States();
 
     $defaults = $db->getById($selected);
 
@@ -52,11 +58,11 @@ Prep displaying the page
 
 **************************************/
 $inputs2 = array("edit_id", "name", "submit_config");
-$subtitle = "Add/Edit Countries";
+$subtitle = "Add/Edit States";
 if($defaults[id]){
-    $subtitle2 = "Edit Country '".$defaults[name]."'";
+    $subtitle2 = "Edit State '".$defaults[name]."'";
 } else {
-    $subtitle2 = "Add New Country";
+    $subtitle2 = "Add New State";
 }
 
 

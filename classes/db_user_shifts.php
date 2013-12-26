@@ -96,7 +96,7 @@ public function deleteUser_shifts($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateUser_shiftsById($id, $columns){
+public function updateUser_shiftsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

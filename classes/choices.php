@@ -16,7 +16,7 @@ class Choices {
         function getConfigureModes(){
             //$modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes");
             $ret = array(   array("text"=>"Countries", "value"=>"countries"),
-                            array("text"=>"States", "value"=>"States"),
+                            array("text"=>"States", "value"=>"states"),
                             array("text"=>"Game Systems", "value"=>"game_systems"),
                             array("text"=>"Factions", "value"=>"game_system_factions"),
                             array("text"=>"Game Sizes", "value"=>"game_sizes")

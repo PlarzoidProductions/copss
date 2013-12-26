@@ -86,7 +86,7 @@ public function deleteStates($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateStatesById($id, $columns){
+public function updateStatesById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

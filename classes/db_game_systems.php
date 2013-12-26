@@ -81,7 +81,7 @@ public function deleteGame_systems($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateGame_systemsById($id, $columns){
+public function updateGame_systemsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

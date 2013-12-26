@@ -497,7 +497,7 @@ class Page {
                 } else {
                     $cname = $v . "_choices";
                 }
-                if(isset($$cname)){//variable already exists, so don't worry about it
+                if(isset($$cname)){//variable already exists, let's clear it??
                     continue;
                 }
 
@@ -645,7 +645,8 @@ class Page {
 
         if($disp_type == "form"){
             $str = "<input type=\"hidden\" name=\"$v\" value=\"".htmlspecialchars($lvar)."\">";
-            $this->printSimpleInput($str);
+            //$this->printSimpleInput($str);
+            echo $str;
         } else {
             //echo $lvar;
         }

@@ -91,7 +91,7 @@ public function deleteMeta_achievement_criteria($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateMeta_achievement_criteriaById($id, $columns){
+public function updateMeta_achievement_criteriaById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

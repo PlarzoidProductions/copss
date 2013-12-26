@@ -91,7 +91,7 @@ public function deleteGame_system_factions($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateGame_system_factionsById($id, $columns){
+public function updateGame_system_factionsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

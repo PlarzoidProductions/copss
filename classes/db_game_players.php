@@ -111,7 +111,7 @@ public function deleteGame_players($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateGame_playersById($id, $columns){
+public function updateGame_playersById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

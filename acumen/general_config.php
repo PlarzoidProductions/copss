@@ -5,13 +5,14 @@
     $page = new Page("ADMIN");
     $db = new Users();
 
+    
     /***************************************
 
     Modes of Operation
 
     ***************************************/
     $modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes");
-    $page->register("mode", "select", array("label"=>"Configure", "reloading"=>1,
+    $page->register("mode", "select", array("label"=>"Configure", "reloading"=>true,
                                             "get_choices_array_func"=>"getConfigureModes",
                                             "get_choices_array_func_args"=>array()));
     $page->getChoices();
@@ -21,6 +22,7 @@
     //If not chosen yet, then let's start withthe top option
     if($mode == null){$mode = $modes[0];}
 
+    
     /***************************************
 
     Start displaying the page
@@ -38,13 +40,14 @@
     $inputs = array("mode");
     include("templates/configure_header.html");
 
+    
     /***************************************
 
     Include the requisite piece
 
     ***************************************/
-    if((@include("acumen/configure_$mode.php")) == false){;
-        include ("acumen/404.php");
+    if((@include("acumen/configure_$mode.php")) == false){
+        include("templates/404.html");
     }
 
     /***************************************

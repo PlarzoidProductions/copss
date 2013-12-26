@@ -146,7 +146,7 @@ public function deleteAchievements($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateAchievementsById($id, $columns){
+public function updateAchievementsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

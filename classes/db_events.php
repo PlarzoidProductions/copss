@@ -81,7 +81,7 @@ public function deleteEvents($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateEventsById($id, $columns){
+public function updateEventsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

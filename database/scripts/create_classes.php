@@ -413,7 +413,7 @@ Update Record By ID Function(s)
 ';
 fputs($class_fptr, $masterUpdateFnHeader);
 
-$masterUpdateFn='private function update'.$table_Fn_name.'ById($id, $columns){
+$masterUpdateFn='public function update'.$table_Fn_name.'ById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

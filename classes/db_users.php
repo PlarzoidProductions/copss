@@ -99,7 +99,7 @@ public function deleteUsers($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateUsersById($id, $columns){
+public function updateUsersById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

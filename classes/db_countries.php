@@ -81,7 +81,7 @@ public function deleteCountries($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateCountriesById($id, $columns){
+public function updateCountriesById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

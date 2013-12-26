@@ -91,7 +91,7 @@ public function deleteShifts($id){
 Update Record By ID Function(s)
 
 **************************************************/
-private function updateShiftsById($id, $columns){
+public function updateShiftsById($id, $columns){
 
     //Values Array
     $values = array(":id"=>$id);

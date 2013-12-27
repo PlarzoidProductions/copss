@@ -1,22 +1,26 @@
 <?php
 
 //  $page is already ready for us
-require_once("classes/db_states.php");
-require_once("classes/db_countries.php");
+require_once("classes/db_game_systems.php");
+require_once("classes/db_game_system_factions.php");
 
 /**************************************
 
 Edit Selector
 
 **************************************/
-$page->register("parent", "select", array(  "label"=>"Parent Country", "reloading"=>1,
-                                                    "get_choices_array_func"=>"getCountries",
+$page->register("parent", "select", array(  "label"=>"Parent Game System", "reloading"=>1,
+                                                    "get_choices_array_func"=>"getGameSystems",
                                                     "get_choices_array_func_args"=>array()));
 $page->getChoices();
 $selected_parent = $page->getVar("parent");
 
-$page->register("edit_select", "select", array( "label"=>"Edit a State",
-                                                "get_choices_array_func"=>"getStates",
+if(Check::isNull($selected_parent)){
+    $selected_parent=1;
+}
+
+$page->register("edit_select", "select", array( "label"=>"Edit a Faction",
+                                                "get_choices_array_func"=>"getGameSystemFactions",
                                                 "get_choices_array_func_args"=>array($selected_parent)));
 $page->getChoices();
 $selected = $page->getVar("edit_select");
@@ -37,7 +41,7 @@ Retrieve defaults accordingly
 **************************************/
 if($page->submitIsSet("edit_submit") && !Check::isNull($selected)){
 
-    $db = new States();
+    $db = new Game_system_factions();
 
     $defaults = $db->getById($selected);
 
@@ -55,6 +59,7 @@ Editable field(s)
 
 **************************************/
 $page->register("name", "textbox", array("default_val"=>$defaults[name]));
+$page->register("acronym", "textbox", array("default_val"=>$defaults[acronym]));
 
 $page->register("edit_id", "hidden", array("value"=>$defaults[id]));
 $page->register("submit_config", "submit", array("value"=>"Submit"));
@@ -65,16 +70,16 @@ $page->register("submit_config", "submit", array("value"=>"Submit"));
 Prep displaying the page
 
 **************************************/
-$inputs2 = array("edit_id", "name", "submit_config");
-$subtitle = "Add/Edit States";
+$inputs2 = array("edit_id", "name", "acronym", "submit_config");
+$subtitle = "Add/Edit Factions";
 
-$country_db = new Countries();
-$country = $country_db->getById($selected_parent);
+$gs_db = new Game_systems();
+$system = $gs_db->getById($selected_parent);
 
 if($defaults[id]){
-    $subtitle2 = "Edit State '".$defaults[name]."'";
+    $subtitle2 = "Edit Faction '".$defaults[name]."'";
 } else {
-    $subtitle2 = "Add New State to ".$country[0][name];
+    $subtitle2 = "Add New Faction to ".$system[0][name];
 }
 
 
@@ -84,22 +89,21 @@ Process the addition / edit
 
 ***************************************/
 if($page->submitIsSet("submit_config")){
-   
-    $db = new States();
+
+    $db = new Game_system_factions();
 
     $edit_id = $page->getVar("edit_id");
     $name = $page->getVar("name");
+    $acronym = $page->getVar("acronym");
 
-
-    if(Check::isNull($edit_id)){    
+    if(Check::isNull($edit_id)){
         $exists = $db->getByName($name);
-        
         if(empty($exists)){
-            $result = $db->create($name, $selected_parent);
+            $result = $db->create($selected_parent, $name, $acronym);
         }
     } else {
-        $columns = array("name"=>$name);
-        $result = $db->updateStatesById($edit_id, $columns);
+        $columns = array("name"=>$name, "acronym"=>$acronym);
+        $result = $db->updateGame_system_factionsById($edit_id, $columns);
     }
 
 }

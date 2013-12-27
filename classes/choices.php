@@ -156,7 +156,7 @@ class Choices {
 
         function getGameSystemFactions($system_id){
             $gsf = new Game_system_factions();
-            $factions = $gsf->getByParent_game_system($system_id);
+            $factions = $gsf->getByParentGameSystem($system_id);
 
             if($factions){
                 $ret = array();
@@ -172,7 +172,7 @@ class Choices {
 
         function getGameSizes($system_id){
             $gsz = new Game_sizes();
-            $sizes = $gsz->getByParent_game_size($system_id);
+            $sizes = $gsz->getByParentGameSystem($system_id);
 
             if($sizes){
                 $ret = array();

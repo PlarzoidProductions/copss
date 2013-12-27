@@ -1,22 +1,26 @@
 <?php
 
 //  $page is already ready for us
-require_once("classes/db_states.php");
-require_once("classes/db_countries.php");
+require_once("classes/db_game_systems.php");
+require_once("classes/db_game_sizes.php");
 
 /**************************************
 
 Edit Selector
 
 **************************************/
-$page->register("parent", "select", array(  "label"=>"Parent Country", "reloading"=>1,
-                                                    "get_choices_array_func"=>"getCountries",
+$page->register("parent", "select", array(  "label"=>"Parent Game System", "reloading"=>1,
+                                                    "get_choices_array_func"=>"getGameSystems",
                                                     "get_choices_array_func_args"=>array()));
 $page->getChoices();
 $selected_parent = $page->getVar("parent");
 
-$page->register("edit_select", "select", array( "label"=>"Edit a State",
-                                                "get_choices_array_func"=>"getStates",
+if(Check::isNull($selected_parent)){
+    $selected_parent=1;
+}
+
+$page->register("edit_select", "select", array( "label"=>"Edit a Game Size",
+                                                "get_choices_array_func"=>"getGameSizes",
                                                 "get_choices_array_func_args"=>array($selected_parent)));
 $page->getChoices();
 $selected = $page->getVar("edit_select");
@@ -37,7 +41,7 @@ Retrieve defaults accordingly
 **************************************/
 if($page->submitIsSet("edit_submit") && !Check::isNull($selected)){
 
-    $db = new States();
+    $db = new Game_sizes();
 
     $defaults = $db->getById($selected);
 
@@ -54,6 +58,8 @@ if($page->submitIsSet("edit_submit") && !Check::isNull($selected)){
 Editable field(s)
 
 **************************************/
+$page->register("size", "number", array("default_val"=>$defaults[size],
+                                        "min"=>1, "max"=>10000, "step"=>1));
 $page->register("name", "textbox", array("default_val"=>$defaults[name]));
 
 $page->register("edit_id", "hidden", array("value"=>$defaults[id]));
@@ -65,16 +71,16 @@ $page->register("submit_config", "submit", array("value"=>"Submit"));
 Prep displaying the page
 
 **************************************/
-$inputs2 = array("edit_id", "name", "submit_config");
-$subtitle = "Add/Edit States";
+$inputs2 = array("edit_id", "size", "name", "submit_config");
+$subtitle = "Add/Edit Games Sizes";
 
-$country_db = new Countries();
-$country = $country_db->getById($selected_parent);
+$gs_db = new Game_systems();
+$system = $gs_db->getById($selected_parent);
 
 if($defaults[id]){
-    $subtitle2 = "Edit State '".$defaults[name]."'";
+    $subtitle2 = "Edit Game Size '".$defaults[size]." (".$defaults[name].")'";
 } else {
-    $subtitle2 = "Add New State to ".$country[0][name];
+    $subtitle2 = "Add New Game Size to ".$system[0][name];
 }
 
 
@@ -84,22 +90,21 @@ Process the addition / edit
 
 ***************************************/
 if($page->submitIsSet("submit_config")){
-   
-    $db = new States();
+
+    $db = new Game_sizes();
 
     $edit_id = $page->getVar("edit_id");
+    $size = $page->getVar("size");
     $name = $page->getVar("name");
 
-
-    if(Check::isNull($edit_id)){    
-        $exists = $db->getByName($name);
-        
+    if(Check::isNull($edit_id)){
+        $exists = $db->getBySize($size);
         if(empty($exists)){
-            $result = $db->create($name, $selected_parent);
+            $result = $db->create($selected_parent, $size, $name);
         }
     } else {
-        $columns = array("name"=>$name);
-        $result = $db->updateStatesById($edit_id, $columns);
+        $columns = array("name"=>$name, "acronym"=>$acronym);
+        $result = $db->updateGame_sizesById($edit_id, $columns);
     }
 
 }

@@ -76,7 +76,7 @@ if($page->submitIsSet("submit_config")){
 
     if(Check::isNull($edit_id)){
         $exists = $db->getByName($name);
-        if($exists != false){
+        if(empty($exists)){
             $result = $db->create($name);
         }
     } else {

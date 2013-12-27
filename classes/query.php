@@ -123,6 +123,17 @@ public function insertGroup($sql, $value_sets){
 }
 
 
+/**********************
+    Delete
+
+    Just run a query instead
+
+**********************/
+
+public function delete($sql, $values){
+    return $this->update($sql, $values);
+}
+
 }//class declaration
 
 ?>

@@ -30,8 +30,21 @@ if(Check::isNull($selected_parent)){
 }
 
 $page->register("edit_submit", "submit", array("value"=>"Select for Editing"));
+$page->register("delete_selected", "submit", array("value"=>"Delete Selected Faction"));
 
-$inputs = array("parent", "edit_select", "edit_submit");
+$inputs = array("parent", "edit_select", "edit_submit", "delete_selected");
+
+
+/*************************************
+
+Handle the delete
+
+*************************************/
+if($page->submitIsSet("delete_selected") && !CHeck::isNull($selected)){
+    $db = new Game_system_factions();
+
+    $result = $db->deleteGame_system_factions($selected);
+}
 
 
 /**************************************

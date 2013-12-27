@@ -9,13 +9,26 @@ Edit Selector
 
 **************************************/
 $page->register("edit_submit", "submit", array("value"=>"Select for Editing"));
+$page->register("delete_selected", "submit", array("value"=>"Delete Selected Item"));
 $page->register("edit_select", "select", array( "label"=>"Edit a Country",
                                                 "get_choices_array_func"=>"getCountries",
                                                 "get_choices_array_func_args"=>array()));
 $page->getChoices();
 $selected = $page->getVar("edit_select");
 
-$inputs = array("edit_select", "edit_submit");
+$inputs = array("edit_select", "edit_submit", "delete_selected");
+
+
+/**************************************
+
+Handle the delete
+
+**************************************/
+if($page->submitIsSet("delete_selected")){
+    $db = new Countries();
+
+    $result = $db->deleteCountries($selected);
+}
 
 /**************************************
 

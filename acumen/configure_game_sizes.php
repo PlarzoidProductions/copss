@@ -30,8 +30,21 @@ if(Check::isNull($selected_parent)){
 }
 
 $page->register("edit_submit", "submit", array("value"=>"Select for Editing"));
+$page->register("delete_selected", "submit", array("value"=>"Delete Selected Game Size"));
 
-$inputs = array("parent", "edit_select", "edit_submit");
+$inputs = array("parent", "edit_select", "edit_submit", "delete_selected");
+
+
+/**************************************
+
+Handle the delete
+
+**************************************/
+if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
+    $db = new Game_sizes();
+
+    $result = $db->deleteGame_sizes($selected);
+}
 
 
 /**************************************

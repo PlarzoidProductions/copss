@@ -157,6 +157,7 @@ class Page {
                 if(!Check::arrayKeysFormat(array("filedir", "filedir_webpath"), $attributes)) return false;
                 if(!preg_match("/\/$/", $attributes[filedir])) $attributes[filedir] .= "/";
                 break;
+            case "reset":
             case "submit":    
                 if(!Check::arrayKeysFormat(array("value"), $attributes)) return false;
                 break;
@@ -294,6 +295,9 @@ class Page {
                 break;
             case "radio": 
                 $this->printRadio($varname, $this->vars[$varname], $disp_type);
+                break;
+            case "reset":
+                $this->printReset($varname, $this->vars[$varname], $disp_type);
                 break;
 
             //Everything else
@@ -662,7 +666,16 @@ class Page {
         global $$v;
         $_REQUEST[$v] = $$v;
         if($disp_type == "form") {
-            $str.= "<input type=\"submit\" name=\"$v\" value=\"".$attr[value]."\">";
+            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr[value]."\">";
+            $this->printSimpleInput($str);
+        }
+    }
+
+    function printReset($v, $attr, $disp_type = "form") {
+        global $$v;
+        $_REQUEST[$v] = $$v;
+        if($disp_type == "form") {
+            $str = "<input type=\"reset\" value=\"".$attr[value]."\">";
             $this->printSimpleInput($str);
         }
     }

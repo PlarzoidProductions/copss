@@ -8,6 +8,7 @@ require_once("classes/db_game_systems.php");
 Edit Selector
 
 **************************************/
+$page->register("delete_selected", "submit", array("value"=>"Delete Selected Item"));
 $page->register("edit_submit", "submit", array("value"=>"Select for Editing"));
 $page->register("edit_select", "select", array( "label"=>"Edit a Game System",
                                                 "get_choices_array_func"=>"getGameSystems",
@@ -15,7 +16,19 @@ $page->register("edit_select", "select", array( "label"=>"Edit a Game System",
 $page->getChoices();
 $selected = $page->getVar("edit_select");
 
-$inputs = array("edit_select", "edit_submit");
+$inputs = array("edit_select", "edit_submit", "delete_selected");
+
+
+/**************************************
+
+Handle the delete
+
+**************************************/
+if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
+    $db = new Game_systems();
+
+    $result = $db->deleteGame_systems($selected);
+}
 
 
 /**************************************

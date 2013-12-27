@@ -17,6 +17,7 @@ $selected = $page->getVar("edit_select");
 
 $inputs = array("edit_select", "edit_submit");
 
+
 /**************************************
 
 Retrieve defaults accordingly
@@ -34,7 +35,6 @@ if($page->submitIsSet("edit_submit")){
     $defaults = array();
 }
 
-var_dump($defaults);
 
 /**************************************
 
@@ -45,6 +45,7 @@ $page->register("name", "textbox", array("default_val"=>$defaults[name]));
 
 $page->register("edit_id", "hidden", array("value"=>$defaults[id]));
 $page->register("submit_config", "submit", array("value"=>"Submit"));
+
 
 
 /**************************************
@@ -93,6 +94,5 @@ Display the special section
 ***************************************/
 
 include("templates/configure_section.html");
-
 
 ?>

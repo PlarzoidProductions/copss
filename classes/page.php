@@ -636,6 +636,12 @@ class Page {
         echo "<div class=\"input_container\"><div class=\"simple\">$input</div></div>";
     }
 
+    function printHidden($v, $attr, $disp_type = "form"){
+        if($disp_type == "form"){
+            echo "<input type=\"hidden\" name=\"$v\" value=\"".$attr[value]."\">";
+        }
+    }
+    /* 
     function printHidden($v, $attr, $disp_type = "form") {
         global $$v;
         $_REQUEST[$v] = $$v;
@@ -651,7 +657,7 @@ class Page {
             //echo $lvar;
         }
     }
-
+    */
     function printSubmit($v, $attr, $disp_type = "form") {
         global $$v;
         $_REQUEST[$v] = $$v;

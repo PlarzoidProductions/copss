@@ -4,12 +4,6 @@ include("classes/session.php");
 
 Session::init();
 
-//Hijack the $_SESSION var for now
-$_SESSION[userid] = 1;
-$_SESSION[is_logged_in] = true;
-$_SESSION[is_admin] = true;
-
-
 //If we're here and not logged in, turn and run
 if(!Session::isLoggedIn()){
     include("login.php");

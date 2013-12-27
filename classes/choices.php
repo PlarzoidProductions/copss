@@ -4,6 +4,7 @@ require_once("check.php");
 require_once("db_players.php");
 require_once("db_countries.php");
 require_once("db_states.php");
+require_once("db_game_systems.php");
 
 class Choices {
 
@@ -127,6 +128,7 @@ class Choices {
                 $countries = $c->getAll();
                 
                 if($countries){
+                    $ret = array();
                     foreach($countries as $country){
                         $ret[] = array("value"=>$country[id], "text"=>$country[name]);
                     }
@@ -135,5 +137,53 @@ class Choices {
 
                 return null;
 	}
+
+        function getGameSystems(){
+            $gs = new Game_systems();
+            $systems = $gs->getAll();
+
+            if($systems){
+                $ret = array();
+                foreach($systems as $system){
+                    $ret[] = array("value"=>$system[id], "text"=>$system[name]);
+                }
+                
+                return $ret;
+            }
+
+            return null;
+        }
+
+        function getGameSystemFactions($system_id){
+            $gsf = new Game_system_factions();
+            $factions = $gsf->getByParent_game_system($system_id);
+
+            if($factions){
+                $ret = array();
+                foreach($factions as $faction){
+                    $ret[] = array("value"=>$faction[id], "text"=>$faction[name]." (".$faction[acronym].")");
+                }
+
+                return $ret;
+            }
+
+            return null;
+        }
+
+        function getGameSizes($system_id){
+            $gsz = new Game_sizes();
+            $sizes = $gsz->getByParent_game_size($system_id);
+
+            if($sizes){
+                $ret = array();
+                foreach($sizes as $size){
+                    $ret[] = array("value"=>$size[id], "text"=>$size[size]." (".$size[name].")");
+                }
+
+                return $ret;
+            }
+
+            return null;
+        }
 }
 ?>

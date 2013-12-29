@@ -5,6 +5,9 @@ require_once("db_players.php");
 require_once("db_countries.php");
 require_once("db_states.php");
 require_once("db_game_systems.php");
+require_once("db_game_system_factions.php");
+require_once("db_game_sizes.php");
+require_once("db_events.php");
 
 class Choices {
 
@@ -32,7 +35,7 @@ class Choices {
 	function getRedeemFunctionChoices(){
 		return array(array("text"=>"Spend Points", "value"=>"SPEND"),array("text"=>"Add Points", "value"=>"ADD"));
 	}
-
+*/
 
 	function getYesNoChoices($default="No"){
 		$yes = array("value"=>1, "text"=>"Yes");
@@ -46,7 +49,7 @@ class Choices {
 		}
 	}
 
-	
+/*	
 	function getPlayerListChoices(){
 		$p = new Player();
 
@@ -155,6 +158,7 @@ class Choices {
         }
 
         function getGameSystemFactions($system_id){
+
             $gsf = new Game_system_factions();
             $factions = $gsf->getByParentGameSystem($system_id);
 
@@ -171,6 +175,7 @@ class Choices {
         }
 
         function getGameSizes($system_id){
+            
             $gsz = new Game_sizes();
             $sizes = $gsz->getByParentGameSystem($system_id);
 
@@ -184,6 +189,23 @@ class Choices {
             }
 
             return null;
+        }
+
+        function getGameSystemEvents($system_id){
+            $edb = new Events();
+            $events = $edb->getAll();
+
+
+            if($events){
+                $ret = array();
+                foreach($events as $event){
+                    $ret[] = array("text"=>$event[name], "value"=>$event[id]);
+                }
+
+                return $ret;
+            }
+            
+            return array(array("text"=>"None Exist!", "value"=>null));
         }
 }
 ?>

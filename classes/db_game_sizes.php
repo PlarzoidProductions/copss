@@ -159,7 +159,7 @@ public function getByParentGameSystem($parent_game_system){
 	
     //Validate Inputs
     $parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
-
+    
     return $this->getByColumn("parent_game_system", $parent_game_system);
 }
 

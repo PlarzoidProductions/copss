@@ -207,7 +207,6 @@ class Page {
                 $attributes[default_val] = $_POST[$varname] = $_REQUEST[$varname];
             }
         }
-            
 
         if($type == "select" || $type == "radio") { //check_func is always validSelect
             $attributes[check_func] = "validSelect";
@@ -535,7 +534,7 @@ class Page {
         $lvar = stripslashes($$v);
 
         //Check for variable existence...
-        if(empty($lvar) && !is_numeric($lvar)){  //empty(0) == true, but we may want the number 0
+        if(($lvar===null) || (empty($lvar) && !is_numeric($lvar))){  //empty(0) == true, but we may want the number 0
             
             //If it's not there, set it to the default
             $lvar = $attr[default_val];
@@ -592,7 +591,7 @@ class Page {
                     break;
 
                 case "default_val":
-                    if($value){
+                    if(!(($value===null) || (empty($value) && !(is_numeric($value))))){
                         if(!strcmp($type, "checkbox")){
                             $str.= "CHECKED ";
                         } else {

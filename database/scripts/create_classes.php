@@ -174,7 +174,27 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
     $validateFn.= "    if(Check::$fn($varname)){\n";
     $validateFn.= "        echo \"$name was invalid!\"; return false;\n";
     $validateFn.= "    }\n\n";
-    $validateFn.= "    return $varname;\n";
+    
+    switch($type){
+        case "INT":
+        case "BIGINT":
+        case "TINYINT":
+            $validateFn.= "    return intVal($varname);\n";
+            break;
+        case "FLOAT":
+            $validateFn.= "    return floatVal($varname);\n";
+            break;
+        case "DOUBLE":
+            $validateFn.= "    return doubleVal($varname);\n";
+            break;
+        case "BOOLEAN":
+            $validateFn.= "    if($varname){ return 1; } else { return 0; }\n";
+            break;
+        default:
+            $validateFn.= "    return $varname;\n";
+            break;
+    }
+
     $validateFn.= "}\n\n";
 
     $validateMe = "$varname = \$this->filter$fnName($varname); if($varname === false){return false;}";

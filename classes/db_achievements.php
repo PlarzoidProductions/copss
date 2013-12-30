@@ -70,6 +70,7 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 	$event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
+
 	//Create the values Array
 	$values = array(
 		":name"=>$name,
@@ -87,8 +88,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
  		":fully_painted_battle"=>$fully_painted_battle,
  		":event_id"=>$event_id
 	);
-
-	//Build the query
+	
+        //Build the query
 	$sql = "INSERT INTO $this->table (
 				name,
 				points,
@@ -351,7 +352,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -381,7 +382,7 @@ function filterPoints($points){
         echo "points was invalid!"; return false;
     }
 
-    return $points;
+    return intVal($points);
 }
 
 
@@ -396,7 +397,7 @@ function filterPerGame($per_game){
         echo "per_game was invalid!"; return false;
     }
 
-    return $per_game;
+    return intVal($per_game);
 }
 
 
@@ -411,7 +412,7 @@ function filterIsMeta($is_meta){
         echo "is_meta was invalid!"; return false;
     }
 
-    return $is_meta;
+    return intVal($is_meta);
 }
 
 
@@ -424,7 +425,7 @@ function filterGameCount($game_count){
         echo "game_count was invalid!"; return false;
     }
 
-    return $game_count;
+    return intVal($game_count);
 }
 
 
@@ -436,8 +437,8 @@ function filterGameSystemId($game_system_id){
     if(Check::notInt($game_system_id)){
         echo "game_system_id was invalid!"; return false;
     }
-
-    return $game_system_id;
+    
+    return intVal($game_system_id);
 }
 
 
@@ -450,7 +451,7 @@ function filterGameSizeId($game_size_id){
         echo "game_size_id was invalid!"; return false;
     }
 
-    return $game_size_id;
+    return intVal($game_size_id);
 }
 
 
@@ -463,7 +464,7 @@ function filterFactionId($faction_id){
         echo "faction_id was invalid!"; return false;
     }
 
-    return $faction_id;
+    return intVal($faction_id);
 }
 
 
@@ -476,7 +477,7 @@ function filterUniqueOpponent($unique_opponent){
         echo "unique_opponent was invalid!"; return false;
     }
 
-    return $unique_opponent;
+    return intVal($unique_opponent);
 }
 
 
@@ -489,7 +490,7 @@ function filterUniqueOpponentLocations($unique_opponent_locations){
         echo "unique_opponent_locations was invalid!"; return false;
     }
 
-    return $unique_opponent_locations;
+    return intVal($unique_opponent_locations);
 }
 
 
@@ -502,7 +503,7 @@ function filterPlayedThemeForce($played_theme_force){
         echo "played_theme_force was invalid!"; return false;
     }
 
-    return $played_theme_force;
+    return intVal($played_theme_force);
 }
 
 
@@ -515,7 +516,7 @@ function filterFullyPainted($fully_painted){
         echo "fully_painted was invalid!"; return false;
     }
 
-    return $fully_painted;
+    return intVal($fully_painted);
 }
 
 
@@ -528,7 +529,7 @@ function filterFullyPaintedBattle($fully_painted_battle){
         echo "fully_painted_battle was invalid!"; return false;
     }
 
-    return $fully_painted_battle;
+    return intVal($fully_painted_battle);
 }
 
 
@@ -541,7 +542,7 @@ function filterEventId($event_id){
         echo "event_id was invalid!"; return false;
     }
 
-    return $event_id;
+    return intVal($event_id);
 }
 
 

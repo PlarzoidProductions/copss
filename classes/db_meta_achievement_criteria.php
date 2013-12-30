@@ -197,7 +197,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -212,7 +212,7 @@ function filterParentAchievement($parent_achievement){
         echo "parent_achievement was invalid!"; return false;
     }
 
-    return $parent_achievement;
+    return intVal($parent_achievement);
 }
 
 
@@ -227,7 +227,7 @@ function filterChildAchievement($child_achievement){
         echo "child_achievement was invalid!"; return false;
     }
 
-    return $child_achievement;
+    return intVal($child_achievement);
 }
 
 
@@ -242,7 +242,7 @@ function filterCount($count){
         echo "count was invalid!"; return false;
     }
 
-    return $count;
+    return intVal($count);
 }
 
 

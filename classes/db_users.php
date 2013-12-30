@@ -223,7 +223,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -296,7 +296,7 @@ function filterAdmin($admin){
         echo "admin was invalid!"; return false;
     }
 
-    return $admin;
+    return intVal($admin);
 }
 
 

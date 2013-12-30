@@ -183,7 +183,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -198,7 +198,7 @@ function filterPlayerId($player_id){
         echo "player_id was invalid!"; return false;
     }
 
-    return $player_id;
+    return intVal($player_id);
 }
 
 
@@ -213,7 +213,7 @@ function filterAchievementId($achievement_id){
         echo "achievement_id was invalid!"; return false;
     }
 
-    return $achievement_id;
+    return intVal($achievement_id);
 }
 
 

@@ -130,7 +130,8 @@
         $success_str.= " user $username!";
 
         $page->setDisplayMode("text");
-        $template = "templates/modify_user_success.html";
+        $link = array("href"=>"home.php?view=manage_users", "text"=>"Add another User?");
+        $template = "templates/success.html";
     
     } else {
 

@@ -78,7 +78,8 @@
         $reg_string.="!";
 
         $page->setDisplayMode("text");
-        $template = "templates/registration_success.html";
+        $link = array("href"=>"home.php?view=register_player", "text"=>"Register Another Player?");
+        $template = "templates/success.html";
     
     } else {
     

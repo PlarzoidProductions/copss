@@ -183,7 +183,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -213,7 +213,7 @@ function filterParent($parent){
         echo "parent was invalid!"; return false;
     }
 
-    return $parent;
+    return intVal($parent);
 }
 
 

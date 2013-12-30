@@ -159,7 +159,7 @@ public function getByParentGameSystem($parent_game_system){
 	
     //Validate Inputs
     $parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
-    
+
     return $this->getByColumn("parent_game_system", $parent_game_system);
 }
 
@@ -197,7 +197,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -212,7 +212,7 @@ function filterParentGameSystem($parent_game_system){
         echo "parent_game_system was invalid!"; return false;
     }
 
-    return $parent_game_system;
+    return intVal($parent_game_system);
 }
 
 
@@ -227,7 +227,7 @@ function filterSize($size){
         echo "size was invalid!"; return false;
     }
 
-    return $size;
+    return intVal($size);
 }
 
 

@@ -251,7 +251,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -309,7 +309,7 @@ function filterCountry($country){
         echo "country was invalid!"; return false;
     }
 
-    return $country;
+    return intVal($country);
 }
 
 
@@ -322,7 +322,7 @@ function filterState($state){
         echo "state was invalid!"; return false;
     }
 
-    return $state;
+    return intVal($state);
 }
 
 
@@ -337,7 +337,7 @@ function filterVip($vip){
         echo "vip was invalid!"; return false;
     }
 
-    return $vip;
+    return intVal($vip);
 }
 
 

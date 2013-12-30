@@ -197,7 +197,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -227,7 +227,7 @@ function filterGameSystem($game_system){
         echo "game_system was invalid!"; return false;
     }
 
-    return $game_system;
+    return intVal($game_system);
 }
 
 
@@ -242,7 +242,7 @@ function filterScenario($scenario){
         echo "scenario was invalid!"; return false;
     }
 
-    return $scenario;
+    return intVal($scenario);
 }
 
 

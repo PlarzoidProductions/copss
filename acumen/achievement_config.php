@@ -38,7 +38,8 @@
     ***************************************/
 
     $page->register("name", "textbox", array("required"=>true, "default_val"=>$defaults[name]));
-    $page->register("points", "number", array("min"=>0, "max"=>100, "step"=>1, "required"=>true, "default_val"=>$defaults[points]));
+    $page->register("points", "number", array(  "min"=>0, "max"=>100, "step"=>1, "required"=>true, 
+                                                "default_val"=>$defaults[points]));
     $page->register("per_game", "select", array("get_choices_array_func"=>"getYesNoChoices",
                                                 "get_choices_array_func_args"=>array("Yes"),
                                                 "default_val"=>$defaults[per_game])); 
@@ -54,7 +55,8 @@
     $page->register("game_size", "select", array(   "get_choices_array_func"=>"getGameSizes",
                                                     "get_choices_array_func_args"=>array($parent_game_system),
                                                     "default_val"=>$defaults[game_size_id]));
-    $page->register("faction", "select", array("get_choices_array_func"=>"getGameSystemFactions",
+    $page->register("faction", "select", array( "label"=>"Played Against Faction",
+                                                "get_choices_array_func"=>"getGameSystemFactions",
                                                 "get_choices_array_func_args"=>array($parent_game_system),
                                                 "default_val"=>$defaults[faction_id]));
     $page->register("unique_opponent", "checkbox", array(   "on_text"=>"Required", "off_text"=>"", 
@@ -74,6 +76,8 @@
 
     $page->getChoices();
 
+
+
     /***************************************
 
     Listen for the click
@@ -83,16 +87,29 @@
     if($page->submitIsSet("submit_ach")){
 
         //Retrieve the vars
-        $first = $page->getVar("first_name");
-        $last = $page->getVar("last_name");
-        $email = $page->getVar("e_mail");
-        $country = $page->getVar("country");
-        $state = $page->getVar("state");
-        $vip = $page->getVar("vip");
+        $name = $page->getVar("name");
+        $points = $page->getVar("points");
+        $per_game = $page->getVar("per_game");
+        $game_system = $page->getVar("game_system");
+        $game_count = $page->getVar("game_count");
+        $game_size = $page->getVar("game_size");
+        $faction = $page->getVar("faction");
+        $unique_opponent = $page->getVar("unique_opponent");
+        $unique_opponent_location = $page->getVar("unique_opponent_location");
+        $played_theme_force = $page->getVar("played_theme_force");
+        $played_fully_painted = $page->getVar("played_fully_painted");
+        $fully_painted_battle = $page->getVar("fully_painted_battle");
+        $completed_event = $page->getVar("completed_event");
+        
+        $db = new Achievements();
 
-        $db = new Players();
-
-        $result = $db->create($first, $last, $email, $country, $state, $vip);
+        if($ach_id){
+           //TODO Update
+        } else {
+           $result = $db->create($name, $points, $per_game, 0, $game_count, $game_system, $game_size,
+                                $faction, $unique_opponent, $unique_opponent_location, $played_theme_force,
+                                $played_fully_painted, $fully_painted_battle, $completed_event);
+        }
     }
 
 
@@ -101,16 +118,23 @@
     Create and Show the Page
 
     **************************************/
-    if($page->submitIsSet("submit_ach") && ($result != false)){
-        
-    
+    if($page->submitIsSet("submit_ach") && ($result != false)){ 
+
+        if($ach_id){
+            $success_str = "Successfully modified $name";
+        } else {
+            $success_str = "Successfully added $name";
+        }
+        $link = array("href"=>"home.php?view=achievement_config", "text"=>"Make Another Achievement?");
+        $template = "templates/success.html"; 
+
     } else {
     
         $inputs = array("name", "points", "per_game", "game_system", "game_count", "game_size", "faction",
                         "unique_opponent", "unique_opponent_location", "played_theme_force", 
                         "played_fully_painted", "fully_painted_battle", "completed_event", "submit_ach");
         $page->setDisplayMode("form");
-        $template = "templates/default_section.html";
+        $template = "templates/default_section.html"; 
     }
     
     $form_method="post";

@@ -211,7 +211,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -226,7 +226,7 @@ function filterUserId($user_id){
         echo "user_id was invalid!"; return false;
     }
 
-    return $user_id;
+    return intVal($user_id);
 }
 
 
@@ -241,7 +241,7 @@ function filterShiftId($shift_id){
         echo "shift_id was invalid!"; return false;
     }
 
-    return $shift_id;
+    return intVal($shift_id);
 }
 
 
@@ -256,7 +256,7 @@ function filterCheckedIn($checked_in){
         echo "checked_in was invalid!"; return false;
     }
 
-    return $checked_in;
+    return intVal($checked_in);
 }
 
 
@@ -271,7 +271,7 @@ function filterCompleted($completed){
         echo "completed was invalid!"; return false;
     }
 
-    return $completed;
+    return intVal($completed);
 }
 
 

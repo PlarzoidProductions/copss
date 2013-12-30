@@ -253,7 +253,7 @@ function filterId($id){
         echo "id was invalid!"; return false;
     }
 
-    return $id;
+    return intVal($id);
 }
 
 
@@ -268,7 +268,7 @@ function filterGameId($game_id){
         echo "game_id was invalid!"; return false;
     }
 
-    return $game_id;
+    return intVal($game_id);
 }
 
 
@@ -283,7 +283,7 @@ function filterPlayerId($player_id){
         echo "player_id was invalid!"; return false;
     }
 
-    return $player_id;
+    return intVal($player_id);
 }
 
 
@@ -296,7 +296,7 @@ function filterFactionId($faction_id){
         echo "faction_id was invalid!"; return false;
     }
 
-    return $faction_id;
+    return intVal($faction_id);
 }
 
 
@@ -309,7 +309,7 @@ function filterGameSize($game_size){
         echo "game_size was invalid!"; return false;
     }
 
-    return $game_size;
+    return intVal($game_size);
 }
 
 
@@ -324,7 +324,7 @@ function filterThemeForce($theme_force){
         echo "theme_force was invalid!"; return false;
     }
 
-    return $theme_force;
+    return intVal($theme_force);
 }
 
 
@@ -339,7 +339,7 @@ function filterFullyPainted($fully_painted){
         echo "fully_painted was invalid!"; return false;
     }
 
-    return $fully_painted;
+    return intVal($fully_painted);
 }
 
 
@@ -354,7 +354,7 @@ function filterWinner($winner){
         echo "winner was invalid!"; return false;
     }
 
-    return $winner;
+    return intVal($winner);
 }
 
 

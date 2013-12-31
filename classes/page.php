@@ -695,9 +695,15 @@ class Page {
 
             //Build the open select tag
             $reloading = "";
+            
             if($attr[reloading]){
                 $reloading.= " onChange=\"this.form.submit()\"";
             }
+            
+            if($attr[multiple]){
+                $reloading.=" multiple";
+            }
+
             $str = "<select name=\"$v\"$reloading>";
 
             //Toss in the choices

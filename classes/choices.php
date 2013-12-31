@@ -8,6 +8,7 @@ require_once("db_game_systems.php");
 require_once("db_game_system_factions.php");
 require_once("db_game_sizes.php");
 require_once("db_events.php");
+require_once("db_achievements.php");
 
 class Choices {
 
@@ -205,6 +206,30 @@ class Choices {
                 return $ret;
             }
             
+            return array(array("text"=>"None Exist!", "value"=>null));
+        }
+
+        function getAchievementTypes(){
+            $ret = array(   array("text"=>"Standard", "value"=>0),
+                            array("text"=>"Meta", "value"=>1)
+                        );
+
+            return $ret;
+        }
+
+        function getGameSystemAchievements($system_id){
+            $adb = new Achievements();
+            $achs = $adb->getByGameSystemId($system_id);
+
+            if($achs){
+                $ret = array();
+                foreach($achs as $ach){
+                    $ret[] = array("value"=>$ach[id], "text"=>$ach[name]." (".$ach[points].")");
+                }
+
+                return $ret;
+            }
+
             return array(array("text"=>"None Exist!", "value"=>null));
         }
 }

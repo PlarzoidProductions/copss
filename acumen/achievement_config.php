@@ -6,7 +6,7 @@
 
     $page = new Page();
 
-
+    
     /***************************************
 
     Extract defaults if we're editing
@@ -15,8 +15,7 @@
     $action = $_REQUEST[action];
     if($action == "edit_ach"){
         $ach_id = $_REQUEST[ach_id];
-        if(Check::notInt($$ach_id)){
-            //TODO Handle error
+        if(Check::notInt($ach_id)){
             $error = "Invalid Achievement ID for editing!";
         }
 
@@ -46,11 +45,18 @@
     $page->register("game_system", "select", array( "get_choices_array_func"=>"getGameSystems",
                                                     "get_choices_array_func_args"=>array(),
                                                     "default_val"=>$defaults[game_system_id]));
+    $page->register("ach_type", "select", array(    "get_choices_array_func"=>"getAchievementTypes",
+                                                    "get_choices_array_func_args"=>array(),
+                                                    "default_val"=>$defaults[is_meta],
+                                                    "reloading"=>1, "label"=>"Achievement Type"));
     $page->getChoices();
 
     $parent_game_system = $page->getVar("game_system");
     if(empty($parent_game_system))$parent_game_system=1;
-    
+
+    $page->register("children[]", "select", array(  "get_choices_array_func"=>"getGameSystemAchievements",
+                                                    "get_choices_array_func_args"=>array($parent_game_system),
+                                                    "multiple"=>true));
     $page->register("game_count", "number", array("min"=>0, "max"=>10000, "step"=>1, "default_val"=>$defaults[game_count]));
     $page->register("game_size", "select", array(   "get_choices_array_func"=>"getGameSizes",
                                                     "get_choices_array_func_args"=>array($parent_game_system),
@@ -77,7 +83,6 @@
     $page->getChoices();
 
 
-
     /***************************************
 
     Listen for the click
@@ -91,6 +96,8 @@
         $points = $page->getVar("points");
         $per_game = $page->getVar("per_game");
         $game_system = $page->getVar("game_system");
+        $is_meta = $page->getVar("ach_type");
+        $children = $page->getVar("children[]");//array
         $game_count = $page->getVar("game_count");
         $game_size = $page->getVar("game_size");
         $faction = $page->getVar("faction");
@@ -104,12 +111,37 @@
         $db = new Achievements();
 
         if($ach_id){
-           //TODO Update
+           $columns = array("name"=>$name,
+                            "points"=>$points,
+                            "per_game"=>$per_game,
+                            "is_meta"=>$is_meta,
+                            "game_system_id"=>$game_system,
+                            "game_count"=>$game_count,
+                            "game_size"=>$game_size,
+                            "faction_id"=>$faction,
+                            "unique_opponent"=>$unique_opponent,
+                            "unique_opponent_location"=>$unique_opponent_location,
+                            "played_theme_force"=>$played_theme_force,
+                            "played_fully_painted"=>$played_fully_painted,
+                            "fully_painted_battle"=>$fully_painted_battle,
+                            "event_id"=>$completed_event
+                        );
+            $result = $db->update($ach_id, $columns);
+                            
         } else {
-           $result = $db->create($name, $points, $per_game, 0, $game_count, $game_system, $game_size,
+            $result = $db->create($name, $points, $per_game, $is_meta, $game_count, $game_system, $game_size,
                                 $faction, $unique_opponent, $unique_opponent_location, $played_theme_force,
                                 $played_fully_painted, $fully_painted_battle, $completed_event);
         }
+
+        if($is_meta){
+            $mdb = new Meta_achievements();
+            foreach($children as $child){
+                //TODO Delete by parent ID - all
+                //TODO Add all new 
+            }
+        }
+
     }
 
 
@@ -118,6 +150,8 @@
     Create and Show the Page
 
     **************************************/
+
+    //If the user submitted something
     if($page->submitIsSet("submit_ach") && ($result != false)){ 
 
         if($ach_id){
@@ -128,11 +162,23 @@
         $link = array("href"=>"home.php?view=achievement_config", "text"=>"Make Another Achievement?");
         $template = "templates/success.html"; 
 
+    //... otherwise
     } else {
-    
-        $inputs = array("name", "points", "per_game", "game_system", "game_count", "game_size", "faction",
-                        "unique_opponent", "unique_opponent_location", "played_theme_force", 
-                        "played_fully_painted", "fully_painted_battle", "completed_event", "submit_ach");
+        $is_meta = $page->getVar("ach_type");
+
+        //Build the Inputs Array
+        $inputs = array("name", "points", "per_game", "game_system", "ach_type");
+        if($is_meta){
+            $inputs[] = "children[]";
+        } else {
+            $inputs = array_merge($inputs, array("game_count", "game_size", "faction",
+                            "unique_opponent", "unique_opponent_location", "played_theme_force", 
+                            "played_fully_painted", "fully_painted_battle", "completed_event")
+                        );
+        
+        }
+        $inputs = array_merge($inputs, array("submit_ach"));
+
         $page->setDisplayMode("form");
         $template = "templates/default_section.html"; 
     }

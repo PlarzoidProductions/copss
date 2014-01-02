@@ -164,20 +164,27 @@ div.simple {
     border-spacing: 0px 2px;
 }
 
-#achievement_listing tr.header{
-    height: 80px;    
+#achievement_listing tr.header {
+    height: 175px;
+}
+
+#achievement_listing th {
+    vertical-align: bottom;
 }
 
 .rotated {
-    -webkit-transform:rotate(-70deg);
+    -webkit-transform:rotate(-90deg);
+    white-space:nowrap;
     padding: 2px;
+    width: 20px;
+    height: 100%;
 }
 
 #achievement_listing tr.odd{
     background: #333;
 }
 
-#achievement_listing td {
+#achievement_listing td, th {
     padding: 0px 2px;
 }
 

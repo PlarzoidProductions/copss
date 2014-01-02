@@ -201,6 +201,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
   `played_theme_force` TINYINT(1) NULL DEFAULT NULL ,
   `fully_painted` TINYINT(1) NULL DEFAULT NULL ,
   `fully_painted_battle` TINYINT(1) NULL DEFAULT NULL ,
+  `played_scenario` TINYINT(1) NULL ,
+  `multiplayer` TINYINT(1) NULL ,
   `event_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_ach_game_system_id` (`game_system_id` ASC) ,

@@ -88,7 +88,7 @@ public function deleteByColumns($columns){
     }
 
     //Create Query\n";
-    $sql = "SELECT * FROM $this->table WHERE ";
+    $sql = "DELETE FROM $this->table WHERE ";
     $keys = array_keys($columns);
     foreach($keys as $column){
         $sql.= "$column=:$column";
@@ -99,6 +99,11 @@ public function deleteByColumns($columns){
 
     return $this->db->delete($sql, $values);
 }
+
+public function deleteById($id){
+    return $this->deleteByColumns(array("id"=>$id));
+}
+
 
 /**************************************************
 

@@ -24,6 +24,8 @@
 *	played_theme_force - TINYINT
 *	fully_painted - TINYINT
 *	fully_painted_battle - TINYINT
+*	played_scenario - TINYINT
+*	multiplayer - TINYINT
 *	event_id - INT
 *
 **************************************************/
@@ -52,7 +54,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $event_id){
+public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $event_id){
 
 	//Validate the inputs
 	$name = $this->filterName($name); if($name === false){return false;}
@@ -68,6 +70,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 	$played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
 	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
+	$played_scenario = $this->filterPlayedScenario($played_scenario); if($played_scenario === false){return false;}
+	$multiplayer = $this->filterMultiplayer($multiplayer); if($multiplayer === false){return false;}
 	$event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
 	//Create the values Array
@@ -85,6 +89,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
  		":played_theme_force"=>$played_theme_force,
  		":fully_painted"=>$fully_painted,
  		":fully_painted_battle"=>$fully_painted_battle,
+ 		":played_scenario"=>$played_scenario,
+ 		":multiplayer"=>$multiplayer,
  		":event_id"=>$event_id
 	);
 
@@ -103,6 +109,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 				played_theme_force,
 				fully_painted,
 				fully_painted_battle,
+				played_scenario,
+				multiplayer,
 				event_id
 			) VALUES (
 				:name,
@@ -118,6 +126,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 				:played_theme_force,
 				:fully_painted,
 				:fully_painted_battle,
+				:played_scenario,
+				:multiplayer,
 				:event_id)";
 
 	return $this->db->insert($sql, $values);
@@ -138,7 +148,7 @@ public function deleteByColumns($columns){
     }
 
     //Create Query\n";
-    $sql = "SELECT * FROM $this->table WHERE ";
+    $sql = "DELETE FROM $this->table WHERE ";
     $keys = array_keys($columns);
     foreach($keys as $column){
         $sql.= "$column=:$column";
@@ -149,6 +159,11 @@ public function deleteByColumns($columns){
 
     return $this->db->delete($sql, $values);
 }
+
+public function deleteById($id){
+    return $this->deleteByColumns(array("id"=>$id));
+}
+
 
 /**************************************************
 
@@ -341,6 +356,24 @@ public function getByFullyPaintedBattle($fully_painted_battle){
     $fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 
     return $this->queryByColumns(array("fully_painted_battle"=>$fully_painted_battle));
+}
+
+
+public function getByPlayedScenario($played_scenario){
+	
+    //Validate Inputs
+    $played_scenario = $this->filterPlayedScenario($played_scenario); if($played_scenario === false){return false;}
+
+    return $this->queryByColumns(array("played_scenario"=>$played_scenario));
+}
+
+
+public function getByMultiplayer($multiplayer){
+	
+    //Validate Inputs
+    $multiplayer = $this->filterMultiplayer($multiplayer); if($multiplayer === false){return false;}
+
+    return $this->queryByColumns(array("multiplayer"=>$multiplayer));
 }
 
 
@@ -558,6 +591,32 @@ function filterFullyPaintedBattle($fully_painted_battle){
     }
 
     return intVal($fully_painted_battle);
+}
+
+
+
+function filterPlayedScenario($played_scenario){
+    //Allowed to be null, catch that first
+    if(Check::isNull($played_scenario)){ return null; }
+
+    if(Check::notBool($played_scenario)){
+        echo "played_scenario was invalid!"; return false;
+    }
+
+    return intVal($played_scenario);
+}
+
+
+
+function filterMultiplayer($multiplayer){
+    //Allowed to be null, catch that first
+    if(Check::isNull($multiplayer)){ return null; }
+
+    if(Check::notBool($multiplayer)){
+        echo "multiplayer was invalid!"; return false;
+    }
+
+    return intVal($multiplayer);
 }
 
 

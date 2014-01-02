@@ -2,24 +2,29 @@
     <header><h1>Achievements</h1></header>
     <table>
         <tr class="header">
-            <th><div class="rotated">Name</div></td>
-            <th><div class="rotated">Points</div></td>
-            <th><div class="rotated">Per Game</div></td>
-            <th><div class="rotated">Game System</div></td>
-            <th><div class="rotated">Type</div></td>
-            <th><div class="rotated">Game Count</div></td>
-            <th><div class="rotated">Game Size</div></td>
-            <th><div class="rotated">Played against Faction</div></td>
-            <th><div class="rotated">Unique Opponent</div></td>
-            <th><div class="rotated">Unique Opponent Location</div></td>
-            <th><div class="rotated">Played Theme Force</div></td>
-            <th><div class="rotated">Played Fully Painted</div></td>
-            <th><div class="rotated">Fully Painted Battle</div></td>
-            <th><div class="rotated">Completed Event</div></td>
+            <th>Name</div></th>
+            <th>Points</div></th>
+            <th>Per Game</div></th>
+            <th>Game System</div></th>
+            <th>Type</div></th>
+            <th><div class="rotated">Game Count</div></th>
+            <th><div class="rotated">Game Size</div></th>
+            <th><div class="rotated">Played against Faction</div></th>
+            <th><div class="rotated">Unique Opponent</div></th>
+            <th><div class="rotated">Unique Opponent Location</div></th>
+            <th><div class="rotated">Played Theme Force</div></th>
+            <th><div class="rotated">Played Fully Painted</div></th>
+            <th><div class="rotated">Fully Painted Battle</div></th>
+            <th><div class="rotated">Scenario Table</div></th>
+            <th><div class="rotated">Multiplayer</div></th>
+            <th>Completed Event</th>
         </tr>
     <?foreach($achievements as $a){?>
         <tr class="<?=$a[style]?>">
-            <td><?=$a[name]?></td>
+            <td>
+                <?=$a[name]?> 
+                (<a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?=$a[id]?>">Edit</a>)
+            </td>
             <td><?=$a[points]?></td>
             <td><?if($a[per_game]){?>Yes<?} else {?>No<?}?></td>
             <td><?=$a[game_system_name]?></td>
@@ -27,14 +32,16 @@
             <td><?if($a[game_count] > 0){?><?=$a[game_count]?><?}?></td>
             <td><?=$a[game_size]?></td>
             <td><?=$a[faction]?></td>
-            <td><?if($a[unique_opponent]){?>Yes<?}?></td>
-            <td><?if($a[unique_opponent_location]){?>Yes<?}?></td>
-            <td><?if($a[played_theme_force]){?>Yes<?}?></td>
-            <td><?if($a[played_fully_painted]){?>Yes<?}?></td>
-            <td><?if($a[fully_painted_battle]){?>Yes<?}?></td>
+            <td><?if($a[unique_opponent]){?>Y<?}?></td>
+            <td><?if($a[unique_opponent_location]){?>Y<?}?></td>
+            <td><?if($a[played_theme_force]){?>Y<?}?></td>
+            <td><?if($a[played_fully_painted]){?>Y<?}?></td>
+            <td><?if($a[fully_painted_battle]){?>Y<?}?></td>
+            <td><?if($a[played_scenario]){?>Y<?}?></td>
+            <td><?if($a[multiplayer]){?>Y<?}?></td>
             <td><?=$a[event_name]?></td>
             <td>
-                <a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?=$a[id]?>">Edit</a>
+                <a href="home.php?view=achievement_config&action=delete&ach_id=<?=$a[id]?>">Delete</a>
             </td>
         </tr>
     <?}?>

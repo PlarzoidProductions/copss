@@ -8,8 +8,6 @@
     require_once("classes/db_game_sizes.php");
     require_once("classes/db_events.php");
 
-
-
     $page = new Page("ADMIN");
 
     $ach_db = new Achievements();
@@ -37,7 +35,7 @@
             }
 
             if($action == "delete"){
-                $ach_db->deleteById($ach_id);
+                $ach_db->deleteByColumns(array("id"=>$ach_id));
             }
         }
     } else {
@@ -89,6 +87,12 @@
                                                                 "default_val"=>$defaults[fully_painted]));
     $page->register("fully_painted_battle", "checkbox", array(  "on_text"=>"Required", "off_text"=>"",
                                                                 "default_val"=>$defaults[fully_painted_battle]));
+    $page->register("played_scenario", "checkbox", array("label"=>"Played on a Scenario Table",  
+                                                        "on_text"=>"Required", "off_text"=>"",
+                                                        "default_val"=>$defaults[played_scenario]));
+    $page->register("multiplayer", "checkbox", array("label"=>"Multiplayer Game",
+                                                        "on_text"=>"Required", "off_text"=>"",
+                                                        "default_val"=>$defaults[multiplayer]));
     $page->register("completed_event", "select", array( "get_choices_array_func"=>"getEvents",
                                                         "get_choices_array_func_args"=>array(),
                                                         "default_val"=>$defaults[event_id]));
@@ -143,6 +147,8 @@
         $played_theme_force = $page->getVar("played_theme_force");
         $played_fully_painted = $page->getVar("played_fully_painted");
         $fully_painted_battle = $page->getVar("fully_painted_battle");
+        $played_scenario = $page->getvar("played_scenario");
+        $multiplayer = $page->getvar("multiplayer");
         $completed_event = $page->getVar("completed_event");
        
         //Update vs Create
@@ -157,6 +163,8 @@
                             "played_theme_force"=>$played_theme_force,
                             "fully_painted"=>$played_fully_painted,
                             "fully_painted_battle"=>$fully_painted_battle,
+                            "played_scenario"=>$played_scenario,
+                            "multiplayer"=>$multiplayer
                         );
             
             //handle references
@@ -189,7 +197,7 @@
         } else {
             $result = $ach_db->create($name, $points, $per_game, $is_meta, $game_count, $game_system, $game_size,
                                 $faction, $unique_opponent, $unique_opponent_location, $played_theme_force,
-                                $played_fully_painted, $fully_painted_battle, $completed_event);
+                                $played_fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $completed_event);
         }
 
     
@@ -231,14 +239,14 @@
 
     *************************************/
     $achievements = $ach_db->getAll();
-
-    $i=true;
-    if($achievements){
+    
+    if(!empty($achievements)){
+    
         $gsys = new Game_systems();
         $gsz = new Game_sizes();
         $factions = new Game_system_factions();
         $events = new Events();
-        
+
         //references
         foreach ($achievements as $key=>$ach) {
             if($ach[game_system_id]){
@@ -309,7 +317,8 @@
         } else {
             $inputs = array_merge($inputs, array("game_count", "game_size", "faction",
                             "unique_opponent", "unique_opponent_location", "played_theme_force", 
-                            "played_fully_painted", "fully_painted_battle", "completed_event")
+                            "played_fully_painted", "fully_painted_battle", "played_scenario",
+                            "multiplayer", "completed_event")
                         );
         
         }

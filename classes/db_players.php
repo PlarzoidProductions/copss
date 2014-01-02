@@ -92,17 +92,26 @@ public function create($first_name, $last_name, $email, $country, $state, $vip){
 Delete Function
 
 **************************************************/
-public function deletePlayers($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -147,19 +156,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -169,7 +186,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -178,7 +195,7 @@ public function getByFirstName($first_name){
     //Validate Inputs
     $first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
 
-    return $this->getByColumn("first_name", $first_name);
+    return $this->queryByColumns(array("first_name"=>$first_name));
 }
 
 
@@ -187,7 +204,7 @@ public function getByLastName($last_name){
     //Validate Inputs
     $last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
 
-    return $this->getByColumn("last_name", $last_name);
+    return $this->queryByColumns(array("last_name"=>$last_name));
 }
 
 
@@ -196,7 +213,7 @@ public function getByEmail($email){
     //Validate Inputs
     $email = $this->filterEmail($email); if($email === false){return false;}
 
-    return $this->getByColumn("email", $email);
+    return $this->queryByColumns(array("email"=>$email));
 }
 
 
@@ -205,7 +222,7 @@ public function getByCountry($country){
     //Validate Inputs
     $country = $this->filterCountry($country); if($country === false){return false;}
 
-    return $this->getByColumn("country", $country);
+    return $this->queryByColumns(array("country"=>$country));
 }
 
 
@@ -214,7 +231,7 @@ public function getByState($state){
     //Validate Inputs
     $state = $this->filterState($state); if($state === false){return false;}
 
-    return $this->getByColumn("state", $state);
+    return $this->queryByColumns(array("state"=>$state));
 }
 
 
@@ -223,7 +240,7 @@ public function getByVip($vip){
     //Validate Inputs
     $vip = $this->filterVip($vip); if($vip === false){return false;}
 
-    return $this->getByColumn("vip", $vip);
+    return $this->queryByColumns(array("vip"=>$vip));
 }
 
 
@@ -232,7 +249,19 @@ public function getByCreationDate($creation_date){
     //Validate Inputs
     $creation_date = $this->filterCreationDate($creation_date); if($creation_date === false){return false;}
 
-    return $this->getByColumn("creation_date", $creation_date);
+    return $this->queryByColumns(array("creation_date"=>$creation_date));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

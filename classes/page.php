@@ -592,7 +592,7 @@ class Page {
 
                 case "default_val":
                     if(!(($value===null) || (empty($value) && !(is_numeric($value))))){
-                        if(!strcmp($type, "checkbox")){
+                        if(!strcmp($type, "checkbox") && strcmp($value, "0")){
                             $str.= "CHECKED ";
                         } else {
                             $str.= "value=\"$value\" ";
@@ -706,11 +706,17 @@ class Page {
 
             $str = "<select name=\"$v\"$reloading>";
 
+            if($_REQUEST[$v]){
+                $selected_option = $_REQUEST[$v];
+            } else {
+                $selected_option = $attr[default_val];
+            }
+
             //Toss in the choices
             foreach($choices as $c) {
 
                 $selected = "";
-                if($_REQUEST[$v] == $c[value]) $selected = " SELECTED";
+                if($selected_option == $c[value]) $selected = " SELECTED";
             
                 $str.= "<option value=\"".$c[value]."\"$selected>".$c[text]."</option>";
             }

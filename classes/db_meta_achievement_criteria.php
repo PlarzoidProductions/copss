@@ -74,17 +74,26 @@ public function create($parent_achievement, $child_achievement, $count){
 Delete Function
 
 **************************************************/
-public function deleteMeta_achievement_criteria($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -92,7 +101,7 @@ Update Record By ID Function(s)
 
 **************************************************/
 public function updateMeta_achievement_criteriaById($id, $columns){
-
+    
     //Values Array
     $values = array(":id"=>$id);
     foreach($columns as $column=>$value){
@@ -129,19 +138,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -151,7 +168,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -160,7 +177,7 @@ public function getByParentAchievement($parent_achievement){
     //Validate Inputs
     $parent_achievement = $this->filterParentAchievement($parent_achievement); if($parent_achievement === false){return false;}
 
-    return $this->getByColumn("parent_achievement", $parent_achievement);
+    return $this->queryByColumns(array("parent_achievement"=>$parent_achievement));
 }
 
 
@@ -169,7 +186,7 @@ public function getByChildAchievement($child_achievement){
     //Validate Inputs
     $child_achievement = $this->filterChildAchievement($child_achievement); if($child_achievement === false){return false;}
 
-    return $this->getByColumn("child_achievement", $child_achievement);
+    return $this->queryByColumns(array("child_achievement"=>$child_achievement));
 }
 
 
@@ -178,7 +195,19 @@ public function getByCount($count){
     //Validate Inputs
     $count = $this->filterCount($count); if($count === false){return false;}
 
-    return $this->getByColumn("count", $count);
+    return $this->queryByColumns(array("count"=>$count));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

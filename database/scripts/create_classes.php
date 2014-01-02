@@ -408,18 +408,31 @@ Delete Function
 
 **************************************************/
 ';
-$deleteFn.= "public function delete".$table_Fn_name."(".$primary_key[varname]."){\n\n";
+$deleteFn.= 'public function deleteByColumns($columns){
 
-$deleteFn.= "\t//Create the values array\n";
-$deleteFn.= "\t\$values = array(\":".$primary_key[name]."\"=>".$primary_key[varname].");\n\n";
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-$deleteFn.= "\t//Create Query\n";
-$deleteFn.= "\t\$sql = \"DELETE FROM \$this->table WHERE ".$primary_key[name]."=:".$primary_key[name]."\";\n\n";
-$deleteFn.= "\treturn \$this->db->delete(\$sql, \$values);\n";
-$deleteFn.= "}\n\n";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
+
+    return $this->db->delete($sql, $values);
+}
+';
 
 echo "Writing delete function...\n";
 fputs($class_fptr, $deleteFn);
+
 
 /**************************
 * Individual Update functions
@@ -458,6 +471,7 @@ $masterUpdateFn.="\n\n";
 echo "Writing master update function...\n";
 fputs($class_fptr, $masterUpdateFn);
 
+
 /**************************
 * Individual 'getBy' functions
 **************************/
@@ -483,33 +497,41 @@ fputs($class_fptr, $allFn);
 
 
 /**************************
-* Individual 'getBy' functions
+* Query by Columns function
 **************************/
-$columnFnHeader = '
+$masterQueryFnHeader = '
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
 ';
-fputs($class_fptr, $columnFnHeader);
+fputs($class_fptr, $masterQueryFnHeader);
 
-$masterColumnFn='private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+$masterQueryFn='public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }';
-$masterColumnFn.="\n\n";
+$masterQueryFn.="\n\n";
 
-echo "Writing master column function...\n";
-fputs($class_fptr, $masterColumnFn);
+echo "Writing master query function...\n";
+fputs($class_fptr, $masterQueryFn);
 
 foreach($columns as $column){
 
@@ -519,7 +541,7 @@ public function getBy'.$column[fnName].'('.$column[varname].'){
     //Validate Inputs
     '.$column[validateFn].'
 
-    return $this->getByColumn("'.$column[name].'", '.$column[varname].');
+    return $this->queryByColumns(array("'.$column[name].'"=>'.$column[varname].'));
 }';
 $columnFn.="\n\n";
 
@@ -527,6 +549,31 @@ echo "Writing column function for $column[name]...\n";
 fputs($class_fptr, $columnFn);
 
 }
+
+
+/*************************
+* Exists by Column(s) Function
+*************************/
+$existsFnHeader = '
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+';
+fputs($class_fptr, $existsFnHeader);
+
+$existsFn = 'public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
+}';
+$existsFn.="\n\n";
+
+echo "Writing exists by column(s) function...\n";
+fputs($class_fptr, $existsFn);
+
+
 
 /*************************
 * ValidationFunctions

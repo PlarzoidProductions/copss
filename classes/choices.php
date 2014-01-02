@@ -25,7 +25,8 @@ class Choices {
                             array("text"=>"States", "value"=>"states"),
                             array("text"=>"Game Systems", "value"=>"game_systems"),
                             array("text"=>"Factions", "value"=>"game_system_factions"),
-                            array("text"=>"Game Sizes", "value"=>"game_sizes")
+                            array("text"=>"Game Sizes", "value"=>"game_sizes"),
+                            array("text"=>"Events", "value"=>"events")
                         );
 
             return $ret;
@@ -147,7 +148,7 @@ class Choices {
             $systems = $gs->getAll();
 
             if($systems){
-                $ret = array();
+                $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($systems as $system){
                     $ret[] = array("value"=>$system[id], "text"=>$system[name]);
                 }
@@ -164,7 +165,7 @@ class Choices {
             $factions = $gsf->getByParentGameSystem($system_id);
 
             if($factions){
-                $ret = array();
+                $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($factions as $faction){
                     $ret[] = array("value"=>$faction[id], "text"=>$faction[name]." (".$faction[acronym].")");
                 }
@@ -181,7 +182,7 @@ class Choices {
             $sizes = $gsz->getByParentGameSystem($system_id);
 
             if($sizes){
-                $ret = array();
+                $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($sizes as $size){
                     $ret[] = array("value"=>$size[id], "text"=>$size[size]." (".$size[name].")");
                 }
@@ -192,13 +193,12 @@ class Choices {
             return null;
         }
 
-        function getGameSystemEvents($system_id){
+        function getEvents(){
             $edb = new Events();
             $events = $edb->getAll();
 
-
             if($events){
-                $ret = array();
+                $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($events as $event){
                     $ret[] = array("text"=>$event[name], "value"=>$event[id]);
                 }
@@ -222,7 +222,7 @@ class Choices {
             $achs = $adb->getByGameSystemId($system_id);
 
             if($achs){
-                $ret = array();
+                $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($achs as $ach){
                     $ret[] = array("value"=>$ach[id], "text"=>$ach[name]." (".$ach[points].")");
                 }

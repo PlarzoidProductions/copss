@@ -82,17 +82,26 @@ public function create($username, $password, $last_login, $admin){
 Delete Function
 
 **************************************************/
-public function deleteUsers($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -137,19 +146,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -159,7 +176,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -168,7 +185,7 @@ public function getByUsername($username){
     //Validate Inputs
     $username = $this->filterUsername($username); if($username === false){return false;}
 
-    return $this->getByColumn("username", $username);
+    return $this->queryByColumns(array("username"=>$username));
 }
 
 
@@ -177,7 +194,7 @@ public function getByPassword($password){
     //Validate Inputs
     $password = $this->filterPassword($password); if($password === false){return false;}
 
-    return $this->getByColumn("password", $password);
+    return $this->queryByColumns(array("password"=>$password));
 }
 
 
@@ -186,7 +203,7 @@ public function getByCreationDate($creation_date){
     //Validate Inputs
     $creation_date = $this->filterCreationDate($creation_date); if($creation_date === false){return false;}
 
-    return $this->getByColumn("creation_date", $creation_date);
+    return $this->queryByColumns(array("creation_date"=>$creation_date));
 }
 
 
@@ -195,7 +212,7 @@ public function getByLastLogin($last_login){
     //Validate Inputs
     $last_login = $this->filterLastLogin($last_login); if($last_login === false){return false;}
 
-    return $this->getByColumn("last_login", $last_login);
+    return $this->queryByColumns(array("last_login"=>$last_login));
 }
 
 
@@ -204,7 +221,19 @@ public function getByAdmin($admin){
     //Validate Inputs
     $admin = $this->filterAdmin($admin); if($admin === false){return false;}
 
-    return $this->getByColumn("admin", $admin);
+    return $this->queryByColumns(array("admin"=>$admin));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

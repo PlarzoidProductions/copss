@@ -70,7 +70,6 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 	$event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
-
 	//Create the values Array
 	$values = array(
 		":name"=>$name,
@@ -88,8 +87,8 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
  		":fully_painted_battle"=>$fully_painted_battle,
  		":event_id"=>$event_id
 	);
-	
-        //Build the query
+
+	//Build the query
 	$sql = "INSERT INTO $this->table (
 				name,
 				points,
@@ -130,17 +129,26 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 Delete Function
 
 **************************************************/
-public function deleteAchievements($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -185,19 +193,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -207,7 +223,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -216,7 +232,7 @@ public function getByName($name){
     //Validate Inputs
     $name = $this->filterName($name); if($name === false){return false;}
 
-    return $this->getByColumn("name", $name);
+    return $this->queryByColumns(array("name"=>$name));
 }
 
 
@@ -225,7 +241,7 @@ public function getByPoints($points){
     //Validate Inputs
     $points = $this->filterPoints($points); if($points === false){return false;}
 
-    return $this->getByColumn("points", $points);
+    return $this->queryByColumns(array("points"=>$points));
 }
 
 
@@ -234,7 +250,7 @@ public function getByPerGame($per_game){
     //Validate Inputs
     $per_game = $this->filterPerGame($per_game); if($per_game === false){return false;}
 
-    return $this->getByColumn("per_game", $per_game);
+    return $this->queryByColumns(array("per_game"=>$per_game));
 }
 
 
@@ -243,7 +259,7 @@ public function getByIsMeta($is_meta){
     //Validate Inputs
     $is_meta = $this->filterIsMeta($is_meta); if($is_meta === false){return false;}
 
-    return $this->getByColumn("is_meta", $is_meta);
+    return $this->queryByColumns(array("is_meta"=>$is_meta));
 }
 
 
@@ -252,7 +268,7 @@ public function getByGameCount($game_count){
     //Validate Inputs
     $game_count = $this->filterGameCount($game_count); if($game_count === false){return false;}
 
-    return $this->getByColumn("game_count", $game_count);
+    return $this->queryByColumns(array("game_count"=>$game_count));
 }
 
 
@@ -261,7 +277,7 @@ public function getByGameSystemId($game_system_id){
     //Validate Inputs
     $game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
 
-    return $this->getByColumn("game_system_id", $game_system_id);
+    return $this->queryByColumns(array("game_system_id"=>$game_system_id));
 }
 
 
@@ -270,7 +286,7 @@ public function getByGameSizeId($game_size_id){
     //Validate Inputs
     $game_size_id = $this->filterGameSizeId($game_size_id); if($game_size_id === false){return false;}
 
-    return $this->getByColumn("game_size_id", $game_size_id);
+    return $this->queryByColumns(array("game_size_id"=>$game_size_id));
 }
 
 
@@ -279,7 +295,7 @@ public function getByFactionId($faction_id){
     //Validate Inputs
     $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
-    return $this->getByColumn("faction_id", $faction_id);
+    return $this->queryByColumns(array("faction_id"=>$faction_id));
 }
 
 
@@ -288,7 +304,7 @@ public function getByUniqueOpponent($unique_opponent){
     //Validate Inputs
     $unique_opponent = $this->filterUniqueOpponent($unique_opponent); if($unique_opponent === false){return false;}
 
-    return $this->getByColumn("unique_opponent", $unique_opponent);
+    return $this->queryByColumns(array("unique_opponent"=>$unique_opponent));
 }
 
 
@@ -297,7 +313,7 @@ public function getByUniqueOpponentLocations($unique_opponent_locations){
     //Validate Inputs
     $unique_opponent_locations = $this->filterUniqueOpponentLocations($unique_opponent_locations); if($unique_opponent_locations === false){return false;}
 
-    return $this->getByColumn("unique_opponent_locations", $unique_opponent_locations);
+    return $this->queryByColumns(array("unique_opponent_locations"=>$unique_opponent_locations));
 }
 
 
@@ -306,7 +322,7 @@ public function getByPlayedThemeForce($played_theme_force){
     //Validate Inputs
     $played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
 
-    return $this->getByColumn("played_theme_force", $played_theme_force);
+    return $this->queryByColumns(array("played_theme_force"=>$played_theme_force));
 }
 
 
@@ -315,7 +331,7 @@ public function getByFullyPainted($fully_painted){
     //Validate Inputs
     $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
-    return $this->getByColumn("fully_painted", $fully_painted);
+    return $this->queryByColumns(array("fully_painted"=>$fully_painted));
 }
 
 
@@ -324,7 +340,7 @@ public function getByFullyPaintedBattle($fully_painted_battle){
     //Validate Inputs
     $fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 
-    return $this->getByColumn("fully_painted_battle", $fully_painted_battle);
+    return $this->queryByColumns(array("fully_painted_battle"=>$fully_painted_battle));
 }
 
 
@@ -333,7 +349,19 @@ public function getByEventId($event_id){
     //Validate Inputs
     $event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
-    return $this->getByColumn("event_id", $event_id);
+    return $this->queryByColumns(array("event_id"=>$event_id));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 
@@ -437,7 +465,7 @@ function filterGameSystemId($game_system_id){
     if(Check::notInt($game_system_id)){
         echo "game_system_id was invalid!"; return false;
     }
-    
+
     return intVal($game_system_id);
 }
 

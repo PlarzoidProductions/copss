@@ -94,17 +94,26 @@ public function create($game_id, $player_id, $faction_id, $game_size, $theme_for
 Delete Function
 
 **************************************************/
-public function deleteGame_players($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -149,19 +158,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -171,7 +188,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -180,7 +197,7 @@ public function getByGameId($game_id){
     //Validate Inputs
     $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
-    return $this->getByColumn("game_id", $game_id);
+    return $this->queryByColumns(array("game_id"=>$game_id));
 }
 
 
@@ -189,7 +206,7 @@ public function getByPlayerId($player_id){
     //Validate Inputs
     $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
-    return $this->getByColumn("player_id", $player_id);
+    return $this->queryByColumns(array("player_id"=>$player_id));
 }
 
 
@@ -198,7 +215,7 @@ public function getByFactionId($faction_id){
     //Validate Inputs
     $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
-    return $this->getByColumn("faction_id", $faction_id);
+    return $this->queryByColumns(array("faction_id"=>$faction_id));
 }
 
 
@@ -207,7 +224,7 @@ public function getByGameSize($game_size){
     //Validate Inputs
     $game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
 
-    return $this->getByColumn("game_size", $game_size);
+    return $this->queryByColumns(array("game_size"=>$game_size));
 }
 
 
@@ -216,7 +233,7 @@ public function getByThemeForce($theme_force){
     //Validate Inputs
     $theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
 
-    return $this->getByColumn("theme_force", $theme_force);
+    return $this->queryByColumns(array("theme_force"=>$theme_force));
 }
 
 
@@ -225,7 +242,7 @@ public function getByFullyPainted($fully_painted){
     //Validate Inputs
     $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
-    return $this->getByColumn("fully_painted", $fully_painted);
+    return $this->queryByColumns(array("fully_painted"=>$fully_painted));
 }
 
 
@@ -234,7 +251,19 @@ public function getByWinner($winner){
     //Validate Inputs
     $winner = $this->filterWinner($winner); if($winner === false){return false;}
 
-    return $this->getByColumn("winner", $winner);
+    return $this->queryByColumns(array("winner"=>$winner));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

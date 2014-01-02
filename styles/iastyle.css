@@ -146,6 +146,41 @@ div.simple {
 }
 
 
+/* -- Tables -- */
+
+
+#achievement_listing {
+    display: block;
+    clear: both;
+    width: 880px;
+    text-align: center;
+    padding: 10px;
+    margin: 20px 30px;
+    background: #000000;
+    overflow: hidden;
+}
+
+#achievement_listing table {
+    border-spacing: 0px 2px;
+}
+
+#achievement_listing tr.header{
+    height: 80px;    
+}
+
+.rotated {
+    -webkit-transform:rotate(-70deg);
+    padding: 2px;
+}
+
+#achievement_listing tr.odd{
+    background: #333;
+}
+
+#achievement_listing td {
+    padding: 0px 2px;
+}
+
 
 /* -- Status classes -- */
 

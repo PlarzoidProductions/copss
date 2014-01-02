@@ -74,17 +74,26 @@ public function create($parent_game_system, $size, $name){
 Delete Function
 
 **************************************************/
-public function deleteGame_sizes($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -129,19 +138,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -151,7 +168,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -160,7 +177,7 @@ public function getByParentGameSystem($parent_game_system){
     //Validate Inputs
     $parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
 
-    return $this->getByColumn("parent_game_system", $parent_game_system);
+    return $this->queryByColumns(array("parent_game_system"=>$parent_game_system));
 }
 
 
@@ -169,7 +186,7 @@ public function getBySize($size){
     //Validate Inputs
     $size = $this->filterSize($size); if($size === false){return false;}
 
-    return $this->getByColumn("size", $size);
+    return $this->queryByColumns(array("size"=>$size));
 }
 
 
@@ -178,7 +195,19 @@ public function getByName($name){
     //Validate Inputs
     $name = $this->filterName($name); if($name === false){return false;}
 
-    return $this->getByColumn("name", $name);
+    return $this->queryByColumns(array("name"=>$name));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

@@ -11,7 +11,7 @@
     Modes of Operation
 
     ***************************************/
-    $modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes");
+    $modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes", "events");
     $page->register("mode", "select", array("label"=>"Configure", "reloading"=>true,
                                             "get_choices_array_func"=>"getConfigureModes",
                                             "get_choices_array_func_args"=>array()));

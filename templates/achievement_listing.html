@@ -1,0 +1,43 @@
+<section id="achievement_listing">
+    <header><h1>Achievements</h1></header>
+    <table>
+        <tr class="header">
+            <th><div class="rotated">Name</div></td>
+            <th><div class="rotated">Points</div></td>
+            <th><div class="rotated">Per Game</div></td>
+            <th><div class="rotated">Game System</div></td>
+            <th><div class="rotated">Type</div></td>
+            <th><div class="rotated">Game Count</div></td>
+            <th><div class="rotated">Game Size</div></td>
+            <th><div class="rotated">Played against Faction</div></td>
+            <th><div class="rotated">Unique Opponent</div></td>
+            <th><div class="rotated">Unique Opponent Location</div></td>
+            <th><div class="rotated">Played Theme Force</div></td>
+            <th><div class="rotated">Played Fully Painted</div></td>
+            <th><div class="rotated">Fully Painted Battle</div></td>
+            <th><div class="rotated">Completed Event</div></td>
+        </tr>
+    <?foreach($achievements as $a){?>
+        <tr class="<?=$a[style]?>">
+            <td><?=$a[name]?></td>
+            <td><?=$a[points]?></td>
+            <td><?if($a[per_game]){?>Yes<?} else {?>No<?}?></td>
+            <td><?=$a[game_system_name]?></td>
+            <td><?if($a[is_meta]){?>Meta<?} else {?>Standard<?}?></td>
+            <td><?if($a[game_count] > 0){?><?=$a[game_count]?><?}?></td>
+            <td><?=$a[game_size]?></td>
+            <td><?=$a[faction]?></td>
+            <td><?if($a[unique_opponent]){?>Yes<?}?></td>
+            <td><?if($a[unique_opponent_location]){?>Yes<?}?></td>
+            <td><?if($a[played_theme_force]){?>Yes<?}?></td>
+            <td><?if($a[played_fully_painted]){?>Yes<?}?></td>
+            <td><?if($a[fully_painted_battle]){?>Yes<?}?></td>
+            <td><?=$a[event_name]?></td>
+            <td>
+                <a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?=$a[id]?>">Edit</a>
+            </td>
+        </tr>
+    <?}?>
+    </table>
+</section>
+

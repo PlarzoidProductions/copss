@@ -79,17 +79,26 @@ public function create($user_id, $shift_id, $checked_in, $completed){
 Delete Function
 
 **************************************************/
-public function deleteUser_shifts($id){
+public function deleteByColumns($columns){
 
-	//Create the values array
-	$values = array(":id"=>$id);
+    //Create the values array
+    $values = array();
+    foreach($columns as $column){
+        $values[":".$column]=$value;
+    }
 
-	//Create Query
-	$sql = "DELETE FROM $this->table WHERE id=:id";
+    //Create Query\n";
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= ", ";
+        }
+    }
 
-	return $this->db->delete($sql, $values);
+    return $this->db->delete($sql, $values);
 }
-
 
 /**************************************************
 
@@ -134,19 +143,27 @@ public function getAll(){
 
 /**************************************************
 
-Query By Column Function(s)
+Query by Column(s) Function
 
 **************************************************/
-private function getByColumn($column, $value){
-
-    //inputs are pre-verified by the mapping functions below, so we can trust them
+public function queryByColumns($columns){
 
     //Values Array
-    $values = array(":$column"=>$value);
+    $values = array();
+    foreach($columns as $column=>$value){
+        $values[":".$column]=$value;
+    }
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table WHERE $column=:$column";
-    
+    $sql = "SELECT * FROM $this->table WHERE ";
+    $keys = array_keys($columns);
+    foreach($keys as $column){
+        $sql.= "$column=:$column";
+        if(strcmp($column, end($keys))){
+            $sql.= " AND ";
+        }
+    }
+
     return $this->db->query($sql, $values);
 }
 
@@ -156,7 +173,7 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->getByColumn("id", $id);
+    return $this->queryByColumns(array("id"=>$id));
 }
 
 
@@ -165,7 +182,7 @@ public function getByUserId($user_id){
     //Validate Inputs
     $user_id = $this->filterUserId($user_id); if($user_id === false){return false;}
 
-    return $this->getByColumn("user_id", $user_id);
+    return $this->queryByColumns(array("user_id"=>$user_id));
 }
 
 
@@ -174,7 +191,7 @@ public function getByShiftId($shift_id){
     //Validate Inputs
     $shift_id = $this->filterShiftId($shift_id); if($shift_id === false){return false;}
 
-    return $this->getByColumn("shift_id", $shift_id);
+    return $this->queryByColumns(array("shift_id"=>$shift_id));
 }
 
 
@@ -183,7 +200,7 @@ public function getByCheckedIn($checked_in){
     //Validate Inputs
     $checked_in = $this->filterCheckedIn($checked_in); if($checked_in === false){return false;}
 
-    return $this->getByColumn("checked_in", $checked_in);
+    return $this->queryByColumns(array("checked_in"=>$checked_in));
 }
 
 
@@ -192,7 +209,19 @@ public function getByCompleted($completed){
     //Validate Inputs
     $completed = $this->filterCompleted($completed); if($completed === false){return false;}
 
-    return $this->getByColumn("completed", $completed);
+    return $this->queryByColumns(array("completed"=>$completed));
+}
+
+
+/**************************************************
+
+Exists by Column(s) Function
+
+**************************************************/
+public function existsByColumns($columns){
+    $results = $this->queryByColumns($columns);
+
+    return count($results);
 }
 
 

@@ -11,9 +11,7 @@ class Check
     }
 
     public static function notInt($v) {
-        if (preg_match("/^[0-9]+$/", $v)) {
-            return false;
-        }
+        if (preg_match("/^[0-9]+$/", $v)) {return false;}
         return true;
     }
 

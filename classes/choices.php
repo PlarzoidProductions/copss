@@ -20,7 +20,6 @@ class Choices {
 	}
 
         function getConfigureModes(){
-            //$modes = array("countries", "states", "game_systems", "game_system_factions", "game_sizes");
             $ret = array(   array("text"=>"Countries", "value"=>"countries"),
                             array("text"=>"States", "value"=>"states"),
                             array("text"=>"Game Systems", "value"=>"game_systems"),
@@ -51,32 +50,37 @@ class Choices {
 		}
 	}
 
-/*	
-	function getPlayerListChoices(){
-		$p = new Player();
+	
+	function getPlayerChoices(){
+	    $db = new Players();
+	    $players = $db->getAll();
 
-		$players = $p->getActivePlayers();
+	    $ret = array(array("text"=>"Please select...", "value"=>null));
 
-		$ret = array(array("text"=>"", "value"=>0));
+	    if(empty($players)){return $ret;}	
+	    foreach($players as $player){
+		$ret[] = array(
+                    "text"=>$player[last_name].', '.$player[first_name], 
+                    "value"=>$player[id]
+                    );
+	    }
 
-		if(empty($players)){return $ret;}	
-		foreach($players as $player){
-			$ret[] = array("text"=>$player[lastname].', '.$player[firstname], "value"=>$player[id]);
-		}
-
-		return $ret;
+	    return $ret;
 	}
 	
-	function getNumOpponentsChoices(){
+	function getIntegerChoices($min, $max, $step){
 		$ret = array();
+                if(Check::notInt($min)){echo "Bad min value!";}
+                if(Check::notInt($max)){echo "Bad max value!";}
+                if(Check::notInt($step)){echo "Bad step value!";}
 
-		for($i=2; $i<=10; $i++){
+		for($i=$min; $i<=$max; $i+=$step){
 			$ret[] = array('value'=>$i, 'text'=>$i);
 		}
 
 		return $ret;
 	}
-
+/*
 	function getEventPlayerCountChoices(){
 		$ret = array();
 
@@ -184,7 +188,10 @@ class Choices {
             if($sizes){
                 $ret = array(array("text"=>"Please select...", "value"=>null));
                 foreach($sizes as $size){
-                    $ret[] = array("value"=>$size[id], "text"=>$size[size]." (".$size[name].")");
+                    $text = $size[size];
+                    if($size[name]){ $text.= " (".$size[name].")";}
+
+                    $ret[] = array("value"=>$size[id], "text"=>$text);
                 }
 
                 return $ret;

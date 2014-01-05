@@ -1,3 +1,4 @@
+<form method="<?=$form_method?>" action="<?=$form_action?>">
 <section id="main_section">
     <? if($success_str){?>
         <header>
@@ -28,7 +29,6 @@
         </hgroup>
     </header>
     <section id="inputs_section">
-        <form method="<?=$form_method?>" action="<?=$form_action?>">
         <? foreach($inputs as $i){?>
             <? echo $page->displayVar($i)?>
         <?}?>
@@ -40,7 +40,7 @@
             <?}?>
         <?}?>
         <div class="input_container"><hr></div>
-        <?=$page->displayVar("submit")?>
-        </form>
+        <?=$page->displayVar("submit_game")?>
     </section>
 </section>
+</form>

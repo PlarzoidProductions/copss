@@ -48,7 +48,7 @@ $page->register("scenario_table", "checkbox", array("on_text"=>"Scenario", "off_
 
 $page->getChoices();
 
-$page->register("submit", "submit", array("value"=>"Submit"));
+$page->register("submit_game", "submit", array("value"=>"Submit"));
 
 
 /*************************************

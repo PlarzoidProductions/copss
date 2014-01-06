@@ -11,7 +11,7 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
-*	time - TIMESTAMP
+*	creation_time - TIMESTAMP
 *	game_system - INT
 *	scenario - TINYINT
 *
@@ -41,27 +41,25 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($time, $game_system, $scenario){
+public function create($game_system, $scenario){
 
 	//Validate the inputs
-	$time = $this->filterTime($time); if($time === false){return false;}
 	$game_system = $this->filterGameSystem($game_system); if($game_system === false){return false;}
 	$scenario = $this->filterScenario($scenario); if($scenario === false){return false;}
 
 	//Create the values Array
 	$values = array(
-		":time"=>$time,
- 		":game_system"=>$game_system,
+		":game_system"=>$game_system,
  		":scenario"=>$scenario
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
-				time,
+				creation_time,
 				game_system,
 				scenario
 			) VALUES (
-				:time,
+				NOW(),
 				:game_system,
 				:scenario)";
 
@@ -177,12 +175,12 @@ public function getById($id){
 }
 
 
-public function getByTime($time){
+public function getByCreationTime($creation_time){
 	
     //Validate Inputs
-    $time = $this->filterTime($time); if($time === false){return false;}
+    $creation_time = $this->filterCreationTime($creation_time); if($creation_time === false){return false;}
 
-    return $this->queryByColumns(array("time"=>$time));
+    return $this->queryByColumns(array("creation_time"=>$creation_time));
 }
 
 
@@ -236,17 +234,17 @@ function filterId($id){
 
 
 
-function filterTime($time){
+function filterCreationTime($creation_time){
     //Not allowed to be null
-    if(Check::isNull($time)){
-        echo "time cannot be null!"; return false;
+    if(Check::isNull($creation_time)){
+        echo "creation_time cannot be null!"; return false;
     }
 
-    if(Check::isNull($time)){
-        echo "time was invalid!"; return false;
+    if(Check::isNull($creation_time)){
+        echo "creation_time was invalid!"; return false;
     }
 
-    return $time;
+    return $creation_time;
 }
 
 

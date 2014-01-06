@@ -110,11 +110,11 @@ $page->getChoices();
 Handle the Submit
 
 **************************************/
-if($page->submitIsSet("submit")){
+if($page->submitIsSet("submit_game")){
 
     //First, extract all our inputs
     $game_system = $page->getVar("game_system");
-    $num_players = $page->getVar("num_players");
+    $num_players = intval($page->getVar("num_players"));
     $scenario = $page->isChecked("scenario_table");
 
     $players = array();
@@ -124,18 +124,60 @@ if($page->submitIsSet("submit")){
 
         $players[$id] = array();
 
-        $players[$id][faction] = $page->getVar("player".$i."_faction");
+        $players[$id][faction] = $page->getVar("player_".$i."_faction");
         $players[$id][size] = $page->getVar("player_".$i."_size");
         $players[$id][theme_force] = $page->getVar("player_".$i."_theme_force");
         $players[$id][won] = $page->getVar("player_".$i."_won");
-    }
+        $players[$id][fully_painted] = $page->getVar("player_".$i."_fully_painted");
         
+    } 
+
     //Next, validate
-    if(Check::isNull($game_system)){ $errors[] = "Choose a Game System!";}
-    foreach(array_keys($players) as $i=>$key){
-        if(Check::isNull($players[$key][faction])){ $error[] = "Choose a Game System!";}
+    if(count($players) < 2){
+        $errors[] = "Not enough players selected, need at least 2!";
     }
-       
+
+    if(Check::isNull($game_system)){ $errors[] = "Choose a Game System!";}
+   
+    for($i=1; $i <= $num_players; $i++){
+        if(Check::isNull($players[$id][faction])){ $errors[] = "Choose a Faction for Player $i!";}
+        if(Check::isNull($players[$id][size])){ $errors[] = "Choose an Army Size for Player $i!";}
+
+        //Just set these to 0 if they're null
+        if(Check::isNull($players[$id][theme_force])){ $players[$id][theme_force]=0; }
+        if(Check::isNull($players[$id][won])){ $players[$id][won]=0; }
+        if(Check::isNull($players[$id][fully_painted])){ $players[$id][fully_painted]=0; }
+    }
+
+
+    //Do stuff
+    if(empty($errors)){
+        
+        //Handle the parent game
+        if($game_id){
+            $game_db->updateByColumns(array("game_system"=>$game_system, "scenario"=>$scenario));
+            $parent_game_id = $game_id;
+        } else {
+            $parent_game_id = $game_db->create($game_system, $scenario);
+        }
+        
+        //Handle the children players
+        if($game_id){   //If we're updating, clear the slate
+            $game_player_db->deleteByColumns(array("game_id"=>$parent_game_id));
+        }
+
+        $result = true;
+        foreach($players as $id=>$player){
+            $creation = $game_player_db->create($parent_game_id, $id, $player[faction], $player[size],
+                                                $player[theme_force], $player[fully_painted], $player[won]);
+            $result = $result && $creation;
+        }
+
+        foreach(array_keys($players) as $pid){
+            //TODO Recalculate Achievements
+        }
+
+    }
 }
 
 
@@ -152,6 +194,7 @@ $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
 
 $page->setDisplayMode("form");
+
 
 /***************************************
 

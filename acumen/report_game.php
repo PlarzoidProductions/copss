@@ -115,7 +115,7 @@ if($page->submitIsSet("submit_game")){
     //First, extract all our inputs
     $game_system = $page->getVar("game_system");
     $num_players = intval($page->getVar("num_players"));
-    $scenario = $page->isChecked("scenario_table");
+    $scenario = $page->getVar("scenario_table");
 
     $players = array();
     for($i=1; $i <= $num_players; $i++){
@@ -192,6 +192,17 @@ $player_inputs = array("_id", "_faction", "_size", "_theme_force", "_fully_paint
 
 $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
+
+if($page->submitIsSet("submit_game") && $result){
+    $success_str = "Successfully ";
+    if($game_id){
+        $success_str.= "updated ";
+    } else {
+        $success_str.= "created ";
+    }
+    $success_str.= "the game!";
+}
+
 
 $page->setDisplayMode("form");
 

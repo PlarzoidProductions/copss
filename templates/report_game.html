@@ -17,7 +17,7 @@
                 </div>
             <?}?>
         </section>
-    <?}?>
+    <?} else {?>
     <header>
         <hgroup>
             <h1><? echo $title?></h1>
@@ -42,5 +42,6 @@
         <div class="input_container"><hr></div>
         <?=$page->displayVar("submit_game")?>
     </section>
+    <?}?>
 </section>
 </form>

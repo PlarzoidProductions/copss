@@ -96,7 +96,6 @@ class Page {
             "Register Player"=>"register_player",
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
-            "Edit a Game"=>"edit_game",
             "Redeem Skulls"=>"redeem",
             "Leaderboard"=>"leaderboard"
             );

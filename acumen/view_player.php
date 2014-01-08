@@ -12,7 +12,7 @@ $player_db = new Players();
 $size_db = new Game_sizes();
 $faction_db = new Game_system_factions();
 $game_db = new Games();
-$game_player_db = new Game_players();
+$game_players_db = new Game_players();
 
 
 /*********************************************
@@ -21,7 +21,7 @@ Register the inputs
 
 *********************************************/
 $page->register("player", "select", array("reloading"=>1,
-                                          "get_choices_array_func"=>"getPlayers",
+                                          "get_choices_array_func"=>"getPlayerChoices",
                                           "get_choices_array_func_args"=>array()));
 $page->getChoices();
 
@@ -31,29 +31,31 @@ $page->getChoices();
 Gather all the data on the chosen player
 
 ********************************************/
-$player = $page->getVar("player");
+$selected_player = $page->getVar("player");
 
-if($player){
-    $player = $player_db->getById($player);
+if($selected_player){
+    $player = $player_db->getById($selected_player);
+    $player = $player[0];
 
-    $tmp1 = $game_player_db->getByPlayerId($player);
+    $tmp1 = $game_players_db->getByPlayerId($player[id]);
+
     $games_played = array();
     foreach($tmp1 as $g){
         $game = $game_db->getById($g[game_id]);
         $game = $game[0];
-
+        
         $tmp2 = $game_players_db->getByGameId($game[id]);
-        $game_players = array()
+
+        $game_players = array();
         foreach($tmp2 as $gp){
             $tmp3 = $player_db->getById($gp[player_id]);
-            $gp[player_details] = $tmp3;
+            $gp[player_details] = $tmp3[0];
 
-            //fetch size
-            $size = $size_db->getById($player[size_id]);
+            $size = $size_db->getById($gp[game_size]);
             $gp[size] = $size[0][size];
 
             //fetch faction
-            $faction = $faction_db->getById($player[faction_id]);
+            $faction = $faction_db->getById($gp[faction_id]);
             $gp[faction_name] = $faction[0][name];
 
             $game_players[] = $gp;
@@ -79,14 +81,20 @@ Prep the page
 
 ********************************************/
 if($games_played){
-   foreach($games_played as $a=>$game){
+    $odd=true;
+    foreach($games_played as $a=>$game){
         $players = $game[players];
-        foreach($players as $b=>$player){
 
-            //concatenate list of players, attach to game
-            //"last, first: X pts of Y <br/>"
-
+        $player_list = "";
+        foreach($players as $b=>$p){
+            $player_list.= $p[player_details][last_name].", ".$p[player_details][first_name].": ";
+            $player_list.= $p[size]."pts of ".$p[faction_name]."<br>";
         }
+
+        $games_played[$a][player_listing] = $player_list;
+        
+        if($odd)$games_played[$a][style]="odd";
+        $odd = !$odd;
     } 
 }    
 
@@ -96,6 +104,7 @@ $form_action = $_SERVER[PHP_SELF]."?view=$view";
 
 $page->setDisplayMode("form");
 
+$inputs = array("player");
 
 /********************************************
 

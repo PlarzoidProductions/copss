@@ -16,14 +16,15 @@ Detect & Handle Edit or Delete Actions
 $action = $_REQUEST[action];
 $game_id = $_REQUEST["game_id"];
 switch($action){
-    case "edit":
+    case "edit_game":
         $defaults = $game_db->getById($game_id);
-        $defaults[players] = $game_players_db->getByGameId($game_id);
+        $defaults = $defaults[0];
+        $defaults[players] = $game_player_db->getByGameId($game_id);
         //TODO Calculate Achievements
         break;
-    case "delete":
+    case "delete":  //Gotta delete children first...
+        $game_players->deleteByColumns(array("game_id"=>$game_id))
         $game_db->deleteById($game_id);
-        $game_players->deleteByColumns(array("game_id"=>$game_id));
         //TODO Calculate Achievements
         break;
     default:
@@ -40,6 +41,7 @@ $page->register("game_system", "select", array( "required"=>true,
                                                 "default_val"=>$defaults[game_system],
                                                 "get_choices_array_func"=>"getGameSystems",
                                                 "get_choices_array_func_args"=>array()));
+$page->register("game_id", "hidden", array("value"=>$game_id));
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>count($defaults[players]),
                                                 "get_choices_array_func"=>"getIntegerChoices",
                                                 "get_choices_array_func_args"=>array(2, 100, 1)));
@@ -81,25 +83,25 @@ if(Check::isNull($game_system)){
 
 for($i=1; $i <= $num_players; $i++){
     $page->register("player_".$i."_id", "select", array("label"=>"Player $i",
-                                                        "default_val"=>$defaults[players][$i][player_id],
+                                                        "default_val"=>$defaults[players][$i-1][player_id],
                                                         "get_choices_array_func"=>"getPlayerChoices",
                                                         "get_choices_array_func_args"=>array()));
-    $page->register("player_".$i."_faction", "select", array("default_val"=>$defaults[players][$i][faction_id],
+    $page->register("player_".$i."_faction", "select", array("default_val"=>$defaults[players][$i-1][faction_id],
                                                              "get_choices_array_func"=>"getGameSystemFactions",
                                                              "get_choices_array_func_args"=>array($game_system))
                                                              );
-    $page->register("player_".$i."_size", "select", array("default_val"=>$defaults[players][$i][game_size],
+    $page->register("player_".$i."_size", "select", array("default_val"=>$defaults[players][$i-1][game_size],
                                                              "get_choices_array_func"=>"getGameSizes",
                                                              "get_choices_array_func_args"=>array($game_system))
                                                              );
     $page->register("player_".$i."_theme_force", "checkbox", array("label"=>"Played Theme Force",
-                                                                   "default_val"=>$defaults[players][$i][theme_force],
+                                                                   "default_val"=>$defaults[players][$i-1][theme_force],
                                                                    "on_text"=>"Yes", "off_text"=>"No"));
     $page->register("player_".$i."_fully_painted", "checkbox", array("label"=>"Played Fully Painted",
-                                                                   "default_val"=>$defaults[players][$i][fully_painted],
+                                                                   "default_val"=>$defaults[players][$i-1][fully_painted],
                                                                    "on_text"=>"Yes", "off_text"=>"No"));
     $page->register("player_".$i."_won", "checkbox", array("label"=>"Won",
-                                                            "default_val"=>$defaults[players][$i][winner],
+                                                            "default_val"=>$defaults[players][$i-1][winner],
                                                             "on_text"=>"Yes", "off_text"=>"No"));
 }
 $page->getChoices();
@@ -114,6 +116,7 @@ if($page->submitIsSet("submit_game")){
 
     //First, extract all our inputs
     $game_system = $page->getVar("game_system");
+    if(empty($game_id))$game_id = $page->getVar("game_id");
     $num_players = intval($page->getVar("num_players"));
     $scenario = $page->getVar("scenario_table");
 
@@ -139,7 +142,8 @@ if($page->submitIsSet("submit_game")){
 
     if(Check::isNull($game_system)){ $errors[] = "Choose a Game System!";}
    
-    for($i=1; $i <= $num_players; $i++){
+    $i=1;
+    foreach(array_keys($players) as $id){
         if(Check::isNull($players[$id][faction])){ $errors[] = "Choose a Faction for Player $i!";}
         if(Check::isNull($players[$id][size])){ $errors[] = "Choose an Army Size for Player $i!";}
 
@@ -147,6 +151,8 @@ if($page->submitIsSet("submit_game")){
         if(Check::isNull($players[$id][theme_force])){ $players[$id][theme_force]=0; }
         if(Check::isNull($players[$id][won])){ $players[$id][won]=0; }
         if(Check::isNull($players[$id][fully_painted])){ $players[$id][fully_painted]=0; }
+
+        $i++;
     }
 
 
@@ -155,12 +161,12 @@ if($page->submitIsSet("submit_game")){
         
         //Handle the parent game
         if($game_id){
-            $game_db->updateByColumns(array("game_system"=>$game_system, "scenario"=>$scenario));
+            $game_db->updateGamesById($game_id, array("game_system"=>$game_system, "scenario"=>$scenario));
             $parent_game_id = $game_id;
         } else {
             $parent_game_id = $game_db->create($game_system, $scenario);
         }
-        
+
         //Handle the children players
         if($game_id){   //If we're updating, clear the slate
             $game_player_db->deleteByColumns(array("game_id"=>$parent_game_id));
@@ -187,7 +193,7 @@ Prep displaying the page
 
 **************************************/
 $title = "Report a Game";
-$inputs = array("game_system", "num_players", "scenario_table");
+$inputs = array("game_system", "game_id", "num_players", "scenario_table");
 $player_inputs = array("_id", "_faction", "_size", "_theme_force", "_fully_painted", "_won");
 
 $form_method = "post";

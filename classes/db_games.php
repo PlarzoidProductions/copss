@@ -76,8 +76,8 @@ public function deleteByColumns($columns){
 
     //Create the values array
     $values = array();
-    foreach($columns as $column){
-        $values[":".$column]=$value;
+    foreach($columns as $c=>$v){
+        $values[":".$c]=$v;
     }
 
     //Create Query\n";

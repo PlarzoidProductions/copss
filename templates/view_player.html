@@ -1,0 +1,45 @@
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><? echo $title?></h1>
+            <? if(!empty($error)){?><h3 class="warning"><?=$error?></h3><?}?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?=$form_method?>" action="<?=$form_action?>">
+        <? foreach($inputs as $i){?>
+            <? echo $page->displayVar($i)?>
+        <?}?>
+        </form>
+        <?if($games_played){?>
+        <header><h1>Details for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+        <table>
+            <tr class="header">
+                <th>Game ID</div></th>
+                <th>Time</div></th>
+                <th>Opponents</div></th>
+                <th>Achievements Earned</div></th>
+                <th>Points Earned</div></th>
+            </tr>
+        <?foreach($games_played as $gp){?>
+            <tr class="<?=$gp[style]?>">
+                <td>
+                    <?=$gp[ID]?> 
+                    (<a href="home.php?view=report_game&action=edit_game&game_id=<?=$gp[id]?>">Edit</a>)
+                </td>
+                <td><?=$gp[creation_time]?></td>
+                <td><?=$gp[player_listing]?></td>
+                <td></td>
+                <td></td>
+                <?if(Session::isAdmin()){?>
+                <td>
+                    <a href="home.php?view=report_game&action=delete&game_id=<?=$gp[id]?>">Delete</a>
+                </td>
+                <?}?>
+            </tr>
+        <?}?>
+        </table>
+        <?}?>
+    </section>
+</section>
+

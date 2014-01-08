@@ -563,6 +563,10 @@ class Page {
         //generate the input header
         $str.= '<input type="'.$type.'" name="'.$v.'" ';
        
+        if(!strcmp($type, "checkbox")){
+            $str.= "value=\"1\" ";
+        }
+
         //Add the attributes
         foreach($attrs as $attr=>$value){
             switch($attr){
@@ -591,8 +595,10 @@ class Page {
 
                 case "default_val":
                     if(!(($value===null) || (empty($value) && !(is_numeric($value))))){
-                        if(!strcmp($type, "checkbox") && strcmp($value, "0")){
-                            $str.= "CHECKED ";
+                        if(!strcmp($type, "checkbox")){
+                            if(!strcmp($value, "1")){
+                                $str.= "CHECKED ";
+                            }
                         } else {
                             $str.= "value=\"$value\" ";
                         }

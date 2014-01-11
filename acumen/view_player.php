@@ -95,12 +95,23 @@ if($games_played){
         
         if($odd)$games_played[$a][style]="odd";
         $odd = !$odd;
-    } 
+    }
+
+
+    //TODO Gather Statistics
+
+    $stats = array();
+    $stats[games] = count($games_played);
+    $stats[opponents] = "Ach Count";
+    $stats[locations] = "Ach Count 2";
+    $stats[factions] = "Faction List";
+    $stats[points] = "Points";
 }    
 
 //Usual stuff
 $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
+$title = "View Player Details";
 
 $page->setDisplayMode("form");
 

@@ -23,7 +23,7 @@ switch($action){
         //TODO Calculate Achievements
         break;
     case "delete":  //Gotta delete children first...
-        $game_players->deleteByColumns(array("game_id"=>$game_id))
+        $game_players->deleteByColumns(array("game_id"=>$game_id));
         $game_db->deleteById($game_id);
         //TODO Calculate Achievements
         break;

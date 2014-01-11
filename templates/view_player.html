@@ -11,35 +11,45 @@
             <? echo $page->displayVar($i)?>
         <?}?>
         </form>
-        <?if($games_played){?>
-        <header><h1>Details for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
-        <table>
-            <tr class="header">
-                <th>Game ID</div></th>
-                <th>Time</div></th>
-                <th>Opponents</div></th>
-                <th>Achievements Earned</div></th>
-                <th>Points Earned</div></th>
-            </tr>
-        <?foreach($games_played as $gp){?>
-            <tr class="<?=$gp[style]?>">
-                <td>
-                    <?=$gp[ID]?> 
-                    (<a href="home.php?view=report_game&action=edit_game&game_id=<?=$gp[id]?>">Edit</a>)
-                </td>
-                <td><?=$gp[creation_time]?></td>
-                <td><?=$gp[player_listing]?></td>
-                <td></td>
-                <td></td>
-                <?if(Session::isAdmin()){?>
-                <td>
-                    <a href="home.php?view=report_game&action=delete&game_id=<?=$gp[id]?>">Delete</a>
-                </td>
-                <?}?>
-            </tr>
-        <?}?>
-        </table>
-        <?}?>
+    <?if($games_played){?>
+        <header><h1>Statistics for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+        <div class="simple">Games Played: <strong><?=$stats[games]?></strong></div>
+        <div class="simple">Unique Opponents Played: <strong><?=$stats[opponents]?></strong></div>
+        <div class="simple">Unique Opponent Locations: <strong><?=$stats[locations]?></strong></div>
+        <div class="simple">Factions Played Against: <strong><?=$stats[factions]?></strong></div>
+        <div class="simple">Current Points: <strong><?=$stats[points]?></strong></div>
+    <?}?>
     </section>
 </section>
+<?if($games_played){?>
+<section id="games_listing">
+    <header><h1>Game Details for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Game ID</div></th>
+            <th>Time</div></th>
+            <th>Opponents</div></th>
+            <th>Achievements Earned</div></th>
+            <th>Points Earned</div></th>
+        </tr>
+    <?foreach($games_played as $gp){?>
+        <tr class="<?=$gp[style]?>">
+            <td>
+                <?=$gp[id]?> 
+                (<a href="home.php?view=report_game&action=edit_game&game_id=<?=$gp[id]?>">Edit</a>)
+            </td>
+            <td><?=$gp[creation_time]?></td>
+            <td><?=$gp[player_listing]?></td>
+            <td></td>
+            <td></td>
+            <?if(Session::isAdmin()){?>
+            <td>
+                <a href="home.php?view=report_game&action=delete&game_id=<?=$gp[id]?>">Delete</a>
+            </td>
+            <?}?>
+        </tr>
+    <?}?>
+    </table>
+</section>
+<?}?>
 

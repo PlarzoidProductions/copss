@@ -149,7 +149,7 @@ div.simple {
 /* -- Tables -- */
 
 
-#achievement_listing {
+#achievement_listing, #games_listing {
     display: block;
     clear: both;
     width: 880px;
@@ -160,15 +160,17 @@ div.simple {
     overflow: hidden;
 }
 
-#achievement_listing table {
+#achievement_listing, #games_listing table {
     border-spacing: 0px 2px;
+    width: 100%;
+    padding: 10px 15px;
 }
 
 #achievement_listing tr.header {
     height: 175px;
 }
 
-#achievement_listing th {
+#achievement_listing, #games_listing th {
     vertical-align: bottom;
 }
 
@@ -180,11 +182,11 @@ div.simple {
     height: 100%;
 }
 
-#achievement_listing tr.odd{
+#achievement_listing, #games_listing tr.odd{
     background: #333;
 }
 
-#achievement_listing td, th {
+#achievement_listing, #games_listing td, th {
     padding: 0px 2px;
 }
 

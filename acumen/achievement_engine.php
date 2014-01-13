@@ -93,16 +93,36 @@ class Ach_Engine {
 
     }
 
+    function deleteGameAchievements($game_id){
+        if(Check::notInt($game_id)){
+            echo "Invalid game ID: '$game_id'!";
+            return;
+        }
+
+        $this->earned_db->deleteByColumns(array("game_id"=>$game_id));
+    }
+
+    function recalculateAchievements($game_id){
+       if(Check::notInt($game_id)){
+            echo "Invalid game ID: '$game_id'!";
+            return;
+        } 
+
+        $this->deleteGameAchievements($game_id);
+
+        $this->awardAchievements($game_id);
+    }
+
 
     private function detectAndAward($player, $game, $achievement){
-
         //Assume they've earned it, unless proven otherwise
         $earned = 1;
 
         //If not per-game, check for existance
         if(!$achievement[per_game]){
-            $tmp = $this->earned_db->queryByColumns(array(  "player_id"=>$p[player_id], 
-                                                            "achievement_id"=>$a[id]));
+            $tmp = $this->earned_db->queryByColumns(array(  "player_id"=>$player[player_id], 
+                                                            "achievement_id"=>$achievement[id]));
+            
             if(!empty($tmp)){
                 return;  //Already has it, so let's quit now
             }
@@ -194,10 +214,10 @@ class Ach_Engine {
             //detect new
             $new_opponents = 0;
             foreach($game[players] as $gp){
-                if($gp[player_id] != $player[player_id]){
-                    if(!in_array($player[player_id], $opponents)){
+                if(strcmp($gp[player_id], $player[player_id])){
+                    if(!in_array($gp[player_id], $opponents)){
                           $new_opponents++;
-                          $locations[] = $player[player_id];
+                          $opponents[] = $player[player_id];
                     }
                 }
             }
@@ -224,7 +244,7 @@ class Ach_Engine {
             //detect new
             $new_locs = 0;
             foreach($game[players] as $gp){
-                if($gp[player_id] != $player[player_id]){
+                if(strcmp($gp[player_id], $player[player_id])){
                     $gp_loc = $gp[player_details][country]."-".$gp[player_details][state];
 
                     if(!in_array($gp_loc, $locations)){
@@ -265,8 +285,6 @@ class Ach_Engine {
         if($earned > 0){
             for($i=0; $i < $earned; $i++){
                 $this->earned_db->create($player[player_id], $achievement[id], $game[id]);
-
-                echo "Awarded ".$achievement[name]." to Player ".$player[player_details][last_name].", ".$player[player_details][first_name]."<br>";
             }   
         } 
     }
@@ -318,6 +336,8 @@ class Ach_Engine {
         $game[players] - Array of players that were inthe game
         $game[players][n] - Player data from the game_players table
         $game[players][n][player_details] - Data on player n from the players table
+        $game[players][n][achievements] - List of achievements earned from the game
+        $game[players][n][points] - Points earned from the game
 
     ****************************************************/ 
 
@@ -338,9 +358,28 @@ class Ach_Engine {
 
         //Get Opponent's Data
         $players = array();
+        $odd=true;
         foreach($player_list as $p){
             $player = $this->player_db->getById($p[player_id]);
             $p[player_details] = $player[0];
+            $achs = $this->earned_db->queryByColumns(array("player_id"=>$p[player_id], 
+                                                        "game_id"=>$game_id));
+
+            $achievements = array();
+            $points = 0;
+            foreach($achs as $a){
+                $ach_details = $this->ach_db->getById($a[achievement_id]);
+                $achievements[] = $ach_details[0];
+                $points += $ach_details[0][points];
+            }
+            $p[achievements] = $achievements;
+            $p[points] = $points;
+
+            $p[point_total] = $this->getPlayerPoints($p[player_id]);
+
+            
+            $p[style] = ($odd ? "odd" : " even");
+            $odd = !$odd;
 
             $players[] = $p;
         }
@@ -350,6 +389,24 @@ class Ach_Engine {
         return $game;
     }
 
+
+    function getPlayerPoints($player_id){
+        if(Check::notInt($player_id)){
+            echo "Invalid player ID: '$player_id'!";
+            return;
+        }
+
+        $achievements = $this->earned_db->getByPlayerId($player_id);
+
+        $points = 0;
+        foreach($$achievements as $a){
+            $details = $this->ach_db->getById($a[achievement_id]);
+            $points += $details[0][points];
+        }
+
+        return $points;
+
+    } 
 
     /****************************************************
 

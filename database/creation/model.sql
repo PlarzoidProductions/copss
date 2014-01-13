@@ -3,18 +3,74 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 DROP SCHEMA IF EXISTS `iron_arena` ;
-CREATE SCHEMA IF NOT EXISTS `iron_arena` DEFAULT CHARACTER SET latin1 ;
+CREATE SCHEMA IF NOT EXISTS `iron_arena` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
 USE `iron_arena` ;
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`countries`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`countries` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`states`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`states` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  `parent` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_parent_id` (`parent` ASC) ,
+  CONSTRAINT `fk_parent_id`
+    FOREIGN KEY (`parent` )
+    REFERENCES `iron_arena`.`countries` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`players`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`players` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `first_name` VARCHAR(255) NOT NULL ,
+  `last_name` VARCHAR(255) NOT NULL ,
+  `email` VARCHAR(255) NULL DEFAULT NULL ,
+  `country` INT(10) UNSIGNED NOT NULL ,
+  `state` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `vip` TINYINT(1) NULL DEFAULT '0' ,
+  `creation_date` DATETIME NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_country_id` (`country` ASC) ,
+  INDEX `fk_state_id` (`state` ASC) ,
+  CONSTRAINT `fk_country_id`
+    FOREIGN KEY (`country` )
+    REFERENCES `iron_arena`.`countries` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_state_id`
+    FOREIGN KEY (`state` )
+    REFERENCES `iron_arena`.`states` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
+
 
 -- -----------------------------------------------------
 -- Table `iron_arena`.`game_systems`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_systems` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -33,7 +89,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_sizes` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -52,127 +109,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_system_factions` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`events`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`events` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`achievements`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  `points` INT(11) NOT NULL ,
-  `per_game` TINYINT(1) NOT NULL DEFAULT '0' ,
-  `is_meta` TINYINT(1) NOT NULL DEFAULT '0' ,
-  `game_count` INT(11) NULL DEFAULT NULL ,
-  `game_system_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
-  `game_size_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
-  `faction_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
-  `unique_opponent` TINYINT(1) NULL DEFAULT NULL ,
-  `unique_opponent_locations` TINYINT(1) NULL DEFAULT NULL ,
-  `played_theme_force` TINYINT(1) NULL DEFAULT NULL ,
-  `fully_painted` TINYINT(1) NULL DEFAULT NULL ,
-  `fully_painted_battle` TINYINT(1) NULL DEFAULT NULL ,
-  `played_scenario` TINYINT(1) NULL ,
-  `multiplayer` TINYINT(1) NULL ,
-  `vs_vip` TINYINT(1) NULL ,
-  `event_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_ach_game_system_id` (`game_system_id` ASC) ,
-  INDEX `fk_ach_game_size_id` (`game_size_id` ASC) ,
-  INDEX `fk_ach_faction_id` (`faction_id` ASC) ,
-  INDEX `fk_ach_event_id` (`event_id` ASC) ,
-  CONSTRAINT `fk_ach_game_system_id`
-    FOREIGN KEY (`game_system_id` )
-    REFERENCES `iron_arena`.`game_systems` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_game_size_id`
-    FOREIGN KEY (`game_size_id` )
-    REFERENCES `iron_arena`.`game_sizes` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_faction_id`
-    FOREIGN KEY (`faction_id` )
-    REFERENCES `iron_arena`.`game_system_factions` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_event_id`
-    FOREIGN KEY (`event_id` )
-    REFERENCES `iron_arena`.`events` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`countries`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`countries` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`states`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`states` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL ,
-  `parent` INT(10) UNSIGNED NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_parent_id` (`parent` ASC) ,
-  CONSTRAINT `fk_parent_id`
-    FOREIGN KEY (`parent` )
-    REFERENCES `iron_arena`.`countries` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`players`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`players` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `first_name` VARCHAR(255) NOT NULL ,
-  `last_name` VARCHAR(255) NOT NULL ,
-  `email` VARCHAR(255) NULL DEFAULT NULL ,
-  `country` INT(10) UNSIGNED NOT NULL ,
-  `state` INT(10) UNSIGNED NULL DEFAULT NULL ,
-  `vip` TINYINT(1) NULL DEFAULT 0 ,
-  `creation_date` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_country_id` (`country` ASC) ,
-  INDEX `fk_state_id` (`state` ASC) ,
-  CONSTRAINT `fk_country_id`
-    FOREIGN KEY (`country` )
-    REFERENCES `iron_arena`.`countries` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_state_id`
-    FOREIGN KEY (`state` )
-    REFERENCES `iron_arena`.`states` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -191,38 +129,8 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`achievements_earned`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `player_id` INT(10) UNSIGNED NOT NULL ,
-  `achievement_id` INT(10) UNSIGNED NOT NULL ,
-  `game_id` INT UNSIGNED NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
-  INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
-  INDEX `fk_ach_earned_game_id` (`game_id` ASC) ,
-  CONSTRAINT `fk_ach_earned_player_id`
-    FOREIGN KEY (`player_id` )
-    REFERENCES `iron_arena`.`players` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_earned_achievement_id`
-    FOREIGN KEY (`achievement_id` )
-    REFERENCES `iron_arena`.`achievements` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_earned_game_id`
-    FOREIGN KEY (`game_id` )
-    REFERENCES `iron_arena`.`games` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -263,7 +171,102 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_players` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`events`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`events` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`achievements`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
+  `points` INT(11) NOT NULL ,
+  `per_game` TINYINT(1) NOT NULL DEFAULT '0' ,
+  `is_meta` TINYINT(1) NOT NULL DEFAULT '0' ,
+  `game_count` INT(11) NULL DEFAULT NULL ,
+  `game_system_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `game_size_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `faction_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `unique_opponent` TINYINT(1) NULL DEFAULT NULL ,
+  `unique_opponent_locations` TINYINT(1) NULL DEFAULT NULL ,
+  `played_theme_force` TINYINT(1) NULL DEFAULT NULL ,
+  `fully_painted` TINYINT(1) NULL DEFAULT NULL ,
+  `fully_painted_battle` TINYINT(1) NULL DEFAULT NULL ,
+  `played_scenario` TINYINT(1) NULL DEFAULT NULL ,
+  `multiplayer` TINYINT(1) NULL DEFAULT NULL ,
+  `vs_vip` TINYINT(1) NULL DEFAULT NULL ,
+  `event_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_ach_game_system_id` (`game_system_id` ASC) ,
+  INDEX `fk_ach_game_size_id` (`game_size_id` ASC) ,
+  INDEX `fk_ach_faction_id` (`faction_id` ASC) ,
+  INDEX `fk_ach_event_id` (`event_id` ASC) ,
+  CONSTRAINT `fk_ach_game_system_id`
+    FOREIGN KEY (`game_system_id` )
+    REFERENCES `iron_arena`.`game_systems` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_game_size_id`
+    FOREIGN KEY (`game_size_id` )
+    REFERENCES `iron_arena`.`game_sizes` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_faction_id`
+    FOREIGN KEY (`faction_id` )
+    REFERENCES `iron_arena`.`game_system_factions` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_event_id`
+    FOREIGN KEY (`event_id` )
+    REFERENCES `iron_arena`.`events` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`achievements_earned`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `player_id` INT(10) UNSIGNED NOT NULL ,
+  `achievement_id` INT(10) UNSIGNED NOT NULL ,
+  `game_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
+  INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
+  INDEX `fk_ach_earned_game_id` (`game_id` ASC) ,
+  CONSTRAINT `fk_ach_earned_player_id`
+    FOREIGN KEY (`player_id` )
+    REFERENCES `iron_arena`.`players` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_earned_achievement_id`
+    FOREIGN KEY (`achievement_id` )
+    REFERENCES `iron_arena`.`achievements` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_earned_game_id`
+    FOREIGN KEY (`game_id` )
+    REFERENCES `iron_arena`.`games` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -288,46 +291,47 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`meta_achievement_criteria` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`shifts`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`shifts` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  `start` DATETIME NOT NULL ,
-  `stop` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
 -- Table `iron_arena`.`users`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `iron_arena`.`users` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NULL ,
   `username` VARCHAR(20) NOT NULL ,
   `password` CHAR(80) NOT NULL ,
+  `phone_number` VARCHAR(45) NOT NULL ,
   `creation_date` DATETIME NOT NULL ,
-  `last_login` TIMESTAMP NULL DEFAULT NULL ,
-  `admin` TINYINT(1) NOT NULL DEFAULT '0' ,
+  `last_login` TIMESTAMP NULL ,
+  `admin` TINYINT(1) NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`shifts`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`shifts` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(45) NOT NULL ,
+  `start` DATETIME NOT NULL ,
+  `stop` DATETIME NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
 -- Table `iron_arena`.`user_shifts`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `iron_arena`.`user_shifts` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `user_id` INT(10) UNSIGNED NOT NULL ,
-  `shift_id` INT(10) UNSIGNED NOT NULL ,
-  `checked_in` TINYINT(1) NOT NULL DEFAULT '0' ,
-  `completed` TINYINT(1) NOT NULL DEFAULT '0' ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `shift_id` INT UNSIGNED NOT NULL ,
+  `checked_in` TINYINT(1) NOT NULL DEFAULT 0 ,
+  `completed` TINYINT(1) NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_shifts_user_id` (`user_id` ASC) ,
   INDEX `fk_user_shifts_shift_id` (`shift_id` ASC) ,
@@ -341,8 +345,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`user_shifts` (
     REFERENCES `iron_arena`.`shifts` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+ENGINE = InnoDB;
 
 
 

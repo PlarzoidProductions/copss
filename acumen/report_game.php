@@ -3,10 +3,12 @@
 require_once("classes/page.php");
 require_once("classes/db_games.php");
 require_once("classes/db_game_players.php");
+require_once("achievement_engine.php");
 
 $page = new Page();
 $game_db = new Games();
 $game_player_db = new Game_players();
+$engine = new Ach_Engine();
 
 /**************************************
 
@@ -20,13 +22,16 @@ switch($action){
         $defaults = $game_db->getById($game_id);
         $defaults = $defaults[0];
         $defaults[players] = $game_player_db->getByGameId($game_id);
-        //TODO Calculate Achievements
         break;
+    
     case "delete":  //Gotta delete children first...
-        $game_players->deleteByColumns(array("game_id"=>$game_id));
+        $game_player_db->deleteByColumns(array("game_id"=>$game_id));
+        $engine->deleteGameAchievements($game_id); 
         $game_db->deleteById($game_id);
-        //TODO Calculate Achievements
+        $result=true;
+        $success_str = "Successfully Deleted Game!";
         break;
+    
     default:
         break;
 }
@@ -119,6 +124,7 @@ if($page->submitIsSet("submit_game")){
     if(empty($game_id))$game_id = $page->getVar("game_id");
     $num_players = intval($page->getVar("num_players"));
     $scenario = $page->getVar("scenario_table");
+    if(Check::isNull($scenario)) $scenario=0;
 
     $players = array();
     for($i=1; $i <= $num_players; $i++){
@@ -162,7 +168,7 @@ if($page->submitIsSet("submit_game")){
         //Handle the parent game
         if($game_id){
             $game_db->updateGamesById($game_id, array("game_system"=>$game_system, "scenario"=>$scenario));
-            $parent_game_id = $game_id;
+            $parent_game_id = $game_id;         
         } else {
             $parent_game_id = $game_db->create($game_system, $scenario);
         }
@@ -179,8 +185,11 @@ if($page->submitIsSet("submit_game")){
             $result = $result && $creation;
         }
 
-        foreach(array_keys($players) as $pid){
-            //TODO Recalculate Achievements
+
+        if($game_id){
+            $engine->recalculateAchievements($parent_game_id);
+        } else {
+            $engine->awardAchievements($parent_game_id);
         }
 
     }
@@ -207,8 +216,9 @@ if($page->submitIsSet("submit_game") && $result){
         $success_str.= "created ";
     }
     $success_str.= "the game!";
-}
 
+    $details = $engine->getGameDetails($parent_game_id);
+}
 
 $page->setDisplayMode("form");
 

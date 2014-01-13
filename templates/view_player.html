@@ -28,7 +28,7 @@
         <tr class="header">
             <th>Game ID</div></th>
             <th>Time</div></th>
-            <th>Opponents</div></th>
+            <th>Players</div></th>
             <th>Achievements Earned</div></th>
             <th>Points Earned</div></th>
         </tr>
@@ -40,8 +40,8 @@
             </td>
             <td><?=$gp[creation_time]?></td>
             <td><?=$gp[player_listing]?></td>
-            <td></td>
-            <td></td>
+            <td><?=$gp[achievement_listing]?></td>
+            <td><h1><?=$gp[points_earned]?></h1></td>
             <?if(Session::isAdmin()){?>
             <td>
                 <a href="home.php?view=report_game&action=delete&game_id=<?=$gp[id]?>">Delete</a>

@@ -11,7 +11,35 @@
             <div class="simple">
                 <?=$success_str?> 
             </div>
-            <? if($link){?>
+        </section>
+        <?if($details){?>
+        <section id="game_report">
+            <table>
+                <tr>
+                    <th>Player</th>
+                    <th>Achievements Earned</th>
+                    <th>Points Earned</th>
+                    <th>Total Points</th>
+                </tr>
+                <?foreach($details[players] as $pl){?>
+                <tr class="<?=$pl[style]?>">
+                    <td>
+                        <?=$pl[player_details][last_name]?>, <?=$pl[player_details][first_name]?>
+                    </td>
+                    <td>
+                    <?foreach($pl[achievements] as $a){?>
+                        <?=$a[name]?> (<?=$a[points]?>)<br>
+                    <?}?>
+                    </td>
+                    <td><h1><?=$pl[points]?></h1></td>
+                    <td><h1><?=$pl[point_total]?></h1></td>
+                </tr>
+                <?}?>
+            </table>
+        </section>
+        <?}?>
+        <section>
+            <?if($link){?>
                 <div class="simple">
                     <a href="<?=$link[href]?>"><h1><?=$link[text]?></h1></a>
                 </div>

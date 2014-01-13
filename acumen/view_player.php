@@ -71,6 +71,18 @@ if($selected_player){
         foreach($players as $b=>$p){
             $player_list.= $p[player_details][last_name].", ".$p[player_details][first_name].": ";
             $player_list.= $p[size]."pts of ".$p[faction_name]."<br>";
+        
+            if($p[player_id] == $selected_player){
+                $achievement_listing = "";
+                $points = 0;
+                foreach($p[achievements] as $ach){
+                    $achievement_listing .= $ach[name]." (".$ach[points].")<br>";
+                    $points += $ach[points];
+                }
+
+                $player[games][$a][achievement_listing] = $achievement_listing;
+                $player[games][$a][points_earned] = $points;
+            }
         }
 
         $player[games][$a][player_listing] = $player_list;
@@ -80,12 +92,12 @@ if($selected_player){
     }
 
 
-    //TODO Gather Statistics
-
     $stats = $engine->getPlayerStats($selected_player);
+    
     $faction_list = "";
     foreach($stats[factions] as $f){
-        $faction_list .= $f;
+        $faction_details = $faction_db->getById($f);
+        $faction_list .= $faction_details[0][acronym];
         if($f != end($stats[factions])){
             $faction_list .= ", ";
         }

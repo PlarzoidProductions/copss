@@ -11,8 +11,10 @@
 *   Table Description:
 *
 *	id - INT - PRIMARY KEY
+*	name - VARCHAR
 *	username - VARCHAR
 *	password - CHAR
+*	phone_number - VARCHAR
 *	creation_date - DATETIME
 *	last_login - TIMESTAMP
 *	admin - TINYINT
@@ -43,32 +45,40 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($username, $password, $last_login, $admin){
+public function create($name, $username, $password, $phone_number, $last_login, $admin){
 
 	//Validate the inputs
+	$name = $this->filterName($name); if($name === false){return false;}
 	$username = $this->filterUsername($username); if($username === false){return false;}
 	$password = $this->filterPassword($password); if($password === false){return false;}
+	$phone_number = $this->filterPhoneNumber($phone_number); if($phone_number === false){return false;}
 	$last_login = $this->filterLastLogin($last_login); if($last_login === false){return false;}
 	$admin = $this->filterAdmin($admin); if($admin === false){return false;}
 
 	//Create the values Array
 	$values = array(
-		":username"=>$username,
+		":name"=>$name,
+ 		":username"=>$username,
  		":password"=>$password,
+ 		":phone_number"=>$phone_number,
  		":last_login"=>$last_login,
  		":admin"=>$admin
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
+				name,
 				username,
 				password,
+				phone_number,
 				creation_date,
 				last_login,
 				admin
 			) VALUES (
+				:name,
 				:username,
 				:password,
+				:phone_number,
 				NOW(),
 				:last_login,
 				:admin)";
@@ -185,6 +195,15 @@ public function getById($id){
 }
 
 
+public function getByName($name){
+	
+    //Validate Inputs
+    $name = $this->filterName($name); if($name === false){return false;}
+
+    return $this->queryByColumns(array("name"=>$name));
+}
+
+
 public function getByUsername($username){
 	
     //Validate Inputs
@@ -200,6 +219,15 @@ public function getByPassword($password){
     $password = $this->filterPassword($password); if($password === false){return false;}
 
     return $this->queryByColumns(array("password"=>$password));
+}
+
+
+public function getByPhoneNumber($phone_number){
+	
+    //Validate Inputs
+    $phone_number = $this->filterPhoneNumber($phone_number); if($phone_number === false){return false;}
+
+    return $this->queryByColumns(array("phone_number"=>$phone_number));
 }
 
 
@@ -262,6 +290,19 @@ function filterId($id){
 
 
 
+function filterName($name){
+    //Allowed to be null, catch that first
+    if(Check::isNull($name)){ return null; }
+
+    if(Check::notString($name)){
+        echo "name was invalid!"; return false;
+    }
+
+    return $name;
+}
+
+
+
 function filterUsername($username){
     //Not allowed to be null
     if(Check::isNull($username)){
@@ -288,6 +329,21 @@ function filterPassword($password){
     }
 
     return $password;
+}
+
+
+
+function filterPhoneNumber($phone_number){
+    //Not allowed to be null
+    if(Check::isNull($phone_number)){
+        echo "phone_number cannot be null!"; return false;
+    }
+
+    if(Check::notString($phone_number)){
+        echo "phone_number was invalid!"; return false;
+    }
+
+    return $phone_number;
 }
 
 

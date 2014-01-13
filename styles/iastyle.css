@@ -160,7 +160,18 @@ div.simple {
     overflow: hidden;
 }
 
-#achievement_listing table, #games_listing table {
+#game_report {
+    display: block;
+    clear: both;
+    width: 640px;
+    text-align: center;
+    padding: 10px;
+    margin: 20px 0px;
+    background: #000000;
+    overflow: hidden;
+}
+
+table {
     border-spacing: 0px 2px;
     width: 100%;
     padding: 10px 15px;
@@ -170,7 +181,7 @@ div.simple {
     height: 175px;
 }
 
-#achievement_listing th, #games_listing th {
+th {
     vertical-align: bottom;
 }
 
@@ -182,11 +193,11 @@ div.simple {
     height: 100%;
 }
 
-#achievement_listing tr.odd, #games_listing tr.odd{
+tr.odd{
     background: #333;
 }
 
-#achievement_listing td, #games_listing td, th {
+td, th {
     padding: 0px 2px;
 }
 

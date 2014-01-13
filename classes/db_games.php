@@ -86,7 +86,7 @@ public function deleteByColumns($columns){
     foreach($keys as $column){
         $sql.= "$column=:$column";
         if(strcmp($column, end($keys))){
-            $sql.= ", ";
+            $sql.= " AND ";
         }
     }
 

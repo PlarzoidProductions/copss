@@ -25,9 +25,21 @@ switch($action){
         break;
     
     case "delete":  //Gotta delete children first...
+
+        //get record of who played in the game
+        $affected = $game_player_db->getByGameId($game_id); 
+
+        //Erase all traces of the game
         $game_player_db->deleteByColumns(array("game_id"=>$game_id));
         $engine->deleteGameAchievements($game_id); 
         $game_db->deleteById($game_id);
+
+        //Redress the affected player's achievements
+        foreach($affected as $afp){
+            $engine->redressAchievements($afp[player_id]);
+        }
+
+        //Report the status
         $result=true;
         $success_str = "Successfully Deleted Game!";
         break;
@@ -221,7 +233,7 @@ if($page->submitIsSet("submit_game") && $result){
 }
 
 $page->setDisplayMode("form");
-
+$link = array("href"=>"home.php?view=$view", "text"=>"Report Another Game?");
 
 /***************************************
 

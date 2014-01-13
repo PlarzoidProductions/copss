@@ -103,16 +103,64 @@ class Ach_Engine {
     }
 
     function recalculateAchievements($game_id){
-       if(Check::notInt($game_id)){
+        if(Check::notInt($game_id)){
             echo "Invalid game ID: '$game_id'!";
             return;
         } 
 
-        $this->deleteGameAchievements($game_id);
+        $game = $this->getGameDetails($game_id);
 
-        $this->awardAchievements($game_id);
+        foreach($game[players] as $p){
+            $this->redressAchievements($p[player_id]);
+        }
+    
     }
 
+    function redressAchievements($player_id){
+        if(Check::notInt($player_id)){
+            echo "Invalid player ID: '$player_id'!";
+            return;
+        }
+        
+        $history = $this->getPlayerHistory($player_id);
+
+        $achievements = $this->getAchievements();
+
+        //Remove any achievements earned by this player
+        $this->earned_db->deleteByColumns(array("player_id"=>$player_id));
+
+        $num_games=0;
+        foreach($history[games] as $game){
+            
+            //Find the player's details
+            $player = null;
+            foreach($game[players] as $p){
+                if($p[player_id] == $player_id){
+                    $player = $p;
+                }
+            }
+
+            //If we found the player's details
+            if($player){
+
+                //count the game
+                $num_games++;
+
+                //Loop through the achievements
+                foreach($achievements as $a){
+                    
+                    //Skipping game count ones unless this is the player's nth game
+                    if($a[game_count]){
+                        if($a[game_count] > $num_games){
+                            continue;
+                        }
+                    }
+
+                    $this->detectAndAward($player, $game, $a);
+                }
+            }
+        }
+    }
 
     private function detectAndAward($player, $game, $achievement){
         //Assume they've earned it, unless proven otherwise
@@ -135,8 +183,16 @@ class Ach_Engine {
                                                                     "achievement_id"=>$criteria[child_achievement]));
 
                 if(is_array($hasEarned)){
-                    if(count($has_earned) < $criteria["count"]){
-                        return;  //Nope, not gonna do it
+
+                    $count=0;
+                    foreach($hasEarned as $e){
+                        //reject things earned after the current game
+                        if($e[game_id] > $game[id]) continue;
+                        $count++;
+                    }
+
+                    if($count < $criteria["count"]){
+                        return;  //Nope, not gonna cut it
                     }
                 }
             }
@@ -203,7 +259,7 @@ class Ach_Engine {
 
             //establish history 
             foreach($history[games] as $g){
-                if($g[id] == $game[id]) continue;
+                if($g[id] >= $game[id]) continue;
                 foreach($g[players] as $p){
                     if($p[player_id] == $player[player_id]) continue;
                     
@@ -233,7 +289,7 @@ class Ach_Engine {
 
             //establish history 
             foreach($history[games] as $g){
-                if($g[id] == $game[id]) continue;
+                if($g[id] >= $game[id]) continue;
                 foreach($g[players] as $p){
                     if($p[player_id] == $player[player_id]) continue;
                     
@@ -399,7 +455,7 @@ class Ach_Engine {
         $achievements = $this->earned_db->getByPlayerId($player_id);
 
         $points = 0;
-        foreach($$achievements as $a){
+        foreach($achievements as $a){
             $details = $this->ach_db->getById($a[achievement_id]);
             $points += $details[0][points];
         }

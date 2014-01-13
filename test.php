@@ -5,12 +5,11 @@ include("acumen/achievement_engine.php");
 $a_db = new Achievements();
 $ae_db = new Achievements_earned();
 
-$ae_db->deleteByColumns(array("player_id"=>1));
-$ae_db->deleteByColumns(array("player_id"=>2));
+$ae_db->deleteByColumns(array("game_id"=>1));
 
 $ae = new Ach_Engine();
-$ae->awardAchievements(9);
-
+$ae->awardAchievements(1);
+/*
 $result = $ae_db->queryByColumns(array("player_id"=>1));
 $points = 0;
 foreach($result as $k=>$ae){
@@ -24,6 +23,6 @@ echo "<pre>";
 print_r($result);
 echo "</pre>";
 echo "Points: ".$points;
-
+*/
 ?>
 

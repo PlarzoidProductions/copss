@@ -93,6 +93,8 @@
     $page->register("multiplayer", "checkbox", array("label"=>"Multiplayer Game",
                                                         "on_text"=>"Required", "off_text"=>"",
                                                         "default_val"=>$defaults[multiplayer]));
+    $page->register("vs_vip", "checkbox", array("label"=>"Played vs VIP", "on_text"=>"Required", "off_text"=>"",
+                                                "default_val"=>$defaults[vs_vip]));
     $page->register("completed_event", "select", array( "get_choices_array_func"=>"getEvents",
                                                         "get_choices_array_func_args"=>array(),
                                                         "default_val"=>$defaults[event_id]));
@@ -149,6 +151,7 @@
         $fully_painted_battle = $page->getVar("fully_painted_battle");
         $played_scenario = $page->getvar("played_scenario");
         $multiplayer = $page->getvar("multiplayer");
+        $vs_vip = $page->getVar("vs_vip");
         $completed_event = $page->getVar("completed_event");
        
         //Update vs Create
@@ -164,7 +167,8 @@
                             "fully_painted"=>$played_fully_painted,
                             "fully_painted_battle"=>$fully_painted_battle,
                             "played_scenario"=>$played_scenario,
-                            "multiplayer"=>$multiplayer
+                            "multiplayer"=>$multiplayer,
+                            "vs_vip"=>$vs_vip
                         );
             
             //handle references
@@ -197,7 +201,7 @@
         } else {
             $result = $ach_db->create($name, $points, $per_game, $is_meta, $game_count, $game_system, $game_size,
                                 $faction, $unique_opponent, $unique_opponent_location, $played_theme_force,
-                                $played_fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $completed_event);
+                                $played_fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $completed_event);
         }
 
     
@@ -318,7 +322,7 @@
             $inputs = array_merge($inputs, array("game_count", "game_size", "faction",
                             "unique_opponent", "unique_opponent_location", "played_theme_force", 
                             "played_fully_painted", "fully_painted_battle", "played_scenario",
-                            "multiplayer", "completed_event")
+                            "multiplayer", "vs_vip", "completed_event")
                         );
         
         }

@@ -26,6 +26,7 @@
 *	fully_painted_battle - TINYINT
 *	played_scenario - TINYINT
 *	multiplayer - TINYINT
+*	vs_vip - TINYINT
 *	event_id - INT
 *
 **************************************************/
@@ -54,7 +55,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $event_id){
+public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $event_id){
 
 	//Validate the inputs
 	$name = $this->filterName($name); if($name === false){return false;}
@@ -72,6 +73,7 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 	$played_scenario = $this->filterPlayedScenario($played_scenario); if($played_scenario === false){return false;}
 	$multiplayer = $this->filterMultiplayer($multiplayer); if($multiplayer === false){return false;}
+	$vs_vip = $this->filterVsVip($vs_vip); if($vs_vip === false){return false;}
 	$event_id = $this->filterEventId($event_id); if($event_id === false){return false;}
 
 	//Create the values Array
@@ -91,6 +93,7 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
  		":fully_painted_battle"=>$fully_painted_battle,
  		":played_scenario"=>$played_scenario,
  		":multiplayer"=>$multiplayer,
+ 		":vs_vip"=>$vs_vip,
  		":event_id"=>$event_id
 	);
 
@@ -111,6 +114,7 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 				fully_painted_battle,
 				played_scenario,
 				multiplayer,
+				vs_vip,
 				event_id
 			) VALUES (
 				:name,
@@ -128,6 +132,7 @@ public function create($name, $points, $per_game, $is_meta, $game_count, $game_s
 				:fully_painted_battle,
 				:played_scenario,
 				:multiplayer,
+				:vs_vip,
 				:event_id)";
 
 	return $this->db->insert($sql, $values);
@@ -377,6 +382,15 @@ public function getByMultiplayer($multiplayer){
 }
 
 
+public function getByVsVip($vs_vip){
+	
+    //Validate Inputs
+    $vs_vip = $this->filterVsVip($vs_vip); if($vs_vip === false){return false;}
+
+    return $this->queryByColumns(array("vs_vip"=>$vs_vip));
+}
+
+
 public function getByEventId($event_id){
 	
     //Validate Inputs
@@ -617,6 +631,19 @@ function filterMultiplayer($multiplayer){
     }
 
     return intVal($multiplayer);
+}
+
+
+
+function filterVsVip($vs_vip){
+    //Allowed to be null, catch that first
+    if(Check::isNull($vs_vip)){ return null; }
+
+    if(Check::notBool($vs_vip)){
+        echo "vs_vip was invalid!"; return false;
+    }
+
+    return intVal($vs_vip);
 }
 
 

@@ -6,6 +6,7 @@ require_once("classes/db_game_sizes.php");
 require_once("classes/db_game_system_factions.php");
 require_once("classes/db_games.php");
 require_once("classes/db_game_players.php");
+require_once("achievement_engine.php");
 
 $page = new Page();
 $player_db = new Players();
@@ -13,6 +14,7 @@ $size_db = new Game_sizes();
 $faction_db = new Game_system_factions();
 $game_db = new Games();
 $game_players_db = new Game_players();
+$engine = new Ach_Engine();
 
 
 /*********************************************
@@ -34,43 +36,23 @@ Gather all the data on the chosen player
 $selected_player = $page->getVar("player");
 
 if($selected_player){
-    $player = $player_db->getById($selected_player);
-    $player = $player[0];
 
-    $tmp1 = $game_players_db->getByPlayerId($player[id]);
+    $player = $engine->getPlayerHistory($selected_player);
 
-    $games_played = array();
-    foreach($tmp1 as $g){
-        $game = $game_db->getById($g[game_id]);
-        $game = $game[0];
-        
-        $tmp2 = $game_players_db->getByGameId($game[id]);
-
-        $game_players = array();
-        foreach($tmp2 as $gp){
+    foreach($player[games] as $i=>$g){
+        foreach($g[players] as $j=>$gp){
             $tmp3 = $player_db->getById($gp[player_id]);
-            $gp[player_details] = $tmp3[0];
+            $player[games][$i][players][$j][player_details] = $tmp3[0];
 
             $size = $size_db->getById($gp[game_size]);
-            $gp[size] = $size[0][size];
+            $player[games][$i][players][$j][size] = $size[0][size];
 
             //fetch faction
             $faction = $faction_db->getById($gp[faction_id]);
-            $gp[faction_name] = $faction[0][name];
+            $player[games][$i][players][$j][faction_name] = $faction[0][name];
 
-            $game_players[] = $gp;
         }
-
-        $game[players] = $game_players;
-        $games_played[] = $game;
     }
-
-    /*
-        $games_played
-            $game       <- games table entry
-                [players]       <- game_players table entry
-                    [player_details]    <- players table entry
-    */
                     
 }
 
@@ -80,9 +62,9 @@ if($selected_player){
 Prep the page
 
 ********************************************/
-if($games_played){
+if($selected_player){
     $odd=true;
-    foreach($games_played as $a=>$game){
+    foreach($player[games] as $a=>$game){
         $players = $game[players];
 
         $player_list = "";
@@ -91,21 +73,24 @@ if($games_played){
             $player_list.= $p[size]."pts of ".$p[faction_name]."<br>";
         }
 
-        $games_played[$a][player_listing] = $player_list;
+        $player[games][$a][player_listing] = $player_list;
         
-        if($odd)$games_played[$a][style]="odd";
+        if($odd)$player[games][$a][style]="odd";
         $odd = !$odd;
     }
 
 
     //TODO Gather Statistics
 
-    $stats = array();
-    $stats[games] = count($games_played);
-    $stats[opponents] = "Ach Count";
-    $stats[locations] = "Ach Count 2";
-    $stats[factions] = "Faction List";
-    $stats[points] = "Points";
+    $stats = $engine->getPlayerStats($selected_player);
+    $faction_list = "";
+    foreach($stats[factions] as $f){
+        $faction_list .= $f;
+        if($f != end($stats[factions])){
+            $faction_list .= ", ";
+        }
+    }
+    $stats[faction_list] = $faction_list;
 }    
 
 //Usual stuff

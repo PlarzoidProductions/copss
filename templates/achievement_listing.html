@@ -1,4 +1,4 @@
-<section id="listing">
+<section id="achievement_listing">
     <header><h1>Achievements</h1></header>
     <table>
         <tr class="header">
@@ -17,6 +17,7 @@
             <th><div class="rotated">Fully Painted Battle</div></th>
             <th><div class="rotated">Scenario Table</div></th>
             <th><div class="rotated">Multiplayer</div></th>
+            <th><div class="rotated">Played vs VIP</div></th>
             <th>Completed Event</th>
         </tr>
     <?foreach($achievements as $a){?>
@@ -39,6 +40,7 @@
             <td><?if($a[fully_painted_battle]){?>Y<?}?></td>
             <td><?if($a[played_scenario]){?>Y<?}?></td>
             <td><?if($a[multiplayer]){?>Y<?}?></td>
+            <td><?if($a[vs_vip]){?>Y<?}?></td>
             <td><?=$a[event_name]?></td>
             <td>
                 <a href="home.php?view=achievement_config&action=delete&ach_id=<?=$a[id]?>">Delete</a>

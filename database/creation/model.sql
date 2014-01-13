@@ -86,6 +86,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
   `fully_painted_battle` TINYINT(1) NULL DEFAULT NULL ,
   `played_scenario` TINYINT(1) NULL ,
   `multiplayer` TINYINT(1) NULL ,
+  `vs_vip` TINYINT(1) NULL ,
   `event_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_ach_game_system_id` (`game_system_id` ASC) ,
@@ -155,6 +156,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`players` (
   `email` VARCHAR(255) NULL DEFAULT NULL ,
   `country` INT(10) UNSIGNED NOT NULL ,
   `state` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `vip` TINYINT(1) NULL DEFAULT 0 ,
   `creation_date` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_country_id` (`country` ASC) ,
@@ -203,7 +205,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
   INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
-  INDEX `fk_ach_earned_game_id` (`id` ASC) ,
+  INDEX `fk_ach_earned_game_id` (`game_id` ASC) ,
   CONSTRAINT `fk_ach_earned_player_id`
     FOREIGN KEY (`player_id` )
     REFERENCES `iron_arena`.`players` (`id` )
@@ -215,7 +217,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_earned_game_id`
-    FOREIGN KEY (`id` )
+    FOREIGN KEY (`game_id` )
     REFERENCES `iron_arena`.`games` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

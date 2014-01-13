@@ -13,6 +13,7 @@
 *	id - INT - PRIMARY KEY
 *	player_id - INT
 *	achievement_id - INT
+*	game_id - INT
 *
 **************************************************/
 require_once("query.php");
@@ -40,25 +41,29 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($player_id, $achievement_id){
+public function create($player_id, $achievement_id, $game_id){
 
 	//Validate the inputs
 	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 	$achievement_id = $this->filterAchievementId($achievement_id); if($achievement_id === false){return false;}
+	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
 	//Create the values Array
 	$values = array(
 		":player_id"=>$player_id,
- 		":achievement_id"=>$achievement_id
+ 		":achievement_id"=>$achievement_id,
+ 		":game_id"=>$game_id
 	);
 
 	//Build the query
 	$sql = "INSERT INTO $this->table (
 				player_id,
-				achievement_id
+				achievement_id,
+				game_id
 			) VALUES (
 				:player_id,
-				:achievement_id)";
+				:achievement_id,
+				:game_id)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -190,6 +195,15 @@ public function getByAchievementId($achievement_id){
 }
 
 
+public function getByGameId($game_id){
+	
+    //Validate Inputs
+    $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
+
+    return $this->queryByColumns(array("game_id"=>$game_id));
+}
+
+
 /**************************************************
 
 Exists by Column(s) Function
@@ -248,6 +262,19 @@ function filterAchievementId($achievement_id){
     }
 
     return intVal($achievement_id);
+}
+
+
+
+function filterGameId($game_id){
+    //Allowed to be null, catch that first
+    if(Check::isNull($game_id)){ return null; }
+
+    if(Check::notInt($game_id)){
+        echo "game_id was invalid!"; return false;
+    }
+
+    return intVal($game_id);
 }
 
 

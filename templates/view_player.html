@@ -11,17 +11,17 @@
             <? echo $page->displayVar($i)?>
         <?}?>
         </form>
-    <?if($games_played){?>
+    <?if($selected_player){?>
         <header><h1>Statistics for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
         <div class="simple">Games Played: <strong><?=$stats[games]?></strong></div>
         <div class="simple">Unique Opponents Played: <strong><?=$stats[opponents]?></strong></div>
         <div class="simple">Unique Opponent Locations: <strong><?=$stats[locations]?></strong></div>
-        <div class="simple">Factions Played Against: <strong><?=$stats[factions]?></strong></div>
+        <div class="simple">Factions Played Against: <strong><?=$stats[faction_list]?></strong></div>
         <div class="simple">Current Points: <strong><?=$stats[points]?></strong></div>
     <?}?>
     </section>
 </section>
-<?if($games_played){?>
+<?if($selected_player){?>
 <section id="games_listing">
     <header><h1>Game Details for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
     <table>
@@ -32,7 +32,7 @@
             <th>Achievements Earned</div></th>
             <th>Points Earned</div></th>
         </tr>
-    <?foreach($games_played as $gp){?>
+    <?foreach($player[games] as $gp){?>
         <tr class="<?=$gp[style]?>">
             <td>
                 <?=$gp[id]?> 

@@ -32,6 +32,40 @@ class Ach_Engine {
     function __destruct(){}
 
 
+    function getPlayerStats($player_id){
+       if(Check::notInt($player_id)){
+            echo "Invalid player ID: '$player_id'!";
+            return;
+        }
+
+        //Gather data
+        $history = $this->getPlayerHistory($player_id);
+        $ach_earned = $this->earned_db->queryByColumns(array("player_id"=>$player_id));
+        foreach($ach_earned as $k=>$ach){
+            $details = $this->ach_db->getById($ach[achievement_id]);
+            $ach_earned[$k][details] = $details[0];
+        }
+
+        //Prep the array
+        $stats = array();
+        $stats[games] = count($history[games]);
+        $stats[opponents] = 0;
+        $stats[locations] = 0;
+        $stats[factions] = array();
+        $stats[points]=0;
+
+
+        foreach($ach_earned as $ach){
+            if($ach[details][unique_opponent]) $stats[opponents]++;
+            if($ach[details][unique_opponent_locations]) $stats[locations]++;
+            if($ach[details][faction_id]) $stats[factions][] = $ach[details][faction_id];
+            $stats[points] += $ach[details][points];
+        }
+        
+        return $stats;
+
+    }
+
     function awardAchievements($game_id){
         if(Check::notInt($game_id)){
             echo "Invalid game ID: '$game_id'!";
@@ -208,13 +242,31 @@ class Ach_Engine {
                 $earned = $new_locs;
             }
         }
+        if($achievement[vs_vip]){
+
+            $count = 0;
+            foreach($game[players] as $p){
+                if($p[player_id] == $player[player_id]) continue;
+                if($p[player_details][vip]){
+                    $count ++;
+                }
+            }
+
+            if(is_numeric($earned)){
+                $earned = min($earned, $count);
+            } else {
+                $earned = $count;
+            }
+                    
+    
+        }
 
         //If we're here, it's time to award things
         if($earned > 0){
             for($i=0; $i < $earned; $i++){
-                $this->earned_db->create($player[player_id], $achievement[id]);
+                $this->earned_db->create($player[player_id], $achievement[id], $game[id]);
 
-                echo "Awarded ".$achievement[name]." to Player ".$player[player_id]."<br>";
+                echo "Awarded ".$achievement[name]." to Player ".$player[player_details][last_name].", ".$player[player_details][first_name]."<br>";
             }   
         } 
     }

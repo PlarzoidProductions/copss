@@ -16,6 +16,7 @@
 *	email - VARCHAR
 *	country - INT
 *	state - INT
+*	vip - TINYINT
 *	creation_date - DATETIME
 *
 **************************************************/
@@ -44,7 +45,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($first_name, $last_name, $email, $country, $state){
+public function create($first_name, $last_name, $email, $country, $state, $vip){
 
 	//Validate the inputs
 	$first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
@@ -52,6 +53,7 @@ public function create($first_name, $last_name, $email, $country, $state){
 	$email = $this->filterEmail($email); if($email === false){return false;}
 	$country = $this->filterCountry($country); if($country === false){return false;}
 	$state = $this->filterState($state); if($state === false){return false;}
+	$vip = $this->filterVip($vip); if($vip === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -59,7 +61,8 @@ public function create($first_name, $last_name, $email, $country, $state){
  		":last_name"=>$last_name,
  		":email"=>$email,
  		":country"=>$country,
- 		":state"=>$state
+ 		":state"=>$state,
+ 		":vip"=>$vip
 	);
 
 	//Build the query
@@ -69,6 +72,7 @@ public function create($first_name, $last_name, $email, $country, $state){
 				email,
 				country,
 				state,
+				vip,
 				creation_date
 			) VALUES (
 				:first_name,
@@ -76,6 +80,7 @@ public function create($first_name, $last_name, $email, $country, $state){
 				:email,
 				:country,
 				:state,
+				:vip,
 				NOW())";
 
 	return $this->db->insert($sql, $values);
@@ -235,6 +240,15 @@ public function getByState($state){
 }
 
 
+public function getByVip($vip){
+	
+    //Validate Inputs
+    $vip = $this->filterVip($vip); if($vip === false){return false;}
+
+    return $this->queryByColumns(array("vip"=>$vip));
+}
+
+
 public function getByCreationDate($creation_date){
 	
     //Validate Inputs
@@ -343,6 +357,19 @@ function filterState($state){
     }
 
     return intVal($state);
+}
+
+
+
+function filterVip($vip){
+    //Allowed to be null, catch that first
+    if(Check::isNull($vip)){ return null; }
+
+    if(Check::notBool($vip)){
+        echo "vip was invalid!"; return false;
+    }
+
+    return intVal($vip);
 }
 
 

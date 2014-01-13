@@ -174,30 +174,6 @@ DEFAULT CHARACTER SET = latin1;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`achievements_earned`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `player_id` INT(10) UNSIGNED NOT NULL ,
-  `achievement_id` INT(10) UNSIGNED NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
-  INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
-  CONSTRAINT `fk_ach_earned_player_id`
-    FOREIGN KEY (`player_id` )
-    REFERENCES `iron_arena`.`players` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ach_earned_achievement_id`
-    FOREIGN KEY (`achievement_id` )
-    REFERENCES `iron_arena`.`achievements` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-
--- -----------------------------------------------------
 -- Table `iron_arena`.`games`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
@@ -210,6 +186,37 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
   CONSTRAINT `fk_parent_game_system_id`
     FOREIGN KEY (`game_system` )
     REFERENCES `iron_arena`.`game_systems` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`achievements_earned`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `player_id` INT(10) UNSIGNED NOT NULL ,
+  `achievement_id` INT(10) UNSIGNED NOT NULL ,
+  `game_id` INT UNSIGNED NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_ach_earned_player_id` (`player_id` ASC) ,
+  INDEX `fk_ach_earned_achievement_id` (`achievement_id` ASC) ,
+  INDEX `fk_ach_earned_game_id` (`id` ASC) ,
+  CONSTRAINT `fk_ach_earned_player_id`
+    FOREIGN KEY (`player_id` )
+    REFERENCES `iron_arena`.`players` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_earned_achievement_id`
+    FOREIGN KEY (`achievement_id` )
+    REFERENCES `iron_arena`.`achievements` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ach_earned_game_id`
+    FOREIGN KEY (`id` )
+    REFERENCES `iron_arena`.`games` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

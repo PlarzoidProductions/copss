@@ -52,16 +52,16 @@ class Ach_Engine {
         $stats[opponents] = 0;
         $stats[locations] = 0;
         $stats[factions] = array();
-        $stats[points]=0;
 
 
         foreach($ach_earned as $ach){
             if($ach[details][unique_opponent]) $stats[opponents]++;
             if($ach[details][unique_opponent_locations]) $stats[locations]++;
             if($ach[details][faction_id]) $stats[factions][] = $ach[details][faction_id];
-            $stats[points] += $ach[details][points];
         }
-        
+
+        //TODO use Points View to get points
+
         return $stats;
 
     }
@@ -127,7 +127,9 @@ class Ach_Engine {
         $achievements = $this->getAchievements();
 
         //Remove any achievements earned by this player
-        $this->earned_db->deleteByColumns(array("player_id"=>$player_id));
+        foreach($history[games] as $game){
+            $this->earned_db->deleteByColumns(array("player_id"=>$player_id, "game_id"=>$game[id]));
+        }
 
         $num_games=0;
         foreach($history[games] as $game){
@@ -165,6 +167,9 @@ class Ach_Engine {
     private function detectAndAward($player, $game, $achievement){
         //Assume they've earned it, unless proven otherwise
         $earned = 1;
+    
+        //We're not touching event achievements
+        if($achievement[event_id]) return;
 
         //If not per-game, check for existance
         if(!$achievement[per_game]){
@@ -312,7 +317,7 @@ class Ach_Engine {
 
             //in the odd case someone make an achievement with (new opponent && new location)
             //Let's take the minimum of the two to get the number of times to award the new achievement
-            if(is_numeric($earned)){
+            if($achievement[unique_opponent]){
                 $earned = min($earned, $new_locs);
             } else {
                 $earned = $new_locs;
@@ -321,10 +326,24 @@ class Ach_Engine {
         if($achievement[vs_vip]){
 
             $count = 0;
+            $played = array();
+
+            $history = $this->getPlayerHistory($player[player_id]);
+            foreach($history[games] as $hgame){
+                if($hgame[id] == $game[id]) continue;
+                foreach($hgame[players] as $gpl){
+                    if($gpl[player_details][vip]){
+                        $played[] = $gpl[player_details][id];
+                    }
+                }
+            }
+
             foreach($game[players] as $p){
                 if($p[player_id] == $player[player_id]) continue;
                 if($p[player_details][vip]){
-                    $count ++;
+                    if(!in_array($p[player_details][id], $played)){
+                        $count ++;
+                    }
                 }
             }
 

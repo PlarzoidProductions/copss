@@ -79,35 +79,8 @@ class Choices {
 
 		return $ret;
 	}
-/*
-	function getEventPlayerCountChoices(){
-		$ret = array();
-
-		for($i=1; $i<=64; $i++){
-			$ret[] = array('value'=>$i, 'text'=>$i);
-		}
-		
-		return $ret;
-	}
-
-	function getEvents(){
-
-		$ret = array();
-		$ret[] = array('value'=>'', 'text'=>'');		
-
-		$s_db = new Settings();
-
-		$settings = $s_db->getSettings();
-
-		for($i=1; $i<=20; $i++){	
-			if(($settings['event'.$i]+0) > 0){
-				$ret[]=array('value'=>'event'.$i, 'text'=>$settings['event'.$i.'name']);
-			}
-		}
-		return $ret;
-	}
-*/
-	function getStates($parent_id){
+	
+        function getStates($parent_id){
 
             if(Check::isNull($parent_id)){
                 return array(array("text"=>"No States Exist", "value"=>"null"));
@@ -238,5 +211,31 @@ class Choices {
 
             return array(array("text"=>"None Exist!", "value"=>null));
         }
+
+
+        function leaderboardSortChoices(){
+            $columns = array("Points"=>"points",
+                         "Name (L, F)"=>"name",
+                         "# Games"=>"game_count",
+                         "# Opponents"=>"opponents",
+                         "# Locations"=>"locations",
+                         "# Factions"=>"factions",
+                         "Points Earned"=>"earned",
+                         "Points Spent"=>"spent");
+
+            $ret = array();
+            foreach($columns as $t=>$v){
+                $ret[] = array("text"=>$t, "value"=>$v);
+            }
+
+            return $ret;
+        }
+
+        function sortDirectionChoices(){
+            return array(array("text"=>"Ascending", "value"=>"SORT_ASC"),
+                         array("text"=>"Descending", "value"=>"SORT_DESC"));
+        }
+
+
 }
 ?>

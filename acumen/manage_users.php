@@ -3,7 +3,7 @@
     require_once("classes/page.php");
     require_once("classes/db_users.php");
 
-    $page = new Page("ADMIN");
+    $page = new Page();
     $db = new Users();
 
     /***************************************
@@ -17,6 +17,8 @@
     }
 
     $page->register("username", "textbox", array("required"=>true, "default_val"=>$defaults[0][username]));
+    $page->register("name", "textbox", array("required"=>true, "default_val"=>$defaults[0][name]));
+    $page->register("phone_number", "textbox", array("required"=>true, "default_val"=>$defaults[0][phone_number]));
     $page->register("password1", "password", array("label"=>"Password"));
     $page->register("password2", "password", array("label"=>"Confirm Password"));
 
@@ -37,7 +39,9 @@
     if($submitted){
 
         //Retrieve the vars
-        $name = $page->getVar("username");
+        $username = $page->getVar("username");
+        $name = $page->getVar("name");
+        $phone = $page->getVar("phone_number");
         $pass1 = $page->getVar("password1");
         $pass2 = $page->getVar("password2");
         $admin = $page->getVar("admin");
@@ -63,7 +67,7 @@
             }
 
             if(empty($error)){
-                $result = $db->create($name, md5($pass1), null, $admin);
+                $result = $db->create($name, $username, md5($pass1), $phone, null, $admin);
             }
         }
 
@@ -79,7 +83,8 @@
                     if($exists[0][id] != $uid)  $error = "Username already exists!";
                 }
 
-                $columns = array("username"=>$username, "admin"=>$admin);
+                $columns = array("name"=>$name, "username"=>$username, 
+                                 "admin"=>$admin, "phone_number"=>$phone);
             
                 if(strlen($pass1) > 0){
                     if(strlen($pass1) < 8){
@@ -135,7 +140,7 @@
     
     } else {
 
-        $inputs = array("username", "password1", "password2", "admin");
+        $inputs = array("name", "phone_number", "username", "password1", "password2", "admin");
         if($uid==null){
             $inputs[]="add";
         } else {
@@ -143,8 +148,15 @@
             $inputs[]="delete";
         }
         $page->setDisplayMode("form");
-        $template = "templates/default_section.html";
+        $template = "templates/manage_users.html";
     
+    }
+    
+    $users = $db->getAll();
+    $odd=true;
+    foreach($users as $k=>$u){
+        if($odd) $users[$k][style] = "odd";
+        $odd = !$odd;
     }
     
     $form_method="post";

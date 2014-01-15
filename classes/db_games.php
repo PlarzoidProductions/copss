@@ -113,9 +113,10 @@ public function updateGamesById($id, $columns){
 
     //Generate the query
     $sql = "UPDATE $this->table SET ";
-    foreach(array_keys($columns) as $column){
+    $keys = array_keys($columns);
+    foreach($keys as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end(array_keys($columns)))){
+        if(strcmp($column, end($keys))){
             $sql.= ", ";
         }
     }
@@ -244,7 +245,7 @@ function filterCreationTime($creation_time){
         echo "creation_time was invalid!"; return false;
     }
 
-    return $creation_time;
+    return date("Y-m-d H:i:s", $creation_time);
 }
 
 

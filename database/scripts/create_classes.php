@@ -190,6 +190,10 @@ if($table_opened && !preg_match("~INDEX~", $line) && preg_match($column_pattern,
         case "BOOLEAN":
             $validateFn.= "    if($varname){ return 1; } else { return 0; }\n";
             break;
+        case "DATETIME":
+        case "TIMESTAMP":
+            $validateFn.= "    return date(\"Y-m-d H:i:s\", $varname);\n";
+            break;
         default:
             $validateFn.= "    return $varname;\n";
             break;
@@ -461,9 +465,10 @@ $masterUpdateFn='public function update'.$table_Fn_name.'ById($id, $columns){
 
     //Generate the query
     $sql = "UPDATE $this->table SET ";
-    foreach(array_keys($columns) as $column){
+    $keys = array_keys($columns);
+    foreach($keys as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end(array_keys($columns)))){
+        if(strcmp($column, end($keys))){
             $sql.= ", ";
         }
     }

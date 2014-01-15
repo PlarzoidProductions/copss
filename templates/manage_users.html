@@ -1,0 +1,44 @@
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><? echo $title?></h1>
+            <? if(!empty($error)){?><h3 class="warning"><?=$error?></h3><?}?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?=$form_method?>" action="<?=$form_action?>">
+        <? foreach($inputs as $i){?>
+            <? echo $page->displayVar($i)?>
+        <?}?>
+        </form>
+    </section>
+</section>
+<section id="listing">
+    <table>
+        <tr class="header">
+            <th>ID</th>
+            <th>username</th>
+            <th>Name</th>
+            <th>Phone #</th>
+            <th>Admin?</th>
+            <th>Last Login</th>
+        </tr>
+    <?foreach($users as $u){?>
+        <tr class="<?=$u[style]?>">
+            <td>
+                <?=$u[id]?> 
+                (<a href="home.php?view=manage_users&action=edit_user&user_id=<?=$u[id]?>">Edit</a>)
+            </td>
+            <td><?=$u[username]?></td>
+            <td><?=$u[name]?></td>
+            <td><?=$u[phone_number]?></td>
+            <td><?if($u[admin]){?>Y<?}?></td>
+            <td><?=$u[last_login]?></td>
+            <td>
+                <a href="home.php?view=manage_users&action=delete&user_id=<?=$u[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?}?>
+    </table>
+</section>
+

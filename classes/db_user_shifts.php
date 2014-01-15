@@ -120,9 +120,10 @@ public function updateUser_shiftsById($id, $columns){
 
     //Generate the query
     $sql = "UPDATE $this->table SET ";
-    foreach(array_keys($columns) as $column){
+    $keys = array_keys($columns);
+    foreach($keys as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end(array_keys($columns)))){
+        if(strcmp($column, end($keys))){
             $sql.= ", ";
         }
     }

@@ -133,14 +133,15 @@ public function updateUsersById($id, $columns){
 
     //Generate the query
     $sql = "UPDATE $this->table SET ";
-    foreach(array_keys($columns) as $column){
+    $keys = array_keys($columns);
+    foreach($keys as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end(array_keys($columns)))){
+        if(strcmp($column, end($keys))){
             $sql.= ", ";
         }
     }
     $sql.= " WHERE id=:id";
-
+    
     return $this->db->update($sql, $values);
 }
 
@@ -358,7 +359,7 @@ function filterCreationDate($creation_date){
         echo "creation_date was invalid!"; return false;
     }
 
-    return $creation_date;
+    return date("Y-m-d H:i:s", $creation_date);
 }
 
 
@@ -371,7 +372,7 @@ function filterLastLogin($last_login){
         echo "last_login was invalid!"; return false;
     }
 
-    return $last_login;
+    return date("Y-m-d H:i:s", $last_login);
 }
 
 

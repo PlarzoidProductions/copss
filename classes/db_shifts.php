@@ -115,9 +115,10 @@ public function updateShiftsById($id, $columns){
 
     //Generate the query
     $sql = "UPDATE $this->table SET ";
-    foreach(array_keys($columns) as $column){
+    $keys = array_keys($columns);
+    foreach($keys as $column){
         $sql.= "$column=:$column";
-        if(strcmp($column, end(array_keys($columns)))){
+        if(strcmp($column, end($keys))){
             $sql.= ", ";
         }
     }
@@ -261,7 +262,7 @@ function filterStart($start){
         echo "start was invalid!"; return false;
     }
 
-    return $start;
+    return date("Y-m-d H:i:s", $start);
 }
 
 
@@ -276,7 +277,7 @@ function filterStop($stop){
         echo "stop was invalid!"; return false;
     }
 
-    return $stop;
+    return date("Y-m-d H:i:s", $stop);
 }
 
 

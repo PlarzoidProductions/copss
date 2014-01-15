@@ -149,7 +149,7 @@ div.simple {
 /* -- Tables -- */
 
 
-#achievement_listing, #games_listing {
+#achievement_listing, #listing {
     display: block;
     clear: both;
     width: 880px;

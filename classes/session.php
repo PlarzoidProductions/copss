@@ -105,7 +105,10 @@ class Session {
 		$_SESSION[sessionuserid] = $u[id];
 		$_SESSION[is_logged_in] = true;
 		$_SESSION[is_admin] = $u[admin];
-	}
+
+                $db = new Users();
+                $db->updateUsersById($u[id], array("last_login"=>date("Y-m-d H:i:s", time())));
+        }
 
 	public static function logout() {
 		unset($_SESSION[sessionuserid]);

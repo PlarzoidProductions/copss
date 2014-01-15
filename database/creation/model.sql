@@ -348,6 +348,40 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`user_shifts` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `iron_arena`.`prize_redemptions`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `player_id` INT UNSIGNED NOT NULL ,
+  `cost` INT NOT NULL ,
+  `description` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_prize_redemptions_player_id` (`player_id` ASC) ,
+  CONSTRAINT `fk_prize_redemptions_player_id`
+    FOREIGN KEY (`player_id` )
+    REFERENCES `iron_arena`.`players` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Placeholder table for view `iron_arena`.`points`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `iron_arena`.`points` (`id` INT, `earned` INT, `player_id` INT, `spent` INT);
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`points`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`points`;
+USE `iron_arena`;
+CREATE  OR REPLACE VIEW `iron_arena`.`points` AS 
+SELECT ae.player_id as id, sum(a.points) as earned, pr.player_id, sum(pr.cost) as spent
+FROM `iron_arena`.`achievements_earned` ae, `iron_arena`.`achievements` a, `iron_arena`.`prize_redemptions` pr
+WHERE ae.achievement_id=a.id AND ae.player_id=pr.player_id
+GROUP BY ae.player_id;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -96,7 +96,7 @@ $line = fgets($sql_fptr);
 */
 $create_table_pattern = "~`[a-z_]+`\.`([a-z_]+)`~";
 
-if(preg_match("~CREATE~", $line) && preg_match($create_table_pattern, $line, $matches)){
+if(preg_match("~CREATE~", $line) && preg_match("~TABLE~", $line) && preg_match($create_table_pattern, $line, $matches)){
 
     $table_name = end($matches);
     

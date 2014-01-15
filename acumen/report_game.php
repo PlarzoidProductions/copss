@@ -61,7 +61,7 @@ $page->register("game_system", "select", array( "required"=>true,
 $page->register("game_id", "hidden", array("value"=>$game_id));
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>count($defaults[players]),
                                                 "get_choices_array_func"=>"getIntegerChoices",
-                                                "get_choices_array_func_args"=>array(2, 100, 1)));
+                                                "get_choices_array_func_args"=>array(2, 10, 1)));
 $page->register("scenario_table", "checkbox", array("on_text"=>"Scenario", "off_text"=>"", 
                                                     "default_val"=>$defaults[scenario]));
 

@@ -141,7 +141,7 @@ public function updateUsersById($id, $columns){
         }
     }
     $sql.= " WHERE id=:id";
-    
+
     return $this->db->update($sql, $values);
 }
 

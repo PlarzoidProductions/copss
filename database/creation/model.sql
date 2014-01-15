@@ -367,20 +367,36 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`points`
+-- Placeholder table for view `iron_arena`.`earned`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`points` (`id` INT, `earned` INT, `player_id` INT, `spent` INT);
+CREATE TABLE IF NOT EXISTS `iron_arena`.`earned` (`id` INT, `earned` INT);
 
 -- -----------------------------------------------------
--- View `iron_arena`.`points`
+-- Placeholder table for view `iron_arena`.`spent`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`points`;
+CREATE TABLE IF NOT EXISTS `iron_arena`.`spent` (`player_id` INT, `spent` INT);
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`earned`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`earned`;
 USE `iron_arena`;
-CREATE  OR REPLACE VIEW `iron_arena`.`points` AS 
-SELECT ae.player_id as id, sum(a.points) as earned, pr.player_id, sum(pr.cost) as spent
-FROM `iron_arena`.`achievements_earned` ae, `iron_arena`.`achievements` a, `iron_arena`.`prize_redemptions` pr
-WHERE ae.achievement_id=a.id AND ae.player_id=pr.player_id
-GROUP BY ae.player_id;
+CREATE  OR REPLACE VIEW `iron_arena`.`earned` AS 
+SELECT ae.player_id as `player_id`, sum(a.points) as earned
+FROM `iron_arena`.`achievements_earned` ae, `iron_arena`.`achievements` a
+WHERE ae.achievement_id=a.id
+;
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`spent`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`spent`;
+USE `iron_arena`;
+CREATE  OR REPLACE VIEW `iron_arena`.`spent` AS
+SELECT pr.player_id as `player_id`, sum(pr.cost) as `spent`
+FROM prize_redemptions pr
+GROUP BY `player_id`
+;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

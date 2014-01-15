@@ -6,7 +6,9 @@ require_once("classes/db_game_sizes.php");
 require_once("classes/db_game_system_factions.php");
 require_once("classes/db_games.php");
 require_once("classes/db_game_players.php");
+require_once("classes/views.php");
 require_once("achievement_engine.php");
+
 
 $page = new Page();
 $player_db = new Players();
@@ -15,6 +17,7 @@ $faction_db = new Game_system_factions();
 $game_db = new Games();
 $game_players_db = new Game_players();
 $engine = new Ach_Engine();
+$views_db = new Views();
 
 
 /*********************************************
@@ -103,6 +106,11 @@ if($selected_player){
         }
     }
     $stats[faction_list] = $faction_list;
+
+    $earned = $views_db->queryByColumns("earned", array("player_id"=>$selected_player));
+    $spent = $views_db->queryByColumns("spent", array("player_id"=>$selected_player));
+
+    $stats[points] = $earned[0][earned] - $spent[0][spent];
 }    
 
 //Usual stuff

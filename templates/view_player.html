@@ -26,11 +26,11 @@
     <header><h1>Game Details for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
     <table>
         <tr class="header">
-            <th>Game ID</div></th>
-            <th>Time</div></th>
-            <th>Players</div></th>
-            <th>Achievements Earned</div></th>
-            <th>Points Earned</div></th>
+            <th>Game ID</th>
+            <th>Time</th>
+            <th>Players</th>
+            <th>Achievements Earned</th>
+            <th>Points Earned</th>
         </tr>
     <?foreach($player[games] as $gp){?>
         <tr class="<?=$gp[style]?>">
@@ -47,6 +47,31 @@
                 <a href="home.php?view=report_game&action=delete&game_id=<?=$gp[id]?>">Delete</a>
             </td>
             <?}?>
+        </tr>
+    <?}?>
+    </table>
+</section>
+<section id="listing">
+    <header><h1>Prize Redemptions for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Redemption ID</th>
+            <th>Time</th>
+            <th>Amount</th>
+            <th>Description</th>
+        </tr>
+    <?foreach($redemptions as $pr){?>
+        <tr class="<?=$pr[style]?>">
+            <td>
+                <?=$pr[id]?>
+                (<a href="home.php?view=redeem&action=edit&pr_id=<?=$pr[id]?>">Edit</a>)
+            </td>
+            <td><?=$pr[creation_time]?></th>
+            <td><h1><?=$pr[cost]?></h1></td>
+            <td><?=$pr[description]?></td>
+            <td>
+                <a href="home.php?view=redeem&action=delete&pr_id=<?=$pr[id]?>">Delete</a>
+            </td>
         </tr>
     <?}?>
     </table>

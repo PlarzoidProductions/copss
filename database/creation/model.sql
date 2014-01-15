@@ -356,6 +356,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
   `player_id` INT UNSIGNED NOT NULL ,
   `cost` INT NOT NULL ,
   `description` VARCHAR(45) NOT NULL ,
+  `creation_time` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_prize_redemptions_player_id` (`player_id` ASC) ,
   CONSTRAINT `fk_prize_redemptions_player_id`
@@ -369,7 +370,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Placeholder table for view `iron_arena`.`earned`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`earned` (`id` INT, `earned` INT);
+CREATE TABLE IF NOT EXISTS `iron_arena`.`earned` (`player_id` INT, `earned` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `iron_arena`.`spent`
@@ -385,7 +386,7 @@ CREATE  OR REPLACE VIEW `iron_arena`.`earned` AS
 SELECT ae.player_id as `player_id`, sum(a.points) as earned
 FROM `iron_arena`.`achievements_earned` ae, `iron_arena`.`achievements` a
 WHERE ae.achievement_id=a.id
-;
+GROUP BY ae.player_id;
 
 -- -----------------------------------------------------
 -- View `iron_arena`.`spent`

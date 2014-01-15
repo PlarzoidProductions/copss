@@ -6,6 +6,7 @@ require_once("classes/db_game_sizes.php");
 require_once("classes/db_game_system_factions.php");
 require_once("classes/db_games.php");
 require_once("classes/db_game_players.php");
+require_once("classes/db_prize_redemptions.php");
 require_once("classes/views.php");
 require_once("achievement_engine.php");
 
@@ -16,6 +17,7 @@ $size_db = new Game_sizes();
 $faction_db = new Game_system_factions();
 $game_db = new Games();
 $game_players_db = new Game_players();
+$pr_db = new Prize_redemptions();
 $engine = new Ach_Engine();
 $views_db = new Views();
 
@@ -66,6 +68,9 @@ Prep the page
 
 ********************************************/
 if($selected_player){
+
+
+    //Game Data
     $odd=true;
     foreach($player[games] as $a=>$game){
         $players = $game[players];
@@ -94,7 +99,8 @@ if($selected_player){
         $odd = !$odd;
     }
 
-
+    
+    //Stats
     $stats = $engine->getPlayerStats($selected_player);
     
     $faction_list = "";
@@ -111,6 +117,15 @@ if($selected_player){
     $spent = $views_db->queryByColumns("spent", array("player_id"=>$selected_player));
 
     $stats[points] = $earned[0][earned] - $spent[0][spent];
+
+
+    //Prize Redemptions
+    $redemptions = $pr_db->queryByColumns(array("player_id"=>$selected_player));
+    $odd = true;
+    foreach($redemptions as $k=>$pr){
+        if($odd)$redemptions[$k][style]="odd";
+        $odd = !$odd;
+    }
 }    
 
 //Usual stuff

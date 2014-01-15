@@ -32,11 +32,10 @@ class Choices {
         }
 
 
-/*
 	function getRedeemFunctionChoices(){
-		return array(array("text"=>"Spend Points", "value"=>"SPEND"),array("text"=>"Add Points", "value"=>"ADD"));
+		return array(array("text"=>"Spend Points", "value"=>"SPEND"),
+                             array("text"=>"Add Points", "value"=>"ADD"));
 	}
-*/
 
 	function getYesNoChoices($default="No"){
 		$yes = array("value"=>1, "text"=>"Yes");

@@ -1,0 +1,41 @@
+<section id="main_section">
+    <? if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><? echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?=$success_str?> 
+            </div>
+            <? if($link){?>
+                <div class="simple">
+                    <a href="<?=$link[href]?>"><h1><?=$link[text]?></h1></a>
+                </div>
+            <?}?>
+        </section>
+    <?}?>
+    <header>
+        <hgroup>
+            <h1><? echo $title?></h1>
+            <? if(!empty($error)){?><h3 class="warning"><?=$error?></h3><?}?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?=$form_method?>" action="<?=$form_action?>">
+        <? echo $page->displayVar("player")?>
+        <?if($selected_player){?>
+            <?if($available){?>
+                <h1 class="success"><?=$available?>pts Available!</h1>
+                <? foreach($inputs as $i){?>
+                    <? echo $page->displayVar($i)?>
+                <?}?>
+            <?} else {?>
+                <h1 class="warning">Play more games!</h1>
+            <?}?>
+        <?}?>
+        </form>
+    </section>
+</section>

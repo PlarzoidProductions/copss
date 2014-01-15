@@ -14,6 +14,7 @@
 *	player_id - INT
 *	cost - INT
 *	description - VARCHAR
+*	creation_time - DATETIME
 *
 **************************************************/
 require_once("query.php");
@@ -59,11 +60,13 @@ public function create($player_id, $cost, $description){
 	$sql = "INSERT INTO $this->table (
 				player_id,
 				cost,
-				description
+				description,
+				creation_time
 			) VALUES (
 				:player_id,
 				:cost,
-				:description)";
+				:description,
+				NOW())";
 
 	return $this->db->insert($sql, $values);
 }
@@ -205,6 +208,15 @@ public function getByDescription($description){
 }
 
 
+public function getByCreationTime($creation_time){
+	
+    //Validate Inputs
+    $creation_time = $this->filterCreationTime($creation_time); if($creation_time === false){return false;}
+
+    return $this->queryByColumns(array("creation_time"=>$creation_time));
+}
+
+
 /**************************************************
 
 Exists by Column(s) Function
@@ -278,6 +290,21 @@ function filterDescription($description){
     }
 
     return $description;
+}
+
+
+
+function filterCreationTime($creation_time){
+    //Not allowed to be null
+    if(Check::isNull($creation_time)){
+        echo "creation_time cannot be null!"; return false;
+    }
+
+    if(Check::isNull($creation_time)){
+        echo "creation_time was invalid!"; return false;
+    }
+
+    return date("Y-m-d H:i:s", $creation_time);
 }
 
 

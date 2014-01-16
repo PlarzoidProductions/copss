@@ -312,43 +312,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`shifts`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`shifts` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  `start` DATETIME NOT NULL ,
-  `stop` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `iron_arena`.`user_shifts`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`user_shifts` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `user_id` INT UNSIGNED NOT NULL ,
-  `shift_id` INT UNSIGNED NOT NULL ,
-  `checked_in` TINYINT(1) NOT NULL DEFAULT 0 ,
-  `completed` TINYINT(1) NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_user_shifts_user_id` (`user_id` ASC) ,
-  INDEX `fk_user_shifts_shift_id` (`shift_id` ASC) ,
-  CONSTRAINT `fk_user_shifts_user_id`
-    FOREIGN KEY (`user_id` )
-    REFERENCES `iron_arena`.`users` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_user_shifts_shift_id`
-    FOREIGN KEY (`shift_id` )
-    REFERENCES `iron_arena`.`shifts` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `iron_arena`.`prize_redemptions`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
@@ -364,6 +327,17 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
     REFERENCES `iron_arena`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `iron_arena`.`feedback`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `iron_arena`.`feedback` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `type` VARCHAR(45) NOT NULL ,
+  `comment` LONGTEXT NOT NULL ,
+  PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
 

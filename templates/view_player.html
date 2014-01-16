@@ -52,6 +52,26 @@
     </table>
 </section>
 <section id="listing">
+    <header><h1>Event & Misc Achievements for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Event</th>
+            <th>Achievement</th>
+            <th>Points Earned</th>
+        </tr>
+    <?foreach($event_achs as $ea){?>
+        <tr class="<?=$ea[style]?>">
+            <td><?=$ea[event_name]?></th>
+            <td><?=$ea[name]?></td>
+            <td></h1><?=$ea[points]?></h1></td>
+            <td>
+                <a href="home.php?view=batch_processing&action=delete&ach_id=<?=$ea[earned_id]?>">Delete</a>
+            </td>
+        </tr>
+    <?}?>
+    </table>
+</section>
+<section id="listing">
     <header><h1>Prize Redemptions for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
     <table>
         <tr class="header">

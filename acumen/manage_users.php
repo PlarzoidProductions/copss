@@ -3,7 +3,7 @@
     require_once("classes/page.php");
     require_once("classes/db_users.php");
 
-    $page = new Page();
+    $page = new Page("ADMIN");
     $db = new Users();
 
     /***************************************

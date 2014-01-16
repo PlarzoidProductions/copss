@@ -74,9 +74,7 @@ INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, co
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (37, 36, 1);
 
 
-INSERT INTO events (name) VALUES ('Wore Midnight Madness 2014 T-shirt');
-INSERT INTO events (name) VALUES ('Displayed TempleCon 2014 patch');
-INSERT INTO events (name) VALUES ('Displayed Templecon 2014 coin');
+INSERT INTO events (name) VALUES ('Iron Arena');
 INSERT INTO events (name) VALUES ('Iron Gauntlet Preliminaries');
 INSERT INTO events (name) VALUES ('Commander\'s Crucible');
 INSERT INTO events (name) VALUES ('Midnight Madness (Flanks)');
@@ -88,14 +86,14 @@ INSERT INTO events (name) VALUES ('Midnight Madness (Death Race)');
 INSERT INTO events (name) VALUES ('Blood, Sweat and Tiers');
 
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Wore Midnight Madness 2014 T-shirt", 2, 0, 0, 1, 1);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Displayed TempleCon 2014 patch", 2, 0, 0, 1, 2);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Displayed TempleCon 2014 coin", 5, 0, 0, 1, 3);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Iron Gauntlet Preliminaries", 10, 0, 0, 1, 4);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Commander\'s Crucible", 10, 0, 0, 1, 5);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Flanks)", 10, 0, 0, 1, 6);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Team Tournament", 10, 0, 0, 1, 7);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Crucible)", 10, 0, 0, 1, 8);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed HARDCORE", 10, 0, 0, 1, 9);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Special Forces", 10, 0, 0, 1, 10);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Death Race)", 10, 0, 0, 1, 11);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Blood, Sweat and Tiers", 10, 0, 0, 1, 12);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Displayed TempleCon 2014 patch", 2, 0, 0, 1, 1);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Displayed TempleCon 2014 coin", 5, 0, 0, 1, 1);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Iron Gauntlet Preliminaries", 10, 0, 0, 1, 2);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Commander\'s Crucible", 10, 0, 0, 1, 3);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Flanks)", 10, 0, 0, 1, 4);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Team Tournament", 10, 0, 0, 1, 5);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Crucible)", 10, 0, 0, 1, 6);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed HARDCORE", 10, 0, 0, 1, 7);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Special Forces", 10, 0, 0, 1, 8);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Midnight Madness (Death Race)", 10, 0, 0, 1, 9);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, event_id) VALUES ("Completed Blood, Sweat and Tiers", 10, 0, 0, 1, 10);

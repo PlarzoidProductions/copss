@@ -49,6 +49,19 @@ class Choices {
 		}
 	}
 
+
+        function getFeedbackTypes(){
+            $types = array("Comment", "Bug", "Question", "Suggestion", "Praise");
+
+            $ret = array();
+            foreach($types as $t){
+                $ret[] = array("text"=>$t, "value"=>$t);
+            }
+
+            return $ret;
+
+        }
+
 	
 	function getPlayerChoices(){
 	    $db = new Players();
@@ -199,6 +212,30 @@ class Choices {
         function getGameSystemAchievements($system_id){
             $adb = new Achievements();
             $achs = $adb->getByGameSystemId($system_id);
+
+            if($achs){
+                $ret = array(array("text"=>"Please select...", "value"=>null));
+                foreach($achs as $ach){
+                    $ret[] = array("value"=>$ach[id], "text"=>$ach[name]." (".$ach[points].")");
+                }
+
+                return $ret;
+            }
+
+            return array(array("text"=>"None Exist!", "value"=>null));
+        }
+
+
+        function getEventAchievementChoices(){
+            $adb = new Achievements();
+            $possible = $adb->getAll();
+
+            $achs = array();
+            foreach($possible as $p){
+                if($p[event_id]){
+                    $achs[] = $p;
+                }
+            }
 
             if($achs){
                 $ret = array(array("text"=>"Please select...", "value"=>null));

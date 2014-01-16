@@ -97,17 +97,17 @@ class Page {
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
             "Redeem Skulls"=>"redeem",
-            "Leaderboard"=>"leaderboard"
+            "Leaderboard"=>"leaderboard",
+            "Event Achievements"=>"batch_processing",
+            "Software Feedback"=>"feedback"
             );
 
         
         if(Session::isAdmin()){
             $admin_tabs = array(
                 "Manage Users"=>"manage_users",
-                "Shift Management"=>"shifts",
                 "General Configuration"=>"general_config",
-                "Achievement Configuration"=>"achievement_config",
-                "Event Batch Processing"=>"batch_processing"
+                "Achievement Configuration"=>"achievement_config"
             );
 
         }
@@ -297,7 +297,9 @@ class Page {
             case "reset":
                 $this->printReset($varname, $this->vars[$varname], $disp_type);
                 break;
-
+            case "textarea":
+                $this->printTextarea($varname, $this->vars[$varname], $disp_type);
+                break;
             //Everything else
             default: 
                 $this->printGenericInput($varname, $type, $this->vars[$varname], $disp_type);
@@ -746,6 +748,55 @@ class Page {
             }            
         }
     }        
+
+    function printTextarea($v, $attr, $disp_type = "form"){
+        global $$v;
+        $_REQUEST[$v] = $$v;
+        
+        if($_REQUEST[$v]){
+            $lvar = $_REQUEST[$v];
+        } else {
+            $lvar = $attr[default_val];
+        }
+
+        if($disp_type == "form"){
+
+            //Build the input String
+            $str = "<textarea name=\"$v\"";
+
+            if($attr[rows]){
+                $str.= " rows=\"".$attr[rows]."\"";
+            }
+
+            if($attr[cols]){
+                $str.= " cols=\"".$attr[cols]."\"";
+            }
+
+            if($attr[placeholder]){
+                $str.= " placeholder=\"".$attr[placeholder]."\"";
+            }
+
+            $str.= ">";
+
+            //$str.=$lvar;
+
+            $str.= "</textarea>";
+
+            //create the Label
+            if($attr[label]){
+                $label = $attr[label];
+            } else {
+                $label = $this->generateLabel($v);
+            }
+
+            //Print it
+
+            $this->printComplexInput($v, $label, $str);
+        } else {
+            echo $lvar;
+        }
+    }
+
 
     function printRadio($v, $attr, $disp_type = "form") {
         global $$v;

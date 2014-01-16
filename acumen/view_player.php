@@ -128,6 +128,13 @@ if($selected_player){
 
     $stats[points] = $earned[0][earned] - $spent[0][spent];
 
+    //Event Achievements
+    $event_achs = $engine->getEventAchievementsByPlayerId($selected_player);
+    $odd = true;
+    foreach($event_achs as $k=>$ea){
+        if($odd)$event_achs[$k][style]="odd";
+        $odd = !$odd;
+    }
 
     //Prize Redemptions
     $redemptions = $pr_db->queryByColumns(array("player_id"=>$selected_player));

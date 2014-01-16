@@ -7,6 +7,7 @@
     require_once("classes/db_players.php");
     require_once("classes/db_games.php");
     require_once("classes/db_game_players.php");
+    require_once("classes/db_events.php");
 
     require_once("classes/check.php");
    
@@ -18,6 +19,7 @@ class Ach_Engine {
     var $ach_db = null;
     var $meta_criteria_db = null;
     var $earned_db = null;
+    var $events_db = null;
 
 
     function Ach_Engine(){
@@ -27,6 +29,7 @@ class Ach_Engine {
         $this->ach_db = new Achievements();
         $this->meta_criteria_db = new Meta_achievement_criteria();
         $this->earned_db = new Achievements_earned();
+        $this->events_db = new Events();
     }
 
     function __destruct(){}
@@ -545,6 +548,29 @@ class Ach_Engine {
 
         return $achievement;
     }
+
+    function getEventAchievementsByPlayerId($player_id){
+        $achs = $this->earned_db->queryByColumns(array("player_id"=>$player_id));
+        
+        $achievements = array();
+        foreach($achs as $a){
+            $achievement = $this->getAchievementDetails($a[achievement_id]);
+
+            if($achievement[event_id]){
+
+                $event = $this->events_db->getById($achievement[event_id]);
+                $achievement[event_name] = $event[0][name];
+
+                $achievement[earned_id] = $a[id];
+
+                $achievements[] = $achievement;
+            }
+        }
+        
+        return $achievements;
+
+    }
+
 
 
 }//class close 

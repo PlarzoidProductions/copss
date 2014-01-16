@@ -5,6 +5,7 @@
         </hgroup>
     </header>
     <section id="inputs_section">
+        <form action="<?=$form_action?>" method="<?=$form_method?>">
         <? foreach($inputs as $i){?>
             <? echo $page->displayVar($i)?>
         <?}?>
@@ -39,7 +40,7 @@
             <td><?=$p[spent]?></td>
             <td><h1><?=$p[points]?></h1></td>
             <td>
-                <a href="home.php?view=view_player?pl_id=<?=$p[id]?>">Details</a>
+                <a href="home.php?view=view_player&pl_id=<?=$p[id]?>">Details</a>
             </td>
         </tr>
     <?}?>

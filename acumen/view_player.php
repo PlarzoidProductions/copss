@@ -22,12 +22,14 @@ $engine = new Ach_Engine();
 $views_db = new Views();
 
 
+$pl_id = $_REQUEST[pl_id];
+
 /*********************************************
 
 Register the inputs
 
 *********************************************/
-$page->register("player", "select", array("reloading"=>1,
+$page->register("player", "select", array("reloading"=>1, "default_val"=>$pl_id,
                                           "get_choices_array_func"=>"getPlayerChoices",
                                           "get_choices_array_func_args"=>array()));
 $page->getChoices();
@@ -38,7 +40,15 @@ $page->getChoices();
 Gather all the data on the chosen player
 
 ********************************************/
-$selected_player = $page->getVar("player");
+if($pl_id){
+    if(Check::notInt($pl_id)){
+        $error = "Not a valid player id in URL!";
+    } else {
+        $selected_player = $pl_id;
+    }
+} else {
+    $selected_player = $page->getVar("player");
+}
 
 if($selected_player){
 

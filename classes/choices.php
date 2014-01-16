@@ -214,14 +214,14 @@ class Choices {
 
 
         function leaderboardSortChoices(){
-            $columns = array("Points"=>"points",
-                         "Name (L, F)"=>"name",
+            $columns = array("Name (L, F)"=>"name",
                          "# Games"=>"game_count",
                          "# Opponents"=>"opponents",
                          "# Locations"=>"locations",
                          "# Factions"=>"factions",
                          "Points Earned"=>"earned",
-                         "Points Spent"=>"spent");
+                         "Points Spent"=>"spent",
+                         "Points"=>"points");
 
             $ret = array();
             foreach($columns as $t=>$v){
@@ -232,8 +232,8 @@ class Choices {
         }
 
         function sortDirectionChoices(){
-            return array(array("text"=>"Ascending", "value"=>"SORT_ASC"),
-                         array("text"=>"Descending", "value"=>"SORT_DESC"));
+            return array(array("text"=>"Descending", "value"=>"1"),
+                         array("text"=>"Ascending", "value"=>"0"));
         }
 
 

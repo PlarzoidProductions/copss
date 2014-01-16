@@ -17,11 +17,22 @@ Register two inputs
 ********************************************/
 $page->register("sort", "select", array("get_choices_array_func"=>"leaderboardSortChoices",
                                         "get_choices_array_func_args"=>array(),
-                                        "reloading"=>1));
+                                        "reloading"=>1, "default_val"=>"points"));
 $page->register("direction", "select", array("get_choices_array_func"=>"sortDirectionChoices",
                                         "get_choices_array_func_args"=>array(),
                                         "reloading"=>1));
 $page->getChoices();
+
+
+/********************************************
+
+Get the sort method
+
+********************************************/
+$sortby = $page->getVar("sort");
+if(!$sortby) $sortby = "points";
+$sortdir = $page->getVar("direction");
+if(empty($sortdir) && !is_numeric($sortdir)) $sortdir=1;
 
 
 /********************************************
@@ -31,8 +42,12 @@ Gather all the data on the players
 ********************************************/
 $players = $player_db->getAll();
 
+$sorter = array();
+$names = array();
+$points = array();
 foreach($players as $k=>$p){
     $stats = $engine->getPlayerStats($p[id]);
+    $players[$k][name] = $p[last_name].", ".$p[first_name];
     $players[$k][game_count] = $stats[games];
     $players[$k][opponents] = $stats[opponents];
     $players[$k][locations] = $stats[locations];
@@ -43,22 +58,30 @@ foreach($players as $k=>$p){
     $players[$k][earned] = $earned[0][earned];
     $players[$k][spent] = $spent[0][spent];
     $players[$k][points] = $players[$k][earned] - $players[$k][spent];
+
+
+    //Arrays for sorting
+    $sorter[$k] = $players[$k][$sortby];
+    $names[$k] = $players[$k][name];
+    $points[$k] = $players[$k][points];
 }
 
+//Sort stuff
+if(!strcmp($sortby, "name")){
+    if($sortdir){//descending
+        $sort_success = array_multisort($names, SORT_DESC, $points, SORT_NUMERIC, SORT_DESC, $players);
+    } else {
+        $sort_success = array_multisort($names, SORT_ASC, $points, SORT_NUMERIC, SORT_DESC, $players);
+    }
+} else {
+    if($sortdir){//descending
+        $sort_success = array_multisort($sorter, SORT_NUMERIC, SORT_DESC, $names, SORT_ASC, $players);
+    } else {
+        $sort_success = array_multisort($sorter, SORT_NUMERIC, SORT_ASC, $names, SORT_ASC, $players);
+    }
+}
 
-/********************************************
-
-Get the sort method
-
-********************************************/
-$sortby = $page->getVar("sort");
-$sortdir = $page->getVar("direction");
-
-
-//Algorithm taken from php documentation, user jimpoz @ jimpoz . com
-    
-
-
+var_dump($sort_success);
 
 /********************************************
 

@@ -81,7 +81,6 @@ if(!strcmp($sortby, "name")){
     }
 }
 
-var_dump($sort_success);
 
 /********************************************
 

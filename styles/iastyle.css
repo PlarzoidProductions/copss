@@ -64,6 +64,12 @@ body {
 }
 
 
+/* -- Main Footer -- */
+#main_footer div.simple{
+    text-align: center;
+    width: 100%;
+}
+
 /* -- Main (Side) Nav bar -- */
 #main_aside {
     float: left;

@@ -54,7 +54,7 @@ switch($action){
 Basic Inputs
 
 **************************************/
-$page->register("game_system", "select", array( "required"=>true,
+$page->register("game_system", "select", array( "required"=>true, "reloading"=>1,
                                                 "default_val"=>$defaults[game_system],
                                                 "get_choices_array_func"=>"getGameSystems",
                                                 "get_choices_array_func_args"=>array()));
@@ -163,7 +163,11 @@ if($page->submitIsSet("submit_game")){
     $i=1;
     foreach(array_keys($players) as $id){
         if(Check::isNull($players[$id][faction])){ $errors[] = "Choose a Faction for Player $i!";}
-        if(Check::isNull($players[$id][size])){ $errors[] = "Choose an Army Size for Player $i!";}
+        if(Check::isNull($players[$id][size])){ 
+            if($game_system==1){
+                $errors[] = "Choose an Army Size for Player $i!";
+            }
+        }
 
         //Just set these to 0 if they're null
         if(Check::isNull($players[$id][theme_force])){ $players[$id][theme_force]=0; }
@@ -214,8 +218,12 @@ Prep displaying the page
 
 **************************************/
 $title = "Report a Game";
-$inputs = array("game_system", "game_id", "num_players", "scenario_table");
-$player_inputs = array("_id", "_faction", "_size", "_theme_force", "_fully_painted", "_won");
+$inputs = array("game_system", "game_id", "num_players");
+$player_inputs = array("_id", "_faction");
+if($game_system == 1){
+    $inputs[] = "scenario_table";
+    $player_inputs = array_merge($player_inputs, array("_size", "_theme_force", "_fully_painted", "_won"));
+}
 
 $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";

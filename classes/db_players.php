@@ -160,6 +160,14 @@ public function getAll(){
 }
 
 
+public function getAllSorted(){
+
+    //Generate the query
+    $sql = "SELECT * FROM $this->table ORDER BY last_name";
+
+    return $this->db->query($sql, array());
+}
+
 /**************************************************
 
 Query by Column(s) Function

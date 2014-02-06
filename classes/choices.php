@@ -65,7 +65,7 @@ class Choices {
 	
 	function getPlayerChoices(){
 	    $db = new Players();
-	    $players = $db->getAll();
+	    $players = $db->getAllSorted();
 
 	    $ret = array(array("text"=>"Please select...", "value"=>null));
 

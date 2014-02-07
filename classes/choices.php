@@ -65,14 +65,26 @@ class Choices {
 	
 	function getPlayerChoices(){
 	    $db = new Players();
+            $c_db = new Countries();
+            $s_db = new States();
+
 	    $players = $db->getAllSorted();
 
 	    $ret = array(array("text"=>"Please select...", "value"=>null));
 
 	    if(empty($players)){return $ret;}	
 	    foreach($players as $player){
+                $c = $c_db->getById($player[country]);
+
+                $text = $player[last_name].', '.$player[first_name]." (".$c[0][name];
+                if($player[state]){
+                    $s = $s_db->getById($player[state]);
+                    $text.= ", ".$s[0][name];
+                }
+                $text.=")";
+
 		$ret[] = array(
-                    "text"=>$player[last_name].', '.$player[first_name], 
+                    "text"=>$text, 
                     "value"=>$player[id]
                     );
 	    }

@@ -8,6 +8,7 @@
     require_once("classes/db_games.php");
     require_once("classes/db_game_players.php");
     require_once("classes/db_events.php");
+    require_once("classes/db_prize_redemptions.php");
 
     require_once("classes/check.php");
    
@@ -20,6 +21,7 @@ class Ach_Engine {
     var $meta_criteria_db = null;
     var $earned_db = null;
     var $events_db = null;
+    var $redems_db = null;
 
 
     function Ach_Engine(){
@@ -30,6 +32,7 @@ class Ach_Engine {
         $this->meta_criteria_db = new Meta_achievement_criteria();
         $this->earned_db = new Achievements_earned();
         $this->events_db = new Events();
+        $this->redems_db = new Prize_redemptions();
     }
 
     function __destruct(){}
@@ -480,6 +483,11 @@ class Ach_Engine {
         foreach($achievements as $a){
             $details = $this->ach_db->getById($a[achievement_id]);
             $points += $details[0][points];
+        }
+
+        $redemptions = $this->redems_db->getByPlayerId($player_id);
+        foreach($redemptions as $r){
+            $points -= $r[cost];
         }
 
         return $points;

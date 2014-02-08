@@ -191,7 +191,7 @@ public function queryByColumns($columns){
         }
     }
 
-    return $this->db->query($sql, $values);
+    return  $this->db->query($sql, $values);
 }
 
 

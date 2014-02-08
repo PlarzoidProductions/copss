@@ -12,12 +12,12 @@
         <?}?>
         </form>
     <?if($selected_player){?>
-        <header><h1>Statistics for <?=$player[last_name]?>, <?=$player[first_name]?></h1></header>
+        <header><h1>Statistics for <?=$player[last_name]?>, <?=$player[first_name]?></h1>(<a href="home.php?view=register_player&action=edit&pl_id=<?=$player[id]?>">Edit player registration</a>)</header>
         <div class="simple">Games Played: <strong><?=$stats[games]?></strong></div>
         <div class="simple">Unique Opponents Played: <strong><?=$stats[opponents]?></strong></div>
         <div class="simple">Unique Opponent Locations: <strong><?=$stats[locations]?></strong></div>
         <div class="simple">Factions Played Against: <strong><?=$stats[faction_list]?></strong></div>
-        <div class="simple">Current Points: <strong><?=$stats[points]?></strong></div>
+        <div class="simple"><font <?if($stats[points] > 0){?>class="success"<? } else {?>class="warning"<?}?>>Current Points: <strong><?=$stats[points]?></font></strong></div>
     <?}?>
     </section>
 </section>

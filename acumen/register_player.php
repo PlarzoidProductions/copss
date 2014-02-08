@@ -75,16 +75,37 @@
 
         $db = new Players();
         if($pl_id){
-            $columns = array("first_name"=>$first,
-                             "last_name"=>$last,
-                             "email"=>$email,
-                             "country"=>$country,
-                             "state"=>$state,
-                             "vip"=>$vip);
+            if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
+                $exists = $db->queryByColumns(array("first_name"=>$first, "last_name"=>$last, "country"=>$country, "state"=>$state));
 
-            $result = $db->updatePlayersById($pl_id, $columns);
+                if($exists){
+                    $error = "Player with that name & location exists!";
+                }
+            }
+
+
+            if(empty($error)){
+                $columns = array("first_name"=>$first,
+                                 "last_name"=>$last,
+                                 "email"=>$email,
+                                 "country"=>$country,
+                                 "state"=>$state,
+                                 "vip"=>$vip);
+
+                $result = $db->updatePlayersById($pl_id, $columns);
+            }
         } else {
-            $result = $db->create($first, $last, $email, $country, $state, $vip);
+
+            $columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
+            if($state != "null") $columns["state"] = $state;
+            $exists = $db->existsByColumns($columns);
+
+            if($exists){
+                $error = "Player with that name & location exists!";
+            }
+
+            if(empty($error))
+                $result = $db->create($first, $last, $email, $country, $state, $vip);
         }
     }
 

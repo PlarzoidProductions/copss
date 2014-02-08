@@ -167,7 +167,7 @@ public function queryByColumns($columns){
             $sql.= " AND ";
         }
     }
-
+    
     return $this->db->query($sql, $values);
 }
 

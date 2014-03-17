@@ -40,25 +40,15 @@ if(empty($sortdir) && !is_numeric($sortdir)) $sortdir=1;
 Gather all the data on the players
 
 ********************************************/
-$players = $player_db->getAll();
+
+$players = $views_db->getAll("leaderboard");
 
 $sorter = array();
 $names = array();
 $points = array();
+
 foreach($players as $k=>$p){
-    $stats = $engine->getPlayerStats($p[id]);
     $players[$k][name] = $p[last_name].", ".$p[first_name];
-    $players[$k][game_count] = $stats[games];
-    $players[$k][opponents] = $stats[opponents];
-    $players[$k][locations] = $stats[locations];
-    $players[$k][factions] = count($stats[factions]);
-
-    $earned = $views_db->queryByColumns("earned", array("player_id"=>$p[id]));
-    $spent = $views_db->queryByColumns("spent", array("player_id"=>$p[id]));
-    $players[$k][earned] = $earned[0][earned];
-    $players[$k][spent] = $spent[0][spent];
-    $players[$k][points] = $players[$k][earned] - $players[$k][spent];
-
 
     //Arrays for sorting
     $sorter[$k] = $players[$k][$sortby];

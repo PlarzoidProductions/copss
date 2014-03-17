@@ -14,7 +14,7 @@
     ***************************************/
     $action = $_REQUEST["action"];
     $pl_id = $_REQUEST["pl_id"];
-    $defaults = array("country_id"=>1);
+    $defaults = array("country"=>244);
    
     if(!strcmp($action, "edit")){
         $p_db = new Players();

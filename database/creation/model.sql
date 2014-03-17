@@ -352,6 +352,16 @@ CREATE TABLE IF NOT EXISTS `iron_arena`.`earned` (`player_id` INT, `earned` INT)
 CREATE TABLE IF NOT EXISTS `iron_arena`.`spent` (`player_id` INT, `spent` INT);
 
 -- -----------------------------------------------------
+-- Placeholder table for view `iron_arena`.`game_counter`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `iron_arena`.`game_counter` (`player_id` INT, `game_count` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `iron_arena`.`leaderboard`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `iron_arena`.`leaderboard` (`player_id` INT, `last_name` INT, `first_name` INT, `game_count` INT, `earned` INT, `spent` INT, `points` INT);
+
+-- -----------------------------------------------------
 -- View `iron_arena`.`earned`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `iron_arena`.`earned`;
@@ -371,6 +381,39 @@ CREATE  OR REPLACE VIEW `iron_arena`.`spent` AS
 SELECT pr.player_id as `player_id`, sum(pr.cost) as `spent`
 FROM prize_redemptions pr
 GROUP BY `player_id`
+;
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`game_counter`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`game_counter`;
+USE `iron_arena`;
+CREATE  OR REPLACE VIEW `iron_arena`.`game_counter` AS
+SELECT player_id, count(1) AS game_count
+FROM game_players
+GROUP BY player_id;
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`leaderboard`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`leaderboard`;
+USE `iron_arena`;
+CREATE  OR REPLACE VIEW `iron_arena`.`leaderboard` AS
+SELECT players.id AS `player_id`,
+players.last_name AS last_name,
+players.first_name AS first_name,
+game_counter.game_count AS game_count,
+earned.earned AS earned,
+spent.spent AS spent,
+earned - spent as points
+FROM `iron_arena`.`players`
+LEFT OUTER JOIN `iron_arena`.`game_counter` 
+        ON game_counter.player_id=players.id
+LEFT OUTER JOIN `iron_arena`.`earned` 
+        ON earned.player_id=players.id
+LEFT OUTER JOIN `iron_arena`.`spent` 
+        ON spent.player_id=players.id
+ORDER BY points DESC, last_name ASC;
 ;
 
 

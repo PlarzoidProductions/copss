@@ -1,28 +1,59 @@
 <?php
 
-include("acumen/achievement_engine.php");
+error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 
-$a_db = new Achievements();
-$ae_db = new Achievements_earned();
+require_once("classes/db_games.php");
+require_once("acumen/achievement_engine.php");
+require_once("classes/page.php");//will give us all the db_classes
 
-$ae_db->deleteByColumns(array("game_id"=>1));
+$game_db = new Games();
+$engine = new Ach_Engine();
+$faction_db = new Game_system_factions();
+$player_db = new Players();
+$game_players_db = new Game_players();
 
-$ae = new Ach_Engine();
-$ae->awardAchievements(1);
-/*
-$result = $ae_db->queryByColumns(array("player_id"=>1));
-$points = 0;
-foreach($result as $k=>$ae){
-    $ach = $a_db->getById($ae[achievement_id]);
-    $result[$k][ach_name] = $ach[0][name];
-    $points += $ach[0][points];
+$player_stats = array();
+
+$players = $player_db->getAll();
+
+$num_winninger_players = 0;
+$num_2f_players = 0;
+
+$factions = array();
+
+$games_played = $game_players_db->getAll();
+
+foreach($games_played as $game_entry){
+
+    if(empty($factions[$game_entry[faction_id]][$game_entry[player_id]])){
+        $factions[$game_entry[faction_id]][$game_entry[player_id]] = 1;
+    } else {
+        $factions[$game_entry[faction_id]][$game_entry[player_id]]++;
+    }
+
 }
-    
 
-echo "<pre>";
-print_r($result);
-echo "</pre>";
-echo "Points: ".$points;
-*/
+print_r($factions);
+
+foreach($factions as $f_id=>$counts){
+    $faction_details = $faction_db->getById($f_id);
+
+
+    if($faction_details[0][parent_game_system] != 1) continue;
+
+    echo $faction_details[0][name].":\n";
+
+    echo "Num Players = ".count($counts).", ";
+
+    $sum=0;
+    foreach($counts as $count){
+        $sum+=$count;
+    }
+
+    echo "Num Games = ".$sum.", ";
+    echo "Avg Num Games = ".$sum/count($counts)."\n\n";
+
+}
+
 ?>
 

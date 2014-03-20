@@ -3,11 +3,18 @@
 require_once("classes/page.php");
 require_once("classes/db_games.php");
 require_once("classes/db_game_players.php");
+require_once("classes/db_game_system_factions.php");
+require_once("classes/db_game_sizes.php");
+require_once("classes/db_achievements.php");
 require_once("achievement_engine.php");
 
 $page = new Page();
 $game_db = new Games();
 $game_player_db = new Game_players();
+$faction_db = new Game_system_factions();
+$size_db = new Game_sizes();
+$ach_db = new Achievements();
+
 $engine = new Ach_Engine();
 
 /**************************************
@@ -72,7 +79,7 @@ $page->register("submit_game", "submit", array("value"=>"Submit"));
 
 /*************************************
 
-Inputs for each Player
+Gather data on the Game System
 
 *************************************/
 
@@ -97,26 +104,59 @@ if(Check::isNull($game_system)){
     }
 }
 
+//Determine if Game System uses factions, army sizes, fully painted, theme forces, etc
+$num_factions = $faction_db->getByParentGameSystem($game_system);
+$uses_factions = count($num_factions) > 0;
 
+$num_sizes = $size_db->getByParentGameSystem($game_system);
+$uses_sizes = count($num_sizes) > 0;
+
+$num_painted_ach = $ach_db->queryByColumns(array("game_system_id"=>$game_system, "fully_painted"=>1));
+$num_painted_all_ach = $ach_db->queryByColumns(array("game_system_id"=>$game_system, "fully_painted_battle"=>1));
+$uses_painted = (count($num_painted_ach) > 0) || (count($num_painted_all_ach) > 0);
+
+$num_theme_ach = $ach_db->queryByColumns(array("game_system_id"=>$game_system, "played_theme_force"=>1));
+$uses_theme = count($num_theme_ach) > 0;
+
+$num_scenario_ach = $ach_db->queryByColumns(array("game_system_id"=>$game_system, "played_scenario"=>1));
+$uses_scenario = count($num_scenario_ach) > 0;
+
+
+/*************************************
+
+Inputs for each Player
+
+*************************************/
 for($i=1; $i <= $num_players; $i++){
-    $page->register("player_".$i."_id", "select", array("label"=>"Player $i",
-                                                        "default_val"=>$defaults[players][$i-1][player_id],
-                                                        "get_choices_array_func"=>"getPlayerChoices",
-                                                        "get_choices_array_func_args"=>array()));
-    $page->register("player_".$i."_faction", "select", array("default_val"=>$defaults[players][$i-1][faction_id],
-                                                             "get_choices_array_func"=>"getGameSystemFactions",
-                                                             "get_choices_array_func_args"=>array($game_system))
-                                                             );
-    $page->register("player_".$i."_size", "select", array("default_val"=>$defaults[players][$i-1][game_size],
-                                                             "get_choices_array_func"=>"getGameSizes",
-                                                             "get_choices_array_func_args"=>array($game_system))
-                                                             );
-    $page->register("player_".$i."_theme_force", "checkbox", array("label"=>"Played Theme Force",
-                                                                   "default_val"=>$defaults[players][$i-1][theme_force],
-                                                                   "on_text"=>"Yes", "off_text"=>"No"));
-    $page->register("player_".$i."_fully_painted", "checkbox", array("label"=>"Played Fully Painted",
-                                                                   "default_val"=>$defaults[players][$i-1][fully_painted],
-                                                                   "on_text"=>"Yes", "off_text"=>"No"));
+    $page->register("player_".$i."_id", "select", 
+        array("label"=>"Player $i",
+            "default_val"=>$defaults[players][$i-1][player_id],
+            "get_choices_array_func"=>"getPlayerChoices",
+            "get_choices_array_func_args"=>array()));
+    
+    if($uses_factions)
+        $page->register("player_".$i."_faction", "select", 
+            array("default_val"=>$defaults[players][$i-1][faction_id],
+                "get_choices_array_func"=>"getGameSystemFactions",
+                "get_choices_array_func_args"=>array($game_system)));
+    
+    if($uses_sizes)
+        $page->register("player_".$i."_size", "select", 
+            array("default_val"=>$defaults[players][$i-1][game_size],                                                     "get_choices_array_func"=>"getGameSizes",
+                "get_choices_array_func_args"=>array($game_system)));
+
+    if($uses_theme)            
+        $page->register("player_".$i."_theme_force", "checkbox", 
+            array("label"=>"Played Theme Force",
+                "default_val"=>$defaults[players][$i-1][theme_force],
+                "on_text"=>"Yes", "off_text"=>"No"));
+
+    if($uses_painted)
+        $page->register("player_".$i."_fully_painted", "checkbox", 
+            array("label"=>"Played Fully Painted",
+                "default_val"=>$defaults[players][$i-1][fully_painted],
+                "on_text"=>"Yes", "off_text"=>"No"));
+
     $page->register("player_".$i."_won", "checkbox", array("label"=>"Won",
                                                             "default_val"=>$defaults[players][$i-1][winner],
                                                             "on_text"=>"Yes", "off_text"=>"No"));
@@ -145,11 +185,15 @@ if($page->submitIsSet("submit_game")){
 
         $players[$id] = array();
 
-        $players[$id][faction] = $page->getVar("player_".$i."_faction");
-        $players[$id][size] = $page->getVar("player_".$i."_size");
-        $players[$id][theme_force] = $page->getVar("player_".$i."_theme_force");
+        if($uses_faction)
+            $players[$id][faction] = $page->getVar("player_".$i."_faction");
+        if($uses_sizes)
+            $players[$id][size] = $page->getVar("player_".$i."_size");
+        if($uses_theme)
+            $players[$id][theme_force] = $page->getVar("player_".$i."_theme_force");
+        if($uses_painted)
+            $players[$id][fully_painted] = $page->getVar("player_".$i."_fully_painted");
         $players[$id][won] = $page->getVar("player_".$i."_won");
-        $players[$id][fully_painted] = $page->getVar("player_".$i."_fully_painted");
         
     } 
 
@@ -162,14 +206,28 @@ if($page->submitIsSet("submit_game")){
    
     $i=1;
     foreach(array_keys($players) as $id){
-        if(Check::isNull($players[$id][faction])){ $errors[] = "Choose a Faction for Player $i!";}
-        if(Check::isNull($players[$id][size])){ 
-            if($game_system==1){
-                $errors[] = "Choose an Army Size for Player $i!";
+
+        //Retrieve their game entries
+        $game_entries = $game_player_db->getByPlayerId($id);
+
+        //Get the oldest game
+        if(is_array($game_entries)){
+            $last_entry = end($game_entries);
+            $mins_elapsed = $game_db->getMinutesFromGameTime($last_entry["game_id"]);
+
+            if($mins_elapsed[0]["minutes"] < 60){
+                $errors[] = "Player $i must wait ".round(60-$mins_elapsed[0]["minutes"])." minutes to report a game!";
             }
         }
 
-        //Just set these to 0 if they're null
+        if($uses_factions && Check::isNull($players[$id][faction]))
+            $errors[] = "Choose a Faction for Player $i!";
+
+
+        if($uses_sizes && Check::isNull($players[$id][size]))
+                $errors[] = "Choose an Army Size for Player $i!";
+
+        //Just set these to 0 if they're null, because they're mandatory in the db
         if(Check::isNull($players[$id][theme_force])){ $players[$id][theme_force]=0; }
         if(Check::isNull($players[$id][won])){ $players[$id][won]=0; }
         if(Check::isNull($players[$id][fully_painted])){ $players[$id][fully_painted]=0; }
@@ -219,10 +277,8 @@ Prep displaying the page
 **************************************/
 $title = "Report a Game";
 $inputs = array("game_system", "game_id", "num_players");
-$player_inputs = array("_id", "_faction");
-if($game_system == 1){
+if($uses_scenario){
     $inputs[] = "scenario_table";
-    $player_inputs = array_merge($player_inputs, array("_size", "_theme_force", "_fully_painted", "_won"));
 }
 
 $form_method = "post";

@@ -72,11 +72,14 @@
         $country = $page->getVar("country");
         $state = $page->getVar("state");
         $vip = $page->getVar("vip");
-
+        
         $db = new Players();
         if($pl_id){
             if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
-                $exists = $db->queryByColumns(array("first_name"=>$first, "last_name"=>$last, "country"=>$country, "state"=>$state));
+                $exists = $db->queryByColumns(array("first_name"=>$first, 
+                                                    "last_name"=>$last, 
+                                                    "country"=>$country, 
+                                                    "state"=>$state));
 
                 if($exists){
                     $error = "Player with that name & location exists!";

@@ -76,10 +76,14 @@ class Choices {
 	    foreach($players as $player){
                 $c = $c_db->getById($player[country]);
 
-                $text = $player[last_name].', '.$player[first_name]." (".$c[0][name];
+                //$text = $player[last_name].', '.$player[first_name]." (".$c[0][name];
+                $text = $player[last_name].', '.$player[first_name]." (";
                 if($player[state]){
                     $s = $s_db->getById($player[state]);
-                    $text.= ", ".$s[0][name];
+                    $text.= $s[0][name];
+                } else {
+                    $c = $c_db->getById($player[country]);
+                    $text.= $c[0][name];
                 }
                 $text.=")";
 

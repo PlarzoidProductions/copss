@@ -63,9 +63,12 @@
         <div class="input_container"><hr></div>
         <?for($i=1; $i<=$num_players; $i++){?>
             <div class="input_container"><header><h3><u>Player <?=$i?></u></h3></header></div>
-            <?foreach($player_inputs as $pi){?>
-                <?=$page->displayVar("player_".$i.$pi)?>
-            <?}?>
+            <?=$page->displayVar("player_".$i."_id")?>
+            <?if($uses_factions){$page->displayVar("player_".$i."_faction");}?>
+            <?if($uses_sizes){$page->displayVar("player_".$i."_size");}?>
+            <?if($uses_painted){$page->displayVar("player_".$i."_fully_painted");}?>
+            <?if($uses_theme){$page->displayVar("player_".$i."_theme_force");}?>
+            <?=$page->displayVar("player_".$i."_won")?>
         <?}?>
         <div class="input_container"><hr></div>
         <?=$page->displayVar("submit_game")?>

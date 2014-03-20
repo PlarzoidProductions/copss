@@ -58,7 +58,8 @@
                                                 "default_val"=>$defaults[per_game])); 
     $page->register("game_system", "select", array( "get_choices_array_func"=>"getGameSystems",
                                                     "get_choices_array_func_args"=>array(),
-                                                    "default_val"=>$defaults[game_system_id]));
+                                                    "default_val"=>$defaults[game_system_id],
+                                                    "reloading"=>1));
     $page->register("ach_type", "select", array(    "get_choices_array_func"=>"getAchievementTypes",
                                                     "get_choices_array_func_args"=>array(),
                                                     "default_val"=>$defaults[is_meta],
@@ -104,7 +105,12 @@
 
 
     //Register stuffs for children
-    $children = $ach_db->getByGameSystemId($parent_game_system);
+    $parent_game_system = $page->getVar("game_system");
+    if(empty($parent_game_system)){
+        $children = $ach_db->getAll();
+    } else {
+        $children = $ach_db->getByGameSystemId($parent_game_system);
+    }
 
     foreach($children as $child){
 
@@ -224,11 +230,14 @@
                 $exists = $meta_db->queryByColumns(array(   "parent_achievement"=>$parent,
                                                             "child_achievement"=>$child[id]));
 
-                if($exists){
-                    $meta_db->updateById($child[id], array("count"=>$count));
+                if($exists && ($count > 0)){
+                    $result = $meta_db->updateMeta_achievement_criteriaById(
+                        $exists[0][id], array("count"=>$count));
+                } else if($exists && ($count == 0)){
+                    $result = $meta_db->deleteById($exists[0][id]);
                 } else {
                     if($count > 0){
-                        $meta_db->create($parent, $child[id], $count);
+                        $result = $meta_db->create($parent, $child[id], $count);
                     }
                 }
             }
@@ -252,6 +261,7 @@
         $events = new Events();
 
         //references
+        $i=true;
         foreach ($achievements as $key=>$ach) {
             if($ach[game_system_id]){
                 $system = $gsys->getById($ach[game_system_id]);
@@ -312,7 +322,7 @@
         }
 
         //Build the Inputs Array
-        $inputs = array("ach_id", "name", "points", "per_game", "game_system", "ach_type");
+        $inputs = array("ach_id", "name", "ach_type", "points", "per_game", "game_system");
         if($is_meta){
             foreach($children as $child){
                 if($child[is_meta]) continue;

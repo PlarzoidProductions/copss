@@ -21,3 +21,4 @@ INSERT INTO game_sizes (parent_game_system, size, name) VALUES (1, 25, NULL);
 INSERT INTO game_sizes (parent_game_system, size, name) VALUES (1, 35, NULL);
 INSERT INTO game_sizes (parent_game_system, size, name) VALUES (1, 50, NULL);
 INSERT INTO game_sizes (parent_game_system, size, name) VALUES (1, 75, NULL);
+INSERT INTO game_sizes (parent_game_system, size, name) VALUES (1, 100, 'Unbound');

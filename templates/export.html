@@ -1,0 +1,51 @@
+<section id="main_section">
+    <?if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><? echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?=$success_str?> 
+            </div>
+        </section>
+        <section>
+            <?if($link){?>
+                <div class="simple">
+                    <a href="<?=$link[href]?>"><h1><?=$link[text]?></h1></a>
+                </div>
+            <?}?>
+        </section>
+    <?} else {?>
+        <header>
+            <hgroup>
+                <h1><? echo $title?></h1>
+            </hgroup>
+        </header>
+        <form action="<?=$form_action?>" method="<?=$form_method?>">
+            <section id="inputs_section">
+            Please Right-Click and chose to download this link:<br/>
+            <a href="<?=$filename?>">Database Export</a>
+            <br/><br/>
+            Please e-mail it to <a href="mailto:hungerford@privateerpress">hungerford@privateerpress</a>
+            <br/><br/>
+            <hr/><br/><br/>
+            <u>Reseting the database will clear the following data:</u><br/>
+            Player Registrations<br/>
+            Game Records<br/>
+            Achievements &amp; points earned<br/>
+            Prize Redmeption data<br/>
+            <br/><br/>
+            <u>The following data will be left intact:</u><br/>
+            Achievement Configuration<br/>
+            User logins<br/>
+            Countries &amp; States<br/>
+            <br\>
+            <?=$page->displayVar("reset_db")?>
+        </section>
+        </form>
+    <?}?>
+</section>
+

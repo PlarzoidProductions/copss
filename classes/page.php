@@ -107,7 +107,8 @@ class Page {
             $admin_tabs = array(
                 "Manage Users"=>"manage_users",
                 "General Configuration"=>"general_config",
-                "Achievement Configuration"=>"achievement_config"
+                "Achievement Configuration"=>"achievement_config",
+                "Export & Reset Database"=>"export_reset"
             );
 
         }

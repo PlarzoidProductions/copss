@@ -58,17 +58,20 @@ if($selected_player){
         foreach($g[players] as $j=>$gp){
             $tmp3 = $player_db->getById($gp[player_id]);
             $player[games][$i][players][$j][player_details] = $tmp3[0];
+     
+            //Fetch game size
+            if($gp[game_size]){
+                $size = $size_db->getById($gp[game_size]);
+                $player[games][$i][players][$j][size] = $size[0][size];
+            }
 
-            $size = $size_db->getById($gp[game_size]);
-            $player[games][$i][players][$j][size] = $size[0][size];
-
-            //fetch faction
-            $faction = $faction_db->getById($gp[faction_id]);
-            $player[games][$i][players][$j][faction_name] = $faction[0][name];
-
+            //Fetch faction
+            if($gp[faction_id]){
+                $faction = $faction_db->getById($gp[faction_id]);
+                $player[games][$i][players][$j][faction_name] = $faction[0][name];
+            }
         }
-    }
-                    
+    }       
 }
 
 
@@ -87,8 +90,19 @@ if($selected_player){
 
         $player_list = "";
         foreach($players as $b=>$p){
-            $player_list.= $p[player_details][last_name].", ".$p[player_details][first_name].": ";
-            $player_list.= $p[size]."pts of ".$p[faction_name]."<br>";
+            $player_list.= $p[player_details][last_name].", ".$p[player_details][first_name];
+            
+            if($p[size] || $p[faction_name]) 
+                $player_list.= ": ";
+            if($p[size]){
+                $player_list.= $p[size]."pts";
+                if($p[faction_name])
+                    $player_list.= " of";
+            }
+            if($p[faction_name])
+                $player_list.= " ".$p[faction_name];
+                
+            $player_list.= "<br>";
         
             if($p[player_id] == $selected_player){
                 $achievement_listing = "";
@@ -112,7 +126,7 @@ if($selected_player){
     
     //Stats
     $stats = $engine->getPlayerStats($selected_player);
-    
+
     $faction_list = "";
     foreach($stats[factions] as $f){
         $faction_details = $faction_db->getById($f);

@@ -22,11 +22,11 @@
             <th>Points Spent</th>
             <th>Points</th>
         </tr>
-    <?foreach($players as $p){?>
+    <?foreach($players as $id=>$p){?>
         <tr class="<?=$p[style]?>">
             <td>
-                <?=$p[id]?> 
-                (<a href="home.php?view=register_player&action=edit&pl_id=<?=$p[id]?>">Edit</a>)
+                <?=$p[player_id]?> 
+                (<a href="home.php?view=register_player&action=edit&pl_id=<?=$p[player_id]?>">Edit</a>)
             </td>
             <td><?=$p[last_name]?>, <?=$p[first_name]?></td>
             <td><?=$p[game_count]?></td>
@@ -34,7 +34,7 @@
             <td><?=$p[spent]?></td>
             <td><h1><?=$p[points]?></h1></td>
             <td>
-                <a href="home.php?view=view_player&pl_id=<?=$p[id]?>">Details</a>
+                <a href="home.php?view=view_player&pl_id=<?=$p[player_id]?>">Details</a>
             </td>
         </tr>
     <?}?>

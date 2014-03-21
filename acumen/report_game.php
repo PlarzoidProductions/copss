@@ -185,7 +185,7 @@ if($page->submitIsSet("submit_game")){
 
         $players[$id] = array();
 
-        if($uses_faction)
+        if($uses_factions)
             $players[$id][faction] = $page->getVar("player_".$i."_faction");
         if($uses_sizes)
             $players[$id][size] = $page->getVar("player_".$i."_size");
@@ -211,7 +211,7 @@ if($page->submitIsSet("submit_game")){
         $game_entries = $game_player_db->getByPlayerId($id);
 
         //Get the oldest game
-        if(is_array($game_entries)){
+        if(!empty($game_entries)){
             $last_entry = end($game_entries);
             $mins_elapsed = $game_db->getMinutesFromGameTime($last_entry["game_id"]);
 

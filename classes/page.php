@@ -97,7 +97,6 @@ class Page {
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
             "Redeem Skulls"=>"redeem",
-            "Leaderboard"=>"leaderboard",
             "Event Achievements"=>"batch_processing",
             "Software Feedback"=>"feedback"
             );
@@ -105,6 +104,7 @@ class Page {
         
         if(Session::isAdmin()){
             $admin_tabs = array(
+                "Leaderboard"=>"leaderboard",
                 "Manage Users"=>"manage_users",
                 "General Configuration"=>"general_config",
                 "Achievement Configuration"=>"achievement_config",

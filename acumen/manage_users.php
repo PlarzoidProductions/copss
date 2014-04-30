@@ -18,7 +18,6 @@
 
     $page->register("username", "textbox", array("required"=>true, "default_val"=>$defaults[0][username]));
     $page->register("name", "textbox", array("required"=>true, "default_val"=>$defaults[0][name]));
-    $page->register("phone_number", "textbox", array("required"=>true, "default_val"=>$defaults[0][phone_number]));
     $page->register("password1", "password", array("label"=>"Password"));
     $page->register("password2", "password", array("label"=>"Confirm Password"));
 
@@ -41,7 +40,6 @@
         //Retrieve the vars
         $username = $page->getVar("username");
         $name = $page->getVar("name");
-        $phone = $page->getVar("phone_number");
         $pass1 = $page->getVar("password1");
         $pass2 = $page->getVar("password2");
         $admin = $page->getVar("admin");
@@ -67,7 +65,7 @@
             }
 
             if(empty($error)){
-                $result = $db->create($name, $username, md5($pass1), $phone, null, $admin);
+                $result = $db->create($name, $username, md5($pass1), null, $admin);
             }
         }
 
@@ -83,8 +81,7 @@
                     if($exists[0][id] != $uid)  $error = "Username already exists!";
                 }
 
-                $columns = array("name"=>$name, "username"=>$username, 
-                                 "admin"=>$admin, "phone_number"=>$phone);
+                $columns = array("name"=>$name, "username"=>$username, "admin"=>$admin);
             
                 if(strlen($pass1) > 0){
                     if(strlen($pass1) < 8){
@@ -140,7 +137,7 @@
     
     } else {
 
-        $inputs = array("name", "phone_number", "username", "password1", "password2", "admin");
+        $inputs = array("name", "username", "password1", "password2", "admin");
         if($uid==null){
             $inputs[]="add";
         } else {

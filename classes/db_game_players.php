@@ -17,7 +17,6 @@
 *	game_size - INT
 *	theme_force - TINYINT
 *	fully_painted - TINYINT
-*	winner - TINYINT
 *
 **************************************************/
 require_once("query.php");
@@ -45,7 +44,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($game_id, $player_id, $faction_id, $game_size, $theme_force, $fully_painted, $winner){
+public function create($game_id, $player_id, $faction_id, $game_size, $theme_force, $fully_painted){
 
 	//Validate the inputs
 	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
@@ -54,7 +53,6 @@ public function create($game_id, $player_id, $faction_id, $game_size, $theme_for
 	$game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
 	$theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
 	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
-	$winner = $this->filterWinner($winner); if($winner === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -63,8 +61,7 @@ public function create($game_id, $player_id, $faction_id, $game_size, $theme_for
  		":faction_id"=>$faction_id,
  		":game_size"=>$game_size,
  		":theme_force"=>$theme_force,
- 		":fully_painted"=>$fully_painted,
- 		":winner"=>$winner
+ 		":fully_painted"=>$fully_painted
 	);
 
 	//Build the query
@@ -74,16 +71,14 @@ public function create($game_id, $player_id, $faction_id, $game_size, $theme_for
 				faction_id,
 				game_size,
 				theme_force,
-				fully_painted,
-				winner
+				fully_painted
 			) VALUES (
 				:game_id,
 				:player_id,
 				:faction_id,
 				:game_size,
 				:theme_force,
-				:fully_painted,
-				:winner)";
+				:fully_painted)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -252,15 +247,6 @@ public function getByFullyPainted($fully_painted){
 }
 
 
-public function getByWinner($winner){
-	
-    //Validate Inputs
-    $winner = $this->filterWinner($winner); if($winner === false){return false;}
-
-    return $this->queryByColumns(array("winner"=>$winner));
-}
-
-
 /**************************************************
 
 Exists by Column(s) Function
@@ -376,23 +362,6 @@ function filterFullyPainted($fully_painted){
 
     return intVal($fully_painted);
 }
-
-
-
-function filterWinner($winner){
-    //Not allowed to be null
-    if(Check::isNull($winner)){
-        echo "winner cannot be null!"; return false;
-    }
-
-    if(Check::notBool($winner)){
-        echo "winner was invalid!"; return false;
-    }
-
-    return intVal($winner);
-}
-
-
 
 }//close class
 

@@ -157,9 +157,6 @@ for($i=1; $i <= $num_players; $i++){
                 "default_val"=>$defaults[players][$i-1][fully_painted],
                 "on_text"=>"Yes", "off_text"=>"No"));
 
-    $page->register("player_".$i."_won", "checkbox", array("label"=>"Won",
-                                                            "default_val"=>$defaults[players][$i-1][winner],
-                                                            "on_text"=>"Yes", "off_text"=>"No"));
 }
 $page->getChoices();
 
@@ -193,8 +190,6 @@ if($page->submitIsSet("submit_game")){
             $players[$id][theme_force] = $page->getVar("player_".$i."_theme_force");
         if($uses_painted)
             $players[$id][fully_painted] = $page->getVar("player_".$i."_fully_painted");
-        $players[$id][won] = $page->getVar("player_".$i."_won");
-        
     } 
 
     //Next, validate
@@ -229,7 +224,6 @@ if($page->submitIsSet("submit_game")){
 
         //Just set these to 0 if they're null, because they're mandatory in the db
         if(Check::isNull($players[$id][theme_force])){ $players[$id][theme_force]=0; }
-        if(Check::isNull($players[$id][won])){ $players[$id][won]=0; }
         if(Check::isNull($players[$id][fully_painted])){ $players[$id][fully_painted]=0; }
 
         $i++;
@@ -255,7 +249,7 @@ if($page->submitIsSet("submit_game")){
         $result = true;
         foreach($players as $id=>$player){
             $creation = $game_player_db->create($parent_game_id, $id, $player[faction], $player[size],
-                                                $player[theme_force], $player[fully_painted], $player[won]);
+                                                $player[theme_force], $player[fully_painted]);
             $result = $result && $creation;
         }
 

@@ -32,7 +32,6 @@
     $page->register("edit_id", "hidden", array("value"=>$pl_id));
     $page->register("first_name", "textbox", array("required"=>true, "default_val"=>$defaults[first_name]));
     $page->register("last_name", "textbox", array("required"=>true, "default_val"=>$defaults[last_name]));
-    $page->register("e_mail", "email", array("label"=>"eMail", "default_val"=>$defaults[email]));
 
     $page->register("country", "select", array( "get_choices_array_func"=>"getCountries", 
                                                 "reloading"=>1, "default_val"=>$defaults[country]));
@@ -68,13 +67,23 @@
         //Retrieve the vars
         $first = $page->getVar("first_name");
         $last = $page->getVar("last_name");
-        $email = $page->getVar("e_mail");
         $country = $page->getVar("country");
         $state = $page->getVar("state");
         $vip = $page->getVar("vip");
         
         $db = new Players();
         if($pl_id){
+            $nameChars = "a-zA-Z0-9' -";
+            if(!preg_match("~^[$nameChars]+$~", $first)){
+                $illegalChars = preg_replace("~[$nameChars]~", "", $first);
+                $error = "First Name contains invalid character(s): '$illegalChars'!";
+            } else 
+
+            if(!preg_match("~^[$nameChars]+$~", $last)){
+                $illegalChars = preg_replace("~[$nameChars]~", "", $last);
+                $error = "Last Name contains invalid character(s): '$illegalChars'!";
+            } else
+
             if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
                 $exists = $db->queryByColumns(array("first_name"=>$first, 
                                                     "last_name"=>$last, 
@@ -90,7 +99,6 @@
             if(empty($error)){
                 $columns = array("first_name"=>$first,
                                  "last_name"=>$last,
-                                 "email"=>$email,
                                  "country"=>$country,
                                  "state"=>$state,
                                  "vip"=>$vip);
@@ -99,16 +107,30 @@
             }
         } else {
 
-            $columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
-            if($state != "null") $columns["state"] = $state;
-            $exists = $db->existsByColumns($columns);
+            $nameChars = "a-zA-Z0-9' -";
+            if(!preg_match("~^[$nameChars]+$~", $first)){
+                $illegalChars = preg_replace("~[$nameChars]~", "", $first);
+                $error = "First Name contains invalid character(s): '$illegalChars'!";
+            } else
 
-            if($exists){
-                $error = "Player with that name & location exists!";
+            if(!preg_match("~^[$nameChars]+$~", $last)){
+                $illegalChars = preg_replace("~[$nameChars]~", "", $last);
+                $error = "Last Name contains invalid character(s): '$illegalChars'!";
+            } else
+            
+            {
+                $columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
+                if($state != "null") $columns["state"] = $state;
+                $exists = $db->existsByColumns($columns);
+
+                if($exists){
+                    $error = "Player with that name & location exists!";
+                }
             }
 
+
             if(empty($error))
-                $result = $db->create($first, $last, $email, $country, $state, $vip);
+                $result = $db->create($first, $last, $country, $state, $vip);
         }
     }
 
@@ -148,7 +170,7 @@
     
     } else {
     
-        $inputs = array("edit_id", "first_name", "last_name", "e_mail", "country", "state", "vip", "register");
+        $inputs = array("edit_id", "first_name", "last_name", "country", "state", "vip", "register");
         $page->setDisplayMode("form");
         $template = "templates/default_section.html";
     }

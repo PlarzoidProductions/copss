@@ -13,7 +13,6 @@
 *	id - INT - PRIMARY KEY
 *	first_name - VARCHAR
 *	last_name - VARCHAR
-*	email - VARCHAR
 *	country - INT
 *	state - INT
 *	vip - TINYINT
@@ -45,12 +44,11 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($first_name, $last_name, $email, $country, $state, $vip){
+public function create($first_name, $last_name, $country, $state, $vip){
 
 	//Validate the inputs
 	$first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
 	$last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
-	$email = $this->filterEmail($email); if($email === false){return false;}
 	$country = $this->filterCountry($country); if($country === false){return false;}
 	$state = $this->filterState($state); if($state === false){return false;}
 	$vip = $this->filterVip($vip); if($vip === false){return false;}
@@ -59,7 +57,6 @@ public function create($first_name, $last_name, $email, $country, $state, $vip){
 	$values = array(
 		":first_name"=>$first_name,
  		":last_name"=>$last_name,
- 		":email"=>$email,
  		":country"=>$country,
  		":state"=>$state,
  		":vip"=>$vip
@@ -69,7 +66,6 @@ public function create($first_name, $last_name, $email, $country, $state, $vip){
 	$sql = "INSERT INTO $this->table (
 				first_name,
 				last_name,
-				email,
 				country,
 				state,
 				vip,
@@ -77,7 +73,6 @@ public function create($first_name, $last_name, $email, $country, $state, $vip){
 			) VALUES (
 				:first_name,
 				:last_name,
-				:email,
 				:country,
 				:state,
 				:vip,
@@ -160,6 +155,15 @@ public function getAll(){
 }
 
 
+public function getAllSorted(){
+
+    //Generate the query
+    $sql = "SELECT * FROM $this->table ORDER BY LOWER(last_name) ASC, LOWER(first_name) ASC";
+
+    return $this->db->query($sql, array());
+}
+
+
 /**************************************************
 
 Query by Column(s) Function
@@ -211,15 +215,6 @@ public function getByLastName($last_name){
     $last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
 
     return $this->queryByColumns(array("last_name"=>$last_name));
-}
-
-
-public function getByEmail($email){
-	
-    //Validate Inputs
-    $email = $this->filterEmail($email); if($email === false){return false;}
-
-    return $this->queryByColumns(array("email"=>$email));
 }
 
 
@@ -317,19 +312,6 @@ function filterLastName($last_name){
     }
 
     return $last_name;
-}
-
-
-
-function filterEmail($email){
-    //Allowed to be null, catch that first
-    if(Check::isNull($email)){ return null; }
-
-    if(Check::notString($email)){
-        echo "email was invalid!"; return false;
-    }
-
-    return $email;
 }
 
 

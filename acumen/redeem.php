@@ -68,13 +68,13 @@ if($selected_player){
     $earned = $views_db->queryByColumns("earned", array("player_id"=>$selected_player));
     $spent = $views_db->queryByColumns("spent", array("player_id"=>$selected_player));
 
-    $available = $earned[0][earned] - $spent[0][spent];
+    $available = $earned[0][earned] + $spent[0][spent];
 }
 
 
 /********************************************
 
-Prep the page
+Handle the submit
 
 ********************************************/
 if($page->submitIsSet("redeem")){
@@ -86,20 +86,27 @@ if($page->submitIsSet("redeem")){
     if(!strcmp($mode, "SPEND")){
         if(intval($amount) > intval($available)){
             $error = "You don't have enough points to buy that!";
+        } else {
+            $amount = $amount * -1;
         }
     } else {
-        $amount = $amount * -1;
+        if(empty($desc)){
+            $error = "Must have a description!";
+        }
     }
      
     if(empty($error)){
         $result = $pr_db->create($selected_player, $amount, $desc);
+        if($result){
+            $available += $amount;
+        }
     }
 
     if($result){
         if(!strcmp($mode, "SPEND")){
-            $success_str = "Successfully redeemed $amount skulls for $desc!";
+            $success_str = "Successfully redeemed ".($amount*-1)." skulls for $desc!";
         } else {
-            $success_str = "Successfully added ".($amount*-1)." for $desc!";
+            $success_str = "Successfully added $amount for $desc!";
         }
     }
 }    

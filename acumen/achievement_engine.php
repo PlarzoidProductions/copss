@@ -487,7 +487,7 @@ class Ach_Engine {
 
         $redemptions = $this->redems_db->getByPlayerId($player_id);
         foreach($redemptions as $r){
-            $points -= $r[cost];
+            $points += $r[cost];
         }
 
         return $points;

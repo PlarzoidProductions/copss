@@ -131,7 +131,7 @@ Query Everything
 public function getAll(){
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table";
+    $sql = "SELECT * FROM $this->table ORDER BY name ASC";
 
     return $this->db->query($sql, array());
 }
@@ -160,6 +160,8 @@ public function queryByColumns($columns){
         }
     }
 
+    $sql .= " ORDER BY name ASC";
+    
     return $this->db->query($sql, $values);
 }
 

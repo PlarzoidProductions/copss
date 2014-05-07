@@ -21,7 +21,6 @@ $pr_db = new Prize_redemptions();
 $engine = new Ach_Engine();
 $views_db = new Views();
 
-
 $pl_id = $_REQUEST[pl_id];
 
 /*********************************************
@@ -140,7 +139,7 @@ if($selected_player){
     $earned = $views_db->queryByColumns("earned", array("player_id"=>$selected_player));
     $spent = $views_db->queryByColumns("spent", array("player_id"=>$selected_player));
 
-    $stats[points] = $earned[0][earned] - $spent[0][spent];
+    $stats[points] = $earned[0][earned] + $spent[0][spent]; //addition, since poinst spent are stored as negative numbers
 
     //Event Achievements
     $event_achs = $engine->getEventAchievementsByPlayerId($selected_player);

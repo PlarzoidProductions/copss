@@ -20,7 +20,16 @@ $action = $_REQUEST[action];
 $ach_id = $_REQUEST[ach_id];
 
 if(!strcmp($action, "delete")){
-    $ae_db->deleteById($ach_id);
+
+	$achievement_e = $ae_db->getById($ach_id);
+
+	$player = $p_db->getById($achievement_e[0]["player_id"]);
+	$achievement = $a_db->getById($achievement_e[0]["achievement_id"]);
+
+	if($ae_db->deleteById($ach_id)){
+		$success_str = "Successfully deleted '".$achievement[0]["name"]."' from:</br>";
+		$success_str .= $player[0]["last_name"].", ".$player["first_name"]."'s record!";
+	}
 }
 
 
@@ -35,7 +44,7 @@ $page->register("ach_id", "select", array("label"=>"Achievement",
 
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>5,
                                                 "get_choices_array_func"=>"getIntegerChoices",
-                                                "get_choices_array_func_args"=>array(2, 10, 1)));
+                                                "get_choices_array_func_args"=>array(5, 15, 5)));
 
 $page->getChoices();
 
@@ -73,29 +82,37 @@ if($page->submitIsSet("submit_batch")){
 
     //First, extract all our inputs
     $ach_id = $page->getVar("ach_id");
-    $num_players = intval($page->getVar("num_players"));
 
-    $players = array();
-    for($i=1; $i <= $num_players; $i++){
-        $id = $page->getVar("player_".$i."_id");
-        if(Check::isNull($id)){ continue;}
+	if(empty($ach_id)){
+		$errors[] = "Must pick an Achievement!";
+	}
 
-        $player = $p_db->getById($id);
-        $players[$id] = $player[0];
-    }
 
-    $end_result = true;
-    foreach($players as $id=>$p){
+	if(empty($errors)){
+		$num_players = intval($page->getVar("num_players"));
 
-        $exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
-        if(!$exists){
-            $result = $ae_db->create($id, $ach_id);
-            $end_result = $end_result && $result;
-        }
-    }
+   		$players = array();
+    	for($i=1; $i <= $num_players; $i++){
+        	$id = $page->getVar("player_".$i."_id");
+	        if(Check::isNull($id)){ continue;}
 
-    $achievement = $a_db->getById($ach_id);
-    $achievement = $achievement[0];
+    	    $player = $p_db->getById($id);
+        	$players[$id] = $player[0];
+	    }
+
+    	$end_result = true;
+    	foreach($players as $id=>$p){
+
+        	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
+        	if(!$exists){
+            	$result = $ae_db->create($id, $ach_id);
+	            $end_result = $end_result && $result;
+    	    }
+    	}
+
+    	$achievement = $a_db->getById($ach_id);
+    	$achievement = $achievement[0];
+	}
 }
 
 

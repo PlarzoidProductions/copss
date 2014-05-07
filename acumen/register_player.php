@@ -29,7 +29,7 @@
     ***************************************/
 
     //store the fact we're editing
-    $page->register("edit_id", "hidden", array("value"=>$pl_id));
+    $page->register("edit_id", "hidden", array("default_val"=>$pl_id));
     $page->register("first_name", "textbox", array("required"=>true, "default_val"=>$defaults[first_name]));
     $page->register("last_name", "textbox", array("required"=>true, "default_val"=>$defaults[last_name]));
 
@@ -95,9 +95,12 @@
                 }
             }
 
-
             if(empty($error)){
-                $columns = array("first_name"=>$first,
+				
+				if(empty($state))
+					$state=null;
+                
+				$columns = array("first_name"=>$first,
                                  "last_name"=>$last,
                                  "country"=>$country,
                                  "state"=>$state,

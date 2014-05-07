@@ -27,7 +27,7 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new Game_systems();
 
-    $result = $db->deleteGame_systems($selected);
+    $result = $db->deleteByColumns(array("id"=>$selected));
 }
 
 

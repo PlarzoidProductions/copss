@@ -15,6 +15,8 @@ $page->register("parent", "select", array(  "label"=>"Parent Country", "reloadin
 $page->getChoices();
 $selected_parent = $page->getVar("parent");
 
+if(empty($selected_parent)){$selected_parent = 1;}
+
 $page->register("edit_select", "select", array( "label"=>"Edit a State",
                                                 "get_choices_array_func"=>"getStates",
                                                 "get_choices_array_func_args"=>array($selected_parent)));
@@ -41,7 +43,7 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new States();
 
-    $db->deleteStates($selected);
+    $result = $db->deleteByColumns(array("id"=>$selected));
 }
 
 

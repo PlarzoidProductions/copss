@@ -49,11 +49,11 @@ $points = array();
 
 foreach($players as $k=>$p){
     $players[$k][name] = $p[last_name].", ".$p[first_name];
-    $players[$k][points] = $players[$k][earned] - $players[$k][spent];
+    $players[$k][points] = $players[$k][earned] + $players[$k][spent];
 
     //Arrays for sorting
     $sorter[$k] = $players[$k][$sortby];
-    $names[$k] = $players[$k][name];
+    $names[$k] = strtolower($players[$k][name]);
     $points[$k] = $players[$k][points];
 }
 

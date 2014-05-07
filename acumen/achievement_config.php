@@ -35,7 +35,11 @@
             }
 
             if($action == "delete"){
-                $ach_db->deleteByColumns(array("id"=>$ach_id));
+				$achievement = $ach_db->getById($ach_id);
+
+                if($ach_db->deleteByColumns(array("id"=>$ach_id))){
+					$success_str = "Successfully deleted '".$achievement[0]["name"]."'!";
+				}
             }
         }
     } else {

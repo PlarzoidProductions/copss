@@ -13,10 +13,9 @@ if(!Session::isLoggedIn()){
 */
 
 //Pull the view from the request variable
-$view = $_REQUEST[view];
-
-//if request var is empty, pick a default view
-if(empty($view)){
+if(isset($_REQUEST["view"])){
+	$view = $_REQUEST["view"];
+} else {
     $view = "register_player";
 }
 

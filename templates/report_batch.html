@@ -20,7 +20,7 @@
         <header>
             <hgroup>
                 <h1><? echo $title?></h1>
-                <? if(!empty($error)){?><h3 class="warning"><?=$error?></h3><?}?>
+                <? if(!empty($errors)){foreach($errors as $error){?><h3 class="warning"><?=$error?></h3><br/><?}}?>
             </hgroup>
         </header>
         <section id="inputs_section">
@@ -28,6 +28,7 @@
             <? foreach($inputs as $i){?>
                 <? echo $page->displayVar($i)?>
             <?}?>
+			<em>Any player slots left set to "Please select..." will be skipped</em>
             <hr>
             <? for($i=1; $i <= $num_players; $i++){?>
                 <? echo $page->displayVar("player_".$i."_id")?>

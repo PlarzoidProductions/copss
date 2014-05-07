@@ -27,7 +27,7 @@ Handle the delete
 if($page->submitIsSet("delete_selected")){
     $db = new Countries();
 
-    $result = $db->deleteCountries($selected);
+    $result = $db->deleteByColumns(array("id"=>$selected));
 }
 
 /**************************************

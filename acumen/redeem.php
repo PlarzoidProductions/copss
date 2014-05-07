@@ -46,7 +46,7 @@ $page->register("mode", "select", array("get_choices_array_func"=>"getRedeemFunc
                                         "get_choices_array_func_args"=>array(),
                                         "default_val"=>$defaults[mode]));
 $page->register("amount", "number", array("min"=>1, "max"=>100, "step"=>1, "default_val"=>$defaults[cost]));
-$page->register("description", "textbox", array("placeholder"=>"dice, poster, etc...", 
+$page->register("description", "textbox", array("placeholder"=>"dice, poster, etc...", "required"=>1,
                                                 "default_val"=>$defaults[description]));
 $page->register("redeem", "submit", array("value"=>"Submit"));
 $page->getChoices();

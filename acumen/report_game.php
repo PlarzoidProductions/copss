@@ -180,6 +180,11 @@ if($page->submitIsSet("submit_game")){
         $id = $page->getVar("player_".$i."_id");
         if(Check::isNull($id)){ continue;}
 
+		if(in_array($id, array_keys($players))){
+	    	$errors[] = "Player $i already chosen!";
+	    	break;
+		}
+
         $players[$id] = array();
 
         if($uses_factions)

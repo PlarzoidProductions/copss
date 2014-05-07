@@ -43,7 +43,7 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !CHeck::isNull($selected)){
     $db = new Game_system_factions();
 
-    $result = $db->deleteGame_system_factions($selected);
+    $result = $db->deleteByColumns(array("id"=>$selected));
 }
 
 

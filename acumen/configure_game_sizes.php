@@ -43,7 +43,7 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new Game_sizes();
 
-    $result = $db->deleteGame_sizes($selected);
+    $result = $db->deleteByColumns(array("id"=>$selected));
 }
 
 

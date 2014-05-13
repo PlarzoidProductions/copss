@@ -24,7 +24,7 @@
         if(Check::notInt($ach_id)){
             $error = "Invalid Achievement ID for editing!";
         }
-    
+
         if(empty($error)){
             if($action == "edit_ach"){
                 $defaults = $ach_db->getById($ach_id);
@@ -36,10 +36,18 @@
 
             if($action == "delete"){
 				$achievement = $ach_db->getById($ach_id);
+				
+				try{
+                	if($ach_db->deleteByColumns(array("id"=>$ach_id))){
+						$success_str = "Successfully deleted '".$achievement[0]["name"]."'!";
+					}
+				 } catch(PDOException $e){
+        			if(($e->errorInfo[1]+0) == 1451){
+            			$error  = "Unable to delete '".$achievement[0]["name"]."', it is referenced<br>";
+						$error .= "by another Achievement or has been awarded to a player.";
+        			}
+    			}
 
-                if($ach_db->deleteByColumns(array("id"=>$ach_id))){
-					$success_str = "Successfully deleted '".$achievement[0]["name"]."'!";
-				}
             }
         }
     } else {
@@ -53,7 +61,7 @@
 
     ***************************************/
 
-    $page->register("ach_id", "hidden", array("value"=>$ach_id));
+    $page->register("ach_id", "hidden", array("default_val"=>$ach_id));
     $page->register("name", "textbox", array("required"=>true, "default_val"=>$defaults[name]));
     $page->register("points", "number", array(  "min"=>0, "max"=>100, "step"=>1, "required"=>true, 
                                                 "default_val"=>intVal($defaults[points])));

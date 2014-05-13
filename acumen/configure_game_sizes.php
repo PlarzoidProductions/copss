@@ -43,7 +43,16 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new Game_sizes();
 
-    $result = $db->deleteByColumns(array("id"=>$selected));
+	$size = $db->getById($selected);
+
+	try{
+    	$result = $db->deleteByColumns(array("id"=>$selected));
+	} catch(PDOException $e){
+        if(($e->errorInfo[1]+0) == 1451){
+            $error = "Unable to delete '".$size[0]["size"]."', an Achievement or Reported Game references it.";
+        }
+    }
+
 }
 
 
@@ -110,16 +119,21 @@ if($page->submitIsSet("submit_config")){
     $size = $page->getVar("size");
     $name = $page->getVar("name");
 
-    if(Check::isNull($edit_id)){
-        $exists = $db->getBySize($size);
-        if(empty($exists)){
-            $result = $db->create($selected_parent, $size, $name);
-        }
-    } else {
-        $columns = array("name"=>$name, "acronym"=>$acronym);
-        $result = $db->updateGame_sizesById($edit_id, $columns);
-    }
+	if(strlen($size) == 0)){
+		$error = "Size cannot be blank!";
+	}
 
+	if(empty($error)){
+	    if(Check::isNull($edit_id)){
+    	    $exists = $db->getBySize($size);
+        	if(empty($exists)){
+            	$result = $db->create($selected_parent, $size, $name);
+	        }
+    	} else {
+        	$columns = array("name"=>$name, "acronym"=>$acronym);
+	        $result = $db->updateGame_sizesById($edit_id, $columns);
+    	}
+	}
 }
 
 

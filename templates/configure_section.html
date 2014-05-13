@@ -1,6 +1,7 @@
     <header>
         <h3><? echo $subtitle?></h3>
     </header>
+	<?if(isset($error)){?><h3 class="warning"><?=$error?></h3><?}?>
     <? foreach($inputs as $i){?>
         <? echo $page->displayVar($i)?>
     <?}?>

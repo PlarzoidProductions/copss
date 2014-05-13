@@ -26,8 +26,16 @@ Handle the delete
 **************************************/
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new Game_systems();
+	
+	$system = $db->getById($selected);
 
-    $result = $db->deleteByColumns(array("id"=>$selected));
+	try{
+    	$result = $db->deleteByColumns(array("id"=>$selected));
+	} catch(PDOException $e){
+        if(($e->errorInfo[1]+0) == 1451){
+            $error = "Unable to delete '".$system[0]["name"]."', an Achievement or Reported Game references it.";
+        }
+    }
 }
 
 
@@ -87,16 +95,21 @@ if($page->submitIsSet("submit_config")){
     $edit_id = $page->getVar("edit_id");
     $name = $page->getVar("name");
 
-    if(Check::isNull($edit_id)){
-        $exists = $db->getByName($name);
-        if(empty($exists)){
-            $result = $db->create($name);
-        }
-    } else {
-        $columns = array("name"=>$name);
-        $result = $db->updateGame_systemsById($edit_id, $columns);
-    }
+	if(strlen($name) < 3){
+		$error = "Name must be at least 3 characters!";
+	}
 
+	if(empty($error)){
+	    if(Check::isNull($edit_id)){
+    	    $exists = $db->getByName($name);
+        	if(empty($exists)){
+            	$result = $db->create($name);
+	        }
+    	} else {
+        	$columns = array("name"=>$name);
+	        $result = $db->updateGame_systemsById($edit_id, $columns);
+    	}
+	}
 }
 
 

@@ -42,8 +42,17 @@ Handle the delete
 *************************************/
 if($page->submitIsSet("delete_selected") && !CHeck::isNull($selected)){
     $db = new Game_system_factions();
+	
+	$faction = $db->getById($selected);
+	
+	try{
 
-    $result = $db->deleteByColumns(array("id"=>$selected));
+		$result = $db->deleteByColumns(array("id"=>$selected));
+	} catch(PDOException $e){
+        if(($e->errorInfo[1]+0) == 1451){
+            $error = "Unable to delete '".$faction[0]["name"]."', an Achievement or Reported Game references it.";
+        }
+    }
 }
 
 
@@ -109,16 +118,25 @@ if($page->submitIsSet("submit_config")){
     $name = $page->getVar("name");
     $acronym = $page->getVar("acronym");
 
-    if(Check::isNull($edit_id)){
-        $exists = $db->getByName($name);
-        if(empty($exists)){
-            $result = $db->create($selected_parent, $name, $acronym);
-        }
-    } else {
-        $columns = array("name"=>$name, "acronym"=>$acronym);
-        $result = $db->updateGame_system_factionsById($edit_id, $columns);
-    }
+	if(strlen($name) < 3){
+		$error = "Name cannot be less than 3 characters!";
+	}
 
+	if(empty($system)){//the retrieved system selected by the parent drop-down - if it failed
+		$error = "Must choose a parent Game System!";
+	}
+
+	if(empty($error)){
+	    if(Check::isNull($edit_id)){
+    	    $exists = $db->getByName($name);
+        	if(empty($exists)){
+            	$result = $db->create($selected_parent, $name, $acronym);
+	        }
+    	} else {
+        	$columns = array("name"=>$name, "acronym"=>$acronym);
+	        $result = $db->updateGame_system_factionsById($edit_id, $columns);
+    	}
+	}
 }
 
 

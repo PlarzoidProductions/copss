@@ -43,7 +43,15 @@ Handle the delete
 if($page->submitIsSet("delete_selected") && !Check::isNull($selected)){
     $db = new States();
 
-    $result = $db->deleteByColumns(array("id"=>$selected));
+	$state = $db->getById($selected);
+
+	try{
+    	$result = $db->deleteByColumns(array("id"=>$selected));
+	} catch(PDOException $e){
+        if(($e->errorInfo[1]+0) == 1451){
+            $error = "Unable to delete '".$state[0]["name"]."', a Player references it.";
+        }
+    }
 }
 
 
@@ -107,18 +115,22 @@ if($page->submitIsSet("submit_config")){
     $edit_id = $page->getVar("edit_id");
     $name = $page->getVar("name");
 
+	if(strlen($name) < 3){
+		$error = "State name must be at least 3 characters!";
+	}
 
-    if(Check::isNull($edit_id)){    
-        $exists = $db->getByName($name);
+	if(empty($error)){
+	    if(Check::isNull($edit_id)){    
+    	    $exists = $db->getByName($name);
         
-        if(empty($exists)){
-            $result = $db->create($name, $selected_parent);
-        }
-    } else {
-        $columns = array("name"=>$name);
-        $result = $db->updateStatesById($edit_id, $columns);
-    }
-
+        	if(empty($exists)){
+            	$result = $db->create($name, $selected_parent);
+        	}
+	    } else {
+    	    $columns = array("name"=>$name);
+        	$result = $db->updateStatesById($edit_id, $columns);
+    	}
+	}
 }
 
 

@@ -85,10 +85,9 @@
             } else
 
             if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
-                $exists = $db->queryByColumns(array("first_name"=>$first, 
-                                                    "last_name"=>$last, 
-                                                    "country"=>$country, 
-                                                    "state"=>$state));
+				$columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
+				if(!empty($state))  $columns["state"]=$state;
+                $exists = $db->existsByColumns($columns);
 
                 if($exists){
                     $error = "Player with that name & location exists!";
@@ -123,7 +122,7 @@
             
             {
                 $columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
-                if($state != "null") $columns["state"] = $state;
+                if(!empty($state)) $columns["state"] = $state;
                 $exists = $db->existsByColumns($columns);
 
                 if($exists){

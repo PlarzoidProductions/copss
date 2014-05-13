@@ -28,7 +28,13 @@ Handle the delete
 if($page->submitIsSet("delete_selected")){
     $db = new Events();
 
-    $result = $db->deleteEvents($selected);
+	try{
+    	$result = $db->deleteById($selected);
+	} catch(PDOException $e){
+		if(($e->errorInfo[1]+0) == 1451){
+			$error = "Unable to delete that event, an Achievement references it.";
+		}
+	}
 }
 
 /**************************************
@@ -86,15 +92,21 @@ if($page->submitIsSet("submit_config")){
     $edit_id = $page->getVar("edit_id");
     $name = $page->getVar("name");
 
-    if(Check::isNull($edit_id)){
-        $exists = $db->getByName($name);
-        if(empty($exists)){
-            $result = $db->create($name);
-        }
-    } else {
-        $columns = array("name"=>$name);
-        $result = $db->updateEventsById($edit_id, $columns);
-    }
+	if(strlen($name) < 5){
+		$error = "Event name must be at least 5 characters!";
+	}
+
+	if(empty($error)){
+    	if(Check::isNull($edit_id)){
+        	$exists = $db->getByName($name);
+        	if(empty($exists)){
+            	$result = $db->create($name);
+        	}
+    	} else {
+        	$columns = array("name"=>$name);
+        	$result = $db->updateEventsById($edit_id, $columns);
+    	}
+	}
 
 }
 

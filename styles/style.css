@@ -15,16 +15,17 @@ hgroup {
 }
 
 #wrapper {
-    width: 960px;
+    width: 960;
+    height: 100%;
     margin: 15px auto;
     text-align: left;
+    background-image: url(../images/13-old-parchment-background-sml.jpg);
 }
 
 body {
     text-align: center;
-    color: #FFFFFF;
-    background: #000000;
-    background-image: url(../images/Plarzoid_Logo.png)
+    color: #000000;
+    background-image: url(../images/combined.png);
 }
 
 /* -- Main Header -- */
@@ -32,7 +33,6 @@ body {
 #main_header {
     text-align: center;
     padding: 20px;
-	background: #000000;
 }
 
 #main_header h1 h2 {
@@ -45,7 +45,6 @@ body {
 #header_nav, #footer_nav {
     clear: both;
     overflow: hidden;
-    background: #000000;
     padding: 5px 15px;
     border: 1px solid #444444;
 }
@@ -69,7 +68,6 @@ body {
 #main_footer {
     text-align: center;
     padding: 20px;
-	background: #000000;
 }
 
 #main_footer div.simple{
@@ -83,7 +81,6 @@ body {
     width: 220px;
     margin: 20px 0px;
     padding: 20px;
-    background: #000000;
     border: 1px solid #444444;
 }
 
@@ -95,10 +92,11 @@ body {
 #main_aside #admin_panel {
     text-align: center;
     color: #FF0000;
+    background: #000;
 }
 
 #main_aside #active_tab {
-    background: #444444;
+    background: #FFFBBB;
 }
 
 
@@ -109,7 +107,6 @@ body {
     text-align: center;
     width: 660px;
     margin: 20px 0px;
-    background: #000000;
 }
 
 #main_section header {
@@ -121,7 +118,6 @@ body {
     width: 660px;
     padding: 0px 150px;
     margin: 20px 0px;
-    background: #000000;
 }
 
 
@@ -169,7 +165,6 @@ div.simple {
     text-align: center;
     padding: 10px;
     margin: 20px 30px;
-    background: #000000;
     overflow: hidden;
 }
 
@@ -180,7 +175,6 @@ div.simple {
     text-align: center;
     padding: 10px;
     margin: 20px 0px;
-    background: #000000;
     overflow: hidden;
 }
 
@@ -191,7 +185,7 @@ table {
 }
 
 #achievement_listing tr.header {
-    height: 175px;
+    height: 250px;
 }
 
 th {
@@ -207,7 +201,7 @@ th {
 }
 
 tr.odd{
-    background: #333;
+    background: #FFFBBB;
 }
 
 td, th {
@@ -222,8 +216,8 @@ td, th {
 
 /* -- Link Colors -- */
 
-a:link {color:#0BE5FF;}      /* unvisited link */
-a:visited {color:#01FF8D;}  /* visited link */
-a:hover {color:#0AE8C3;}  /* mouse over link */
-a:active {color:#10FF0B;}  /* selected link */
+a:link {color:#03452B;}      /* unvisited link */
+a:visited {color:#500CE8;}  /* visited link */
+a:hover {color:#005EFF;}  /* mouse over link */
+a:active {color:#FF0000;}  /* selected link */
 

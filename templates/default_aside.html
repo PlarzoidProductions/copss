@@ -7,7 +7,7 @@
     <?php }?>
     </ul>
     <?php  if(Session::isAdmin()){?>
-        <div id="admin_panel">--- Admin Panel ---</div>
+        <div id="admin_panel"><strong>--- Admin Panel ---</strong></div>
         <ul>
         <?php  foreach($admin_tabs as $label=>$link){?>
             <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>

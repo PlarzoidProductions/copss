@@ -1,4 +1,4 @@
-USE iron_arena;
+USE copss;
 
 INSERT INTO countries (name) VALUES ('Afghanistan');
 INSERT INTO countries (name) VALUES ('Akrotiri');

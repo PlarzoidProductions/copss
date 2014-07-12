@@ -25,7 +25,7 @@
 
     $tables = array();
     foreach($raw_tables as $rt){
-        $tables[] = $rt["Tables_in_iron_arena"];
+        $tables[] = $rt["Tables_in_copss"];
     }
 
 

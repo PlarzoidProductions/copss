@@ -1,3 +1,3 @@
-DROP USER 'ironarena'@'localhost';
-CREATE USER 'ironarena'@'localhost' identified by 'iwantskullz';
-GRANT ALL ON iron_arena.* to 'ironarena'@'localhost';
+DROP USER 'copss'@'localhost';
+CREATE USER 'copss'@'localhost' identified by 'w0rkh4rdpl4yh4r3r';
+GRANT ALL ON copss.* to 'copss'@'localhost';

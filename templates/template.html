@@ -1,12 +1,12 @@
 <section id="main_section">
     <header>
-        <h1><? echo $title?></h1>
+        <h1><?php  echo $title?></h1>
     </header>
     <section id="inputs_section">
-        <form method="<?=$form_method?>" action="<?=$form_action?>">
-        <? foreach($inputs as $i){?>
-            <? echo $page->displayVar($i)?>
-        <?}?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
         </form>
     </section>
 </section>
@@ -16,14 +16,14 @@
             <h2>Please Log In!</h2>
         </hgroup>
     </header>
-    <?if($login_error){?>
-        <h2 class="warning"><?=$login_error?></h2>
-    <?}?>
+    <?php if($login_error){?>
+        <h2 class="warning"><?php echo $login_error?></h2>
+    <?php }?>
     <section id="inputs_section">
-        <form action="<?=$form_action?>" method="<?=$form_method?>">
-            <? echo $page->displayVar("user_name")?>
-            <? echo $page->displayVar("password")?>
-            <? echo $page->displayVar("login_submit")?>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  echo $page->displayVar("user_name")?>
+            <?php  echo $page->displayVar("password")?>
+            <?php  echo $page->displayVar("login_submit")?>
         </form>
     </section>
 </section>

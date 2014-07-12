@@ -1,0 +1,113 @@
+        <tr class="<?php echo $a[style]?>">
+                <?php echo $a[name]?> 
+                (<a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?php echo $a[id]?>">Edit</a>)
+            <td><?php echo $a[points]?></td>
+            <td><?php echo $a[game_system_name]?></td>
+            <td><?php if($a[game_count] > 0){?><?php echo $a[game_count]?><?php }?></td>
+            <td><?php echo $a[game_size]?></td>
+            <td><?php echo $a[faction]?></td>
+            <td><?php echo $a[event_name]?></td>
+                <a href="home.php?view=achievement_config&action=delete&ach_id=<?php echo $a[id]?>">Delete</a>
+<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+	<?php if(isset($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+    <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+            <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+                <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+		<li>Logged in as: <?php echo Session::getUsername()?></li>
+            Iron Arena Software version <?php echo $this->version?>
+                <?php echo $success_str?> 
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+                <?php echo $success_str?> 
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <a href="<?php echo $filename?>">Database Export</a>
+            <?php echo $page->displayVar("reset_db")?>
+                <?php echo $success_str?> 
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                <h3 class="warning"><?php echo $error?></h3>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+        <tr class="<?php echo $f[style]?>">
+            <td><h2><?php echo $f[type]?></h2></td>
+            <td><?php echo $f[comment]?></td>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+        <tr class="<?php echo $p[style]?>">
+                <?php echo $p[player_id]?> 
+                (<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $p[player_id]?>">Edit</a>)
+            <td><?php echo $p[last_name]?>, <?php echo $p[first_name]?></td>
+            <td><?php echo $p[game_count]?></td>
+            <td><?php echo $p[earned]?></td>
+            <td><?php echo $p[spent]?></td>
+            <td><h1><?php echo $p[points]?></h1></td>
+                <a href="home.php?view=view_player&pl_id=<?php echo $p[player_id]?>">Details</a>
+        <h2 class="warning"><?php echo $login_error?></h2>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <tr class="<?php echo $u[style]?>">
+                <?php echo $u[id]?> 
+                (<a href="home.php?view=manage_users&action=edit_user&user_id=<?php echo $u[id]?>">Edit</a>)
+            <td><?php echo $u[username]?></td>
+            <td><?php echo $u[name]?></td>
+            <td><?php echo $u[last_login]?></td>
+                <a href="home.php?view=manage_users&action=delete&user_id=<?php echo $u[id]?>">Delete</a>
+                <?php echo $success_str?> 
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+                <h1 class="success"><?php echo $available?>pts Available!</h1>
+                <?php echo $success_str?> 
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                <?php  if(!empty($errors)){foreach($errors as $error){?><h3 class="warning"><?php echo $error?></h3><br/><?php }}?>
+            <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+                <?php echo $success_str?> 
+                <tr class="<?php echo $pl[style]?>">
+                        <?php echo $pl[player_details][last_name]?>, <?php echo $pl[player_details][first_name]?>
+                        <?php echo $a[name]?> (<?php echo $a[points]?>)<br>
+                    <td><h1><?php echo $pl[points]?></h1></td>
+                    <td><h1><?php echo $pl[point_total]?></h1></td>
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                    <h3 class="warning"><?php echo $e?></h3>
+            <div class="input_container"><header><h3><u>Player <?php echo $i?></u></h3></header></div>
+            <?php echo $page->displayVar("player_".$i."_id")?>
+        <?php echo $page->displayVar("submit_game")?>
+            <?php echo $success_str?> 
+            <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <h2 class="warning"><?php echo $login_error?></h2>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <header><h1>Statistics for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1>(<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $player[id]?>">Edit player registration</a>)</header>
+        <div class="simple">Games Played: <strong><?php echo $stats[games]?></strong></div>
+        <div class="simple">Unique Opponents Played: <strong><?php echo $stats[opponents]?></strong></div>
+        <div class="simple">Unique Opponent Locations: <strong><?php echo $stats[locations]?></strong></div>
+        <div class="simple">Factions Played Against: <strong><?php echo $stats[faction_list]?></strong></div>
+        <div class="simple"><font <?php if($stats[points] > 0){?>class="success"<?php  } else {?>class="warning"<?php }?>>Current Points: <strong><?php echo $stats[points]?></font></strong></div>
+    <header><h1>Game Details for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+        <tr class="<?php echo $gp[style]?>">
+                <?php echo $gp[id]?> 
+                (<a href="home.php?view=report_game&action=edit_game&game_id=<?php echo $gp[id]?>">Edit</a>)
+            <td><?php echo $gp[creation_time]?></td>
+            <td><?php echo $gp[player_listing]?></td>
+            <td><?php echo $gp[achievement_listing]?></td>
+            <td><h1><?php echo $gp[points_earned]?></h1></td>
+                <a href="home.php?view=report_game&action=delete&game_id=<?php echo $gp[id]?>">Delete</a>
+    <header><h1>Event & Misc Achievements for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+        <tr class="<?php echo $ea[style]?>">
+            <td><?php echo $ea[event_name]?></th>
+            <td><?php echo $ea[name]?></td>
+            <td></h1><?php echo $ea[points]?></h1></td>
+                <a href="home.php?view=batch_processing&action=delete&ach_id=<?php echo $ea[earned_id]?>">Delete</a>
+    <header><h1>Prize Redemptions for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+        <tr class="<?php echo $pr[style]?>">
+                <?php echo $pr[id]?>
+                (<a href="home.php?view=redeem&action=edit&pr_id=<?php echo $pr[id]?>">Edit</a>)
+            <td><?php echo $pr[creation_time]?></th>
+            <td><h1><?php echo $pr[cost]?></h1></td>
+            <td><?php echo $pr[description]?></td>
+                <a href="home.php?view=redeem&action=delete&pr_id=<?php echo $pr[id]?>">Delete</a>
+            <h1>Welcome, <?php echo Session::getUsername()?>!</h1>

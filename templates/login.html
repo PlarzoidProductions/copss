@@ -4,14 +4,14 @@
             <h2>Please Log In!</h2>
         </hgroup>
     </header>
-    <?if($login_error){?>
-        <h2 class="warning"><?=$login_error?></h2>
-    <?}?>
+    <?php if($login_error){?>
+        <h2 class="warning"><?php echo $login_error?></h2>
+    <?php }?>
     <section id="inputs_section">
-        <form action="<?=$form_action?>" method="<?=$form_method?>">
-            <? echo $page->displayVar("user_name")?>
-            <? echo $page->displayVar("password")?>
-            <? echo $page->displayVar("login_submit")?>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  echo $page->displayVar("user_name")?>
+            <?php  echo $page->displayVar("password")?>
+            <?php  echo $page->displayVar("login_submit")?>
         </form>
     </section>
 </section>

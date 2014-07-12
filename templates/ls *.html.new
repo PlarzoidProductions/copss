@@ -1,0 +1,723 @@
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1 class="warning">It's dead, Jim.</h1>
+            <h3>I'm sorry, I can't do that, Hal.</h3>
+        </hgroup>
+    </header>
+    <section>
+        <div class="simple">
+            I'm sorry, something broke.  Try again, or start from the beginning?
+        </div>
+        <div class="simple">
+            <img src="images/404-1.jpg"/>
+        </div>
+    </section>
+</section>
+<section id="achievement_listing">
+    <header><h1>Achievements</h1></header>
+    <table>
+        <tr class="header">
+            <th>Name</div></th>
+            <th>Points</div></th>
+            <th>Per Game</div></th>
+            <th>Game System</div></th>
+            <th>Type</div></th>
+            <th><div class="rotated">Game Count</div></th>
+            <th><div class="rotated">Game Size</div></th>
+            <th><div class="rotated">Played against Faction</div></th>
+            <th><div class="rotated">Unique Opponent</div></th>
+            <th><div class="rotated">Unique Opponent Location</div></th>
+            <th><div class="rotated">Played Theme Force</div></th>
+            <th><div class="rotated">Played Fully Painted</div></th>
+            <th><div class="rotated">Fully Painted Battle</div></th>
+            <th><div class="rotated">Scenario Table</div></th>
+            <th><div class="rotated">Multiplayer</div></th>
+            <th><div class="rotated">Played vs VIP</div></th>
+            <th>Completed Event</th>
+        </tr>
+    <?php foreach($achievements as $a){?>
+        <tr class="<?php echo $a[style]?>">
+            <td>
+                <?php echo $a[name]?> 
+                (<a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?php echo $a[id]?>">Edit</a>)
+            </td>
+            <td><?php echo $a[points]?></td>
+            <td><?php if($a[per_game]){?>Yes<?php } else {?>No<?php }?></td>
+            <td><?php echo $a[game_system_name]?></td>
+            <td><?php if($a[is_meta]){?>Meta<?php } else {?>Standard<?php }?></td>
+            <td><?php if($a[game_count] > 0){?><?php echo $a[game_count]?><?php }?></td>
+            <td><?php echo $a[game_size]?></td>
+            <td><?php echo $a[faction]?></td>
+            <td><?php if($a[unique_opponent]){?>Y<?php }?></td>
+            <td><?php if($a[unique_opponent_locations]){?>Y<?php }?></td>
+            <td><?php if($a[played_theme_force]){?>Y<?php }?></td>
+            <td><?php if($a[fully_painted]){?>Y<?php }?></td>
+            <td><?php if($a[fully_painted_battle]){?>Y<?php }?></td>
+            <td><?php if($a[played_scenario]){?>Y<?php }?></td>
+            <td><?php if($a[multiplayer]){?>Y<?php }?></td>
+            <td><?php if($a[vs_vip]){?>Y<?php }?></td>
+            <td><?php echo $a[event_name]?></td>
+            <td>
+                <a href="home.php?view=achievement_config&action=delete&ach_id=<?php echo $a[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+
+</section>
+</form>
+<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+    </section>
+    <hr>
+    <header>
+        <h3><?php  echo $subtitle?></h3>
+    </header>
+	<?php if(isset($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+    <?php  foreach($inputs as $i){?>
+        <?php  echo $page->displayVar($i)?>
+    <?php }?>
+    <hr>
+    <header>
+        <h3><?php  echo $subtitle2?></h3>
+    </header>
+    <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+    <?php  foreach($inputs2 as $i){?>
+        <?php  echo $page->displayVar($i)?>
+    <?php }?>
+    </form>
+    <?php  if($result){?>
+        <h2 class="success">Success!</h2>
+        <section>Refresh page to see changes take effect</section>
+    <?php }?>
+<aside id="main_aside">
+    <ul>
+    <?php  foreach($tabs as $label=>$link){?>
+        <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+            <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+        </li>
+    <?php }?>
+    </ul>
+    <?php  if(Session::isAdmin()){?>
+        <div id="admin_panel">--- Admin Panel ---</div>
+        <ul>
+        <?php  foreach($admin_tabs as $label=>$link){?>
+            <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+                <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+            </li>
+        <?php }?>
+        </ul>
+    <?php }?>
+</aside>
+<footer id="main_footer">
+    <nav id="footer_nav">
+        <ul>
+            <li><a href="home.php">Home</a></li>
+	    <?php if(Session::isLoggedIn()){?>
+		<li>Logged in as: <?php echo Session::getUsername()?></li>
+		<li><a href="login.php?action=logout">Log Out</a></li>
+	    <?php } else {?>
+                <li>Not logged in!</li>
+                <li><a href="login.php">Log In</a></li>
+            <?php }?>
+        </ul>
+    </nav>
+    <section>
+        <div class="simple">
+            Software &copy; Plarzoid Productions, LLC<br>
+            <em>Iron Arena</em>, <em>Warmachine</em>, <em>Hordes</em>, the "Skully" logo and all other intellectual properties of Privateer Press are used with permission.
+        </div>
+        <div class="simple">
+            Iron Arena Software version <?php echo $this->version?>
+        </div>
+    </section>
+</footer>
+</div>
+</body>
+</html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <?php php echo $meta?>
+    <title>Iron Arena</title>
+    <link rel="stylesheet"  href="<?php php echo $this->getWebRoot()?>styles/style.css">
+</head>
+<body>
+<div id="wrapper">
+    <header id="main_header">
+        <hgroup>
+            <h1>Privateer Press' Iron Arena</h1>
+        </hgroup>
+    </header>
+    <nav id="header_nav">
+        <ul>
+        <li><a href="home.php">Home</a></li>
+        <?php php if(Session::isLoggedIn()){?>
+            <li>Logged in as: <?php php echo Session::getUsername()?></li>
+            <li><a href="login.php?action=logout">Log Out</a></li>
+        <?php php } else {?>
+            <li>Not logged in!</li>
+            <li><a href="login.php">Log In</a></li>
+        <?php php }?>
+        </ul>
+    </nav>
+<section id="main_section">
+    <?php  if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+            <?php  if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php }?>
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        </form>
+    </section>
+</section>
+<section id="main_section">
+    <?php if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+        </section>
+        <section>
+            <?php if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php } else {?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+            </hgroup>
+        </header>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <section id="inputs_section">
+            Please Right-Click and chose to download this link:<br/>
+            <a href="<?php echo $filename?>">Database Export</a>
+            <br/><br/>
+            Please e-mail it to <a href="mailto:hungerford@privateerpress">hungerford@privateerpress</a>
+            <br/><br/>
+            <hr/><br/><br/>
+            <u>Reseting the database will clear the following data:</u><br/>
+            Player Registrations<br/>
+            Game Records<br/>
+            Achievements &amp; points earned<br/>
+            Prize Redmeption data<br/>
+            <br/><br/>
+            <u>The following data will be left intact:</u><br/>
+            Achievement Configuration<br/>
+            User logins<br/>
+            Countries &amp; States<br/>
+            <br\>
+            <?php echo $page->displayVar("reset_db")?>
+        </section>
+        </form>
+    <?php }?>
+</section>
+
+<section id="main_section">
+    <?php if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+        </section>
+        <section>
+            <?php if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php } else {?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <?php  if($error){?>
+                <h3 class="warning"><?php echo $error?></h3>
+                <?php }?>
+            </hgroup>
+        </header>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+        <section id="inputs_section">
+            <?php  foreach($inputs as $i){?>
+                <?php  echo $page->displayVar($i)?>
+            <?php }?>
+        </section>
+        </form>
+    <?php }?>
+</section>
+<section id="listing">
+    <table>
+        <tr class="header">
+            <th>Type</th>
+            <th>Comments</th>
+        </tr>
+    <?php foreach($feedback as $f){?>
+        <tr class="<?php echo $f[style]?>">
+            <td><h2><?php echo $f[type]?></h2></td>
+            <td><?php echo $f[comment]?></td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        </form>
+    </section>
+</section>
+<section id="listing">
+    <table>
+        <tr class="header">
+            <th>Player ID</th>
+            <th>Name</th>
+            <th># Games</th>
+            <th>Points Earned</th>
+            <th>Points Spent</th>
+            <th>Points</th>
+        </tr>
+    <?php foreach($players as $id=>$p){?>
+        <tr class="<?php echo $p[style]?>">
+            <td>
+                <?php echo $p[player_id]?> 
+                (<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $p[player_id]?>">Edit</a>)
+            </td>
+            <td><?php echo $p[last_name]?>, <?php echo $p[first_name]?></td>
+            <td><?php echo $p[game_count]?></td>
+            <td><?php echo $p[earned]?></td>
+            <td><?php echo $p[spent]?></td>
+            <td><h1><?php echo $p[points]?></h1></td>
+            <td>
+                <a href="home.php?view=view_player&pl_id=<?php echo $p[player_id]?>">Details</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+
+<section id="only_section">
+    <header>
+        <hgroup>
+            <h2>Please Log In!</h2>
+        </hgroup>
+    </header>
+    <?php if($login_error){?>
+        <h2 class="warning"><?php echo $login_error?></h2>
+    <?php }?>
+    <section id="inputs_section">
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  echo $page->displayVar("user_name")?>
+            <?php  echo $page->displayVar("password")?>
+            <?php  echo $page->displayVar("login_submit")?>
+        </form>
+    </section>
+</section>
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        </form>
+    </section>
+</section>
+<section id="listing">
+    <table>
+        <tr class="header">
+            <th>ID</th>
+            <th>username</th>
+            <th>Name</th>
+            <th>Admin?</th>
+            <th>Last Login</th>
+        </tr>
+    <?php foreach($users as $u){?>
+        <tr class="<?php echo $u[style]?>">
+            <td>
+                <?php echo $u[id]?> 
+                (<a href="home.php?view=manage_users&action=edit_user&user_id=<?php echo $u[id]?>">Edit</a>)
+            </td>
+            <td><?php echo $u[username]?></td>
+            <td><?php echo $u[name]?></td>
+            <td><?php if($u[admin]){?>Y<?php }?></td>
+            <td><?php echo $u[last_login]?></td>
+            <td>
+                <a href="home.php?view=manage_users&action=delete&user_id=<?php echo $u[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+
+<section id="main_section">
+    <?php  if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+            <?php  if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php }?>
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  echo $page->displayVar("player")?>
+        <?php if($selected_player){?>
+            <?php if($available){?>
+                <h1 class="success"><?php echo $available?>pts Available!</h1>
+                <?php  foreach($inputs as $i){?>
+                    <?php  echo $page->displayVar($i)?>
+                <?php }?>
+            <?php } else {?>
+                <h1 class="warning">Play more games!</h1>
+            <?php }?>
+        <?php }?>
+        </form>
+    </section>
+</section>
+<section id="main_section">
+    <?php  if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+            <?php  if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php } else {?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <?php  if(!empty($errors)){foreach($errors as $error){?><h3 class="warning"><?php echo $error?></h3><br/><?php }}?>
+            </hgroup>
+        </header>
+        <section id="inputs_section">
+            <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+            <?php  foreach($inputs as $i){?>
+                <?php  echo $page->displayVar($i)?>
+            <?php }?>
+			<em>Any player slots left set to "Please select..." will be skipped</em>
+            <hr>
+            <?php  for($i=1; $i <= $num_players; $i++){?>
+                <?php  echo $page->displayVar("player_".$i."_id")?>
+            <?php }?>
+            <hr>
+            <?php  echo $page->displayVar("submit_batch")?>
+            </form>
+        </section>
+    <?php }?>
+</section>
+<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+<section id="main_section">
+    <?php  if($success_str){?>
+        <header>
+            <hgroup>
+                <h1><?php  echo $title?></h1>
+                <h2 class="success">Successful!</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="simple">
+                <?php echo $success_str?> 
+            </div>
+        </section>
+        <?php if($details){?>
+        <section id="game_report">
+            <table>
+                <tr>
+                    <th>Player</th>
+                    <th>Achievements Earned</th>
+                    <th>Points Earned</th>
+                    <th>Total Points</th>
+                </tr>
+                <?php foreach($details[players] as $pl){?>
+                <tr class="<?php echo $pl[style]?>">
+                    <td>
+                        <?php echo $pl[player_details][last_name]?>, <?php echo $pl[player_details][first_name]?>
+                    </td>
+                    <td>
+                    <?php foreach($pl[achievements] as $a){?>
+                        <?php echo $a[name]?> (<?php echo $a[points]?>)<br>
+                    <?php }?>
+                    </td>
+                    <td><h1><?php echo $pl[points]?></h1></td>
+                    <td><h1><?php echo $pl[point_total]?></h1></td>
+                </tr>
+                <?php }?>
+            </table>
+        </section>
+        <?php }?>
+        <section>
+            <?php if($link){?>
+                <div class="simple">
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+                </div>
+            <?php }?>
+        </section>
+    <?php } else {?>
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($errors)){?>
+                <?php foreach($errors as $e){?>
+                    <h3 class="warning"><?php echo $e?></h3>
+                <?php }?>
+            <?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        <div class="input_container"><hr></div>
+        <?php for($i=1; $i<=$num_players; $i++){?>
+            <div class="input_container"><header><h3><u>Player <?php echo $i?></u></h3></header></div>
+            <?php echo $page->displayVar("player_".$i."_id")?>
+            <?php if($uses_factions){$page->displayVar("player_".$i."_faction");}?>
+            <?php if($uses_sizes){$page->displayVar("player_".$i."_size");}?>
+            <?php if($uses_painted){$page->displayVar("player_".$i."_fully_painted");}?>
+            <?php if($uses_theme){$page->displayVar("player_".$i."_theme_force");}?>
+        <?php }?>
+        <div class="input_container"><hr></div>
+        <?php echo $page->displayVar("submit_game")?>
+    </section>
+    <?php }?>
+</section>
+</form>
+<section id="main_section">
+    <header>
+        <h1><?php  echo $title?></h1>
+        <h2 class="success">Successful!</h2>
+    </header>
+    <section>
+        <div class="simple">
+            <?php echo $success_str?> 
+        </div>
+        <div class="simple">
+            <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
+        </div>
+    </section>
+</section>
+<section id="main_section">
+    <header>
+        <h1><?php  echo $title?></h1>
+    </header>
+    <section id="inputs_section">
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        </form>
+    </section>
+</section>
+<section id="only_section">
+    <header>
+        <hgroup>
+            <h2>Please Log In!</h2>
+        </hgroup>
+    </header>
+    <?php if($login_error){?>
+        <h2 class="warning"><?php echo $login_error?></h2>
+    <?php }?>
+    <section id="inputs_section">
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+            <?php  echo $page->displayVar("user_name")?>
+            <?php  echo $page->displayVar("password")?>
+            <?php  echo $page->displayVar("login_submit")?>
+        </form>
+    </section>
+</section>
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
+        </form>
+    <?php if($selected_player){?>
+        <header><h1>Statistics for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1>(<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $player[id]?>">Edit player registration</a>)</header>
+        <div class="simple">Games Played: <strong><?php echo $stats[games]?></strong></div>
+        <div class="simple">Unique Opponents Played: <strong><?php echo $stats[opponents]?></strong></div>
+        <div class="simple">Unique Opponent Locations: <strong><?php echo $stats[locations]?></strong></div>
+        <div class="simple">Factions Played Against: <strong><?php echo $stats[faction_list]?></strong></div>
+        <div class="simple"><font <?php if($stats[points] > 0){?>class="success"<?php  } else {?>class="warning"<?php }?>>Current Points: <strong><?php echo $stats[points]?></font></strong></div>
+    <?php }?>
+    </section>
+</section>
+<?php if($selected_player){?>
+<section id="listing">
+    <header><h1>Game Details for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Game ID</th>
+            <th>Time</th>
+            <th>Players</th>
+            <th>Achievements Earned</th>
+            <th>Points Earned</th>
+        </tr>
+    <?php foreach($player[games] as $gp){?>
+        <tr class="<?php echo $gp[style]?>">
+            <td>
+                <?php echo $gp[id]?> 
+                (<a href="home.php?view=report_game&action=edit_game&game_id=<?php echo $gp[id]?>">Edit</a>)
+            </td>
+            <td><?php echo $gp[creation_time]?></td>
+            <td><?php echo $gp[player_listing]?></td>
+            <td><?php echo $gp[achievement_listing]?></td>
+            <td><h1><?php echo $gp[points_earned]?></h1></td>
+            <?php if(Session::isAdmin()){?>
+            <td>
+                <a href="home.php?view=report_game&action=delete&game_id=<?php echo $gp[id]?>">Delete</a>
+            </td>
+            <?php }?>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+<section id="listing">
+    <header><h1>Event & Misc Achievements for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Event</th>
+            <th>Achievement</th>
+            <th>Points Earned</th>
+        </tr>
+    <?php foreach($event_achs as $ea){?>
+        <tr class="<?php echo $ea[style]?>">
+            <td><?php echo $ea[event_name]?></th>
+            <td><?php echo $ea[name]?></td>
+            <td></h1><?php echo $ea[points]?></h1></td>
+            <td>
+                <a href="home.php?view=batch_processing&action=delete&ach_id=<?php echo $ea[earned_id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+<section id="listing">
+    <header><h1>Prize Redemptions for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+    <table>
+        <tr class="header">
+            <th>Redemption ID</th>
+            <th>Time</th>
+            <th>Amount</th>
+            <th>Description</th>
+        </tr>
+    <?php foreach($redemptions as $pr){?>
+        <tr class="<?php echo $pr[style]?>">
+            <td>
+                <?php echo $pr[id]?>
+                (<a href="home.php?view=redeem&action=edit&pr_id=<?php echo $pr[id]?>">Edit</a>)
+            </td>
+            <td><?php echo $pr[creation_time]?></th>
+            <td><h1><?php echo $pr[cost]?></h1></td>
+            <td><?php echo $pr[description]?></td>
+            <td>
+                <a href="home.php?view=redeem&action=delete&pr_id=<?php echo $pr[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+<?php }?>
+
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1>Welcome, <?php echo Session::getUsername()?>!</h1>
+        </hgroup>
+    </header>
+</section>

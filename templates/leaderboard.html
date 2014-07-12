@@ -1,14 +1,14 @@
 <section id="main_section">
     <header>
         <hgroup>
-            <h1><? echo $title?></h1>
+            <h1><?php  echo $title?></h1>
         </hgroup>
     </header>
     <section id="inputs_section">
-        <form action="<?=$form_action?>" method="<?=$form_method?>">
-        <? foreach($inputs as $i){?>
-            <? echo $page->displayVar($i)?>
-        <?}?>
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
         </form>
     </section>
 </section>
@@ -22,22 +22,22 @@
             <th>Points Spent</th>
             <th>Points</th>
         </tr>
-    <?foreach($players as $id=>$p){?>
-        <tr class="<?=$p[style]?>">
+    <?php foreach($players as $id=>$p){?>
+        <tr class="<?php echo $p[style]?>">
             <td>
-                <?=$p[player_id]?> 
-                (<a href="home.php?view=register_player&action=edit&pl_id=<?=$p[player_id]?>">Edit</a>)
+                <?php echo $p[player_id]?> 
+                (<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $p[player_id]?>">Edit</a>)
             </td>
-            <td><?=$p[last_name]?>, <?=$p[first_name]?></td>
-            <td><?=$p[game_count]?></td>
-            <td><?=$p[earned]?></td>
-            <td><?=$p[spent]?></td>
-            <td><h1><?=$p[points]?></h1></td>
+            <td><?php echo $p[last_name]?>, <?php echo $p[first_name]?></td>
+            <td><?php echo $p[game_count]?></td>
+            <td><?php echo $p[earned]?></td>
+            <td><?php echo $p[spent]?></td>
+            <td><h1><?php echo $p[points]?></h1></td>
             <td>
-                <a href="home.php?view=view_player&pl_id=<?=$p[player_id]?>">Details</a>
+                <a href="home.php?view=view_player&pl_id=<?php echo $p[player_id]?>">Details</a>
             </td>
         </tr>
-    <?}?>
+    <?php }?>
     </table>
 </section>
 

@@ -34,7 +34,7 @@
     Get the Data from the tables, construct a string
 
     ***********************************/
-    $data = "";
+    $data = "USE copss;\n\n";
     foreach ($tables as $t){
 
         $table_data = $db->query("SELECT * FROM $t", array());
@@ -71,7 +71,7 @@
             $data.= "\n";
         }
 
-        $data .= "\n";
+        $data .= ");\n";
 
     }
 
@@ -81,7 +81,7 @@
     Write the file
 
     *********************************/
-    $filename = "iadb_".md5($data).".sql";
+    $filename = "copssdb_".md5($data).".sql";
     file_put_contents($filename, $data);
 
     

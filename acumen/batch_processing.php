@@ -89,29 +89,31 @@ if($page->submitIsSet("submit_batch")){
 
 
 	if(empty($errors)){
-		$num_players = intval($page->getVar("num_players"));
+	    $num_players = intval($page->getVar("num_players"));
 
-   		$players = array();
-    	for($i=1; $i <= $num_players; $i++){
+   	    $players = array();
+    	    for($i=1; $i <= $num_players; $i++){
         	$id = $page->getVar("player_".$i."_id");
 	        if(Check::isNull($id)){ continue;}
 
-    	    $player = $p_db->getById($id);
+    	        $player = $p_db->getById($id);
         	$players[$id] = $player[0];
 	    }
 
-    	$end_result = true;
-    	foreach($players as $id=>$p){
+    	    $end_result = true;
+    	    
+	    $achievement = $a_db->getById($ach_id);
+            $achievement = $achievement[0];
+	    
+
+	    foreach($players as $id=>$p){
 
         	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
-        	if(!$exists){
-            	$result = $ae_db->create($id, $ach_id);
+        	if(!$exists || $achievement["per_game"]){
+            	    $result = $ae_db->create($id, $ach_id);
 	            $end_result = $end_result && $result;
+    	        }
     	    }
-    	}
-
-    	$achievement = $a_db->getById($ach_id);
-    	$achievement = $achievement[0];
 	}
 }
 

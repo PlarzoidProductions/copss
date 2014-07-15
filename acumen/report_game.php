@@ -215,7 +215,8 @@ if($page->submitIsSet("submit_game")){
             $last_entry = end($game_entries);
             $mins_elapsed = $game_db->getMinutesFromGameTime($last_entry["game_id"]);
 
-            if($mins_elapsed[0]["minutes"] < 60){
+	    if(!$game_id) //ignore the time enforcement if we're updating
+            if($mins_elapsed[0]["minutes"] < 20){  //EDIT THIS LINE TO CHANGE GAME REPORT COOLDOWN TIME
                 $errors[] = "Player $i must wait ".round(60-$mins_elapsed[0]["minutes"])." minutes to report a game!";
             }
         }

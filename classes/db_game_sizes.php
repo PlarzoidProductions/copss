@@ -106,7 +106,6 @@ Update Record By ID Function(s)
 
 **************************************************/
 public function updateGame_sizesById($id, $columns){
-
     //Values Array
     $values = array(":id"=>$id);
     foreach($columns as $column=>$value){

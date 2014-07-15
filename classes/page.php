@@ -210,7 +210,8 @@ class Page {
         //Override the registered default value with the returned one, if it's there
         if(array_key_exists("use_post", $attributes) && $attributes["use_post"]){
             if(in_array($varname, array_keys($_POST))){
-                $attributes["default_val"] = $_POST[$varname];
+		if(!empty($_POST[$varname]))
+		    $attributes["default_val"] = $_POST[$varname];
             }
         } else {
             if(in_array($varname, array_keys($_REQUEST))){

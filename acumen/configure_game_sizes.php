@@ -10,6 +10,7 @@ Edit Selector
 
 **************************************/
 $page->register("parent", "select", array(  "label"=>"Parent Game System", "reloading"=>1,
+						    "default_val"=>1,
                                                     "get_choices_array_func"=>"getGameSystems",
                                                     "get_choices_array_func_args"=>array()));
 $page->getChoices();
@@ -74,7 +75,6 @@ if($page->submitIsSet("edit_submit") && !Check::isNull($selected)){
     $defaults = array();
 }
 
-
 /**************************************
 
 Editable field(s)
@@ -119,20 +119,21 @@ if($page->submitIsSet("submit_config")){
     $size = $page->getVar("size");
     $name = $page->getVar("name");
 
-	if(strlen($size) == 0)){
+	if(strlen($size) == 0){
 		$error = "Size cannot be blank!";
 	}
 
 	if(empty($error)){
 	    if(Check::isNull($edit_id)){
-    	    $exists = $db->getBySize($size);
+    	        $exists = $db->queryByColumns(array("size"=>$size, "parent_game_system"=>$selected_parent));
         	if(empty($exists)){
-            	$result = $db->create($selected_parent, $size, $name);
+            	    $result = $db->create($selected_parent, $size, $name);
 	        }
-    	} else {
-        	$columns = array("name"=>$name, "acronym"=>$acronym);
+    	    } else {
+        	$columns = array("size"=>$size, "name"=>$name);
 	        $result = $db->updateGame_sizesById($edit_id, $columns);
-    	}
+
+    	    }
 	}
 }
 

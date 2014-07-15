@@ -101,17 +101,18 @@ if($page->submitIsSet("submit_batch")){
 	    }
 
     	$end_result = true;
+
+	$achievement = $a_db->getById($ach_id);
+        $achievement = $achievement[0];
+
     	foreach($players as $id=>$p){
 
         	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
-        	if(!$exists){
+        	if(!$exists || $achievement["per_game"]){
             	$result = $ae_db->create($id, $ach_id);
 	            $end_result = $end_result && $result;
     	    }
     	}
-
-    	$achievement = $a_db->getById($ach_id);
-    	$achievement = $achievement[0];
 	}
 }
 

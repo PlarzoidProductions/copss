@@ -11,7 +11,7 @@ class Page {
     var $vars;
     var $root=null;
 
-    var $version = "v0.9.3";
+    var $version = "v0.9.4";
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
         Session::init();
@@ -209,11 +209,11 @@ class Page {
        
         //Override the registered default value with the returned one, if it's there
         if(array_key_exists("use_post", $attributes) && $attributes["use_post"]){
-            if(in_array($varname, array_keys($_POST))){
+            if(in_array($varname, array_keys($_POST)) && !empty($_POST[$varname])){
                 $attributes["default_val"] = $_POST[$varname];
             }
         } else {
-            if(in_array($varname, array_keys($_REQUEST))){
+            if(in_array($varname, array_keys($_REQUEST))&& !empty($_REQUEST[$varname])){
                 $attributes["default_val"] = $_REQUEST[$varname];
             }
         }

@@ -119,7 +119,7 @@ if($page->submitIsSet("submit_config")){
     $size = $page->getVar("size");
     $name = $page->getVar("name");
 
-	if(strlen($size) == 0)){
+	if(strlen($size) == 0){
 		$error = "Size cannot be blank!";
 	}
 
@@ -130,7 +130,7 @@ if($page->submitIsSet("submit_config")){
             	$result = $db->create($selected_parent, $size, $name);
 	        }
     	} else {
-        	$columns = array("name"=>$name, "acronym"=>$acronym);
+        	$columns = array("name"=>$name, "size"=>$size);
 	        $result = $db->updateGame_sizesById($edit_id, $columns);
     	}
 	}

@@ -41,7 +41,18 @@
 
         if(empty($table_data)) continue;
 
-        $data .= "INSERT INTO $t VALUES \n";
+        $data .= "INSERT INTO $t (";
+
+	$columns = array_keys($data[0]);
+	foreach($columns as $column){
+	    $data .= "$column";
+		
+	    if($column != end($columns)){
+                $data.= ",";
+            }
+	}
+
+	$data .= ") VALUES \n";
 
         foreach($table_data as $point){
 
@@ -71,7 +82,7 @@
             $data.= "\n";
         }
 
-        $data .= ");\n";
+        $data .= ";\n";
 
     }
 

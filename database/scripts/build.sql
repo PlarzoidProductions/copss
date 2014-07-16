@@ -10,7 +10,5 @@ SOURCE ../creation/create_access.sql
 SELECT 'Adding default Location info...' as '';
 SOURCE ../creation/add_locations.sql
 
-/*
-SELECT 'Adding default Achievements...' as '';
-SOURCE ../creation/add_achievements.sql
-*/
+SELECT 'Adding CaptainCon Captains\'s Log 2014 Achievements...' as '';
+SOURCE ../creation/captaincon_config.sql

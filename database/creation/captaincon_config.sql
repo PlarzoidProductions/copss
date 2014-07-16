@@ -1,13 +1,13 @@
 USE copss;
 
-INSERT INTO events VALUES 
+INSERT INTO events (id, name) VALUES 
 	(1,"Tournament"),
 	(2,"Tournament Achievement"),
 	(3,"Scheduled Demo"),
 	(4,"Painting Time"),
 	(5,"Painted a Starter Box")
-);
-INSERT INTO game_systems VALUES 
+;
+INSERT INTO game_systems (id, name) VALUES  
 	(1,"Warmachine / Hordes"),
 	(2,"Malifaux"),
 	(3,"Netrunner"),
@@ -17,14 +17,14 @@ INSERT INTO game_systems VALUES
 	(7,"X-Wing"),
 	(8,"Board / Card Games"),
 	(9,"Infinity")
-);
-INSERT INTO game_sizes VALUES 
+;
+INSERT INTO game_sizes (id, parent_game_system, size, name) VALUES 
 	(1,1,35,"or smaller"),
 	(2,1,50,"or larger"),
 	(3,2,25,"or smaller"),
 	(4,2,35,"or Larger")
-);
-INSERT INTO achievements VALUES 
+;
+INSERT INTO achievements (id, name, points, per_game, is_meta, game_count, game_system_id, game_size_id, faction_id, unique_opponent, unique_opponent_locations, played_theme_force, fully_painted, fully_painted_battle, played_scenario, multiplayer, vs_vip, event_id) VALUES  
 	(1,"Played 35pt game",1,1,0,0,1,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 	(2,"Played a 50pt Game",2,1,0,0,1,2,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 	(3,"Played a T2+ Theme List",2,1,0,0,1,NULL,NULL,NULL,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -73,10 +73,10 @@ INSERT INTO achievements VALUES
 	(46,"Tournament Specific Achievement",3,1,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,2),
 	(47,"Spent Time at G&G Hobby Center",3,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,4),
 	(48,"Painted Entire Starter at G&G Hobby Center",15,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,5)
-);
-INSERT INTO meta_achievement_criteria VALUES 
+;
+INSERT INTO meta_achievement_criteria (id, parent_achievement, child_achievement, count) VALUES 
 	(1,41,40,5),
 	(2,42,40,10),
 	(3,43,40,15),
 	(4,44,40,20)
-);
+;

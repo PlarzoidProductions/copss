@@ -2,24 +2,20 @@
     <nav id="footer_nav">
         <ul>
             <li><a href="home.php">Home</a></li>
-	    <?if(Session::isLoggedIn()){?>
-		<li>Logged in as: <?=Session::getUsername()?></li>
+	    <?php if(Session::isLoggedIn()){?>
+		<li>Logged in as: <?php echo Session::getUsername()?></li>
 		<li><a href="login.php?action=logout">Log Out</a></li>
-	    <?} else {?>
+	    <?php } else {?>
                 <li>Not logged in!</li>
                 <li><a href="login.php">Log In</a></li>
-            <?}?>
+            <?php }?>
         </ul>
     </nav>
-    <section>
-        <div class="simple">
-            Software &copy; Plarzoid Productions, LLC<br>
-            <em>Iron Arena</em>, <em>Warmachine</em>, <em>Hordes</em>, the "Skully" logo and all other intellectual properties of Privateer Press are used with permission.
-        </div>
-        <div class="simple">
-            Iron Arena Software version <?=$this->version?>
-        </div>
-    </section>
+    <section style="font-size:75%">
+        <em>Iron Arena</em>, <em>Warmachine</em>, <em>Hordes</em>, the "Skully" logo and all other intellectual properties of Privateer Press are used with permission.<br/>
+        Iron Arena Software version <?php echo $this->version?><br/>
+		Powered by COPSS, &copy; <a href="mailto:plarzoid@gmail.com">Plarzoid Productions, LLC</a>
+	</section>
 </footer>
 </div>
 </body>

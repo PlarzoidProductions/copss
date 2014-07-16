@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <?=$meta?>
-    <title>Iron Arena</title>
-    <link rel="stylesheet"  href="<?=$this->getWebRoot()?>styles/iastyle.css">
+    <?php  echo $meta?>
+    <title>COPSS</title>
+    <link rel="stylesheet"  href="<?php echo $this->getWebRoot()?>styles/iastyle.css">
 </head>
 <body>
 <div id="wrapper">
@@ -15,12 +15,12 @@
     <nav id="header_nav">
         <ul>
         <li><a href="home.php">Home</a></li>
-        <?if(Session::isLoggedIn()){?>
-            <li>Logged in as: <?=Session::getUsername()?></li>
+        <?php  if(Session::isLoggedIn()){?>
+            <li>Logged in as: <?php  echo Session::getUsername()?></li>
             <li><a href="login.php?action=logout">Log Out</a></li>
-        <?} else {?>
+        <?php  } else {?>
             <li>Not logged in!</li>
             <li><a href="login.php">Log In</a></li>
-        <?}?>
+        <?php  }?>
         </ul>
     </nav>

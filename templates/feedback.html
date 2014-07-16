@@ -1,40 +1,40 @@
 <section id="main_section">
-    <?if($success_str){?>
+    <?php if($success_str){?>
         <header>
             <hgroup>
-                <h1><? echo $title?></h1>
+                <h1><?php  echo $title?></h1>
                 <h2 class="success">Successful!</h2>
             </hgroup>
         </header>
         <section>
             <div class="simple">
-                <?=$success_str?> 
+                <?php echo $success_str?> 
             </div>
         </section>
         <section>
-            <?if($link){?>
+            <?php if($link){?>
                 <div class="simple">
-                    <a href="<?=$link[href]?>"><h1><?=$link[text]?></h1></a>
+                    <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
                 </div>
-            <?}?>
+            <?php }?>
         </section>
-    <?} else {?>
+    <?php } else {?>
         <header>
             <hgroup>
-                <h1><? echo $title?></h1>
-                <? if($error){?>
-                <h3 class="warning"><?=$error?></h3>
-                <?}?>
+                <h1><?php  echo $title?></h1>
+                <?php  if($error){?>
+                <h3 class="warning"><?php echo $error?></h3>
+                <?php }?>
             </hgroup>
         </header>
-        <form action="<?=$form_action?>" method="<?=$form_method?>">
+        <form action="<?php echo $form_action?>" method="<?php echo $form_method?>">
         <section id="inputs_section">
-            <? foreach($inputs as $i){?>
-                <? echo $page->displayVar($i)?>
-            <?}?>
+            <?php  foreach($inputs as $i){?>
+                <?php  echo $page->displayVar($i)?>
+            <?php }?>
         </section>
         </form>
-    <?}?>
+    <?php }?>
 </section>
 <section id="listing">
     <table>
@@ -42,12 +42,12 @@
             <th>Type</th>
             <th>Comments</th>
         </tr>
-    <?foreach($feedback as $f){?>
-        <tr class="<?=$f[style]?>">
-            <td><h2><?=$f[type]?></h2></td>
-            <td><?=$f[comment]?></td>
+    <?php foreach($feedback as $f){?>
+        <tr class="<?php echo $f[style]?>">
+            <td><h2><?php echo $f[type]?></h2></td>
+            <td><?php echo $f[comment]?></td>
         </tr>
-    <?}?>
+    <?php }?>
     </table>
 </section>
 

@@ -1,20 +1,20 @@
     <header>
-        <h3><? echo $subtitle?></h3>
+        <h3><?php  echo $subtitle?></h3>
     </header>
-	<?if(isset($error)){?><h3 class="warning"><?=$error?></h3><?}?>
-    <? foreach($inputs as $i){?>
-        <? echo $page->displayVar($i)?>
-    <?}?>
+	<?php if(isset($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+    <?php  foreach($inputs as $i){?>
+        <?php  echo $page->displayVar($i)?>
+    <?php }?>
     <hr>
     <header>
-        <h3><? echo $subtitle2?></h3>
+        <h3><?php  echo $subtitle2?></h3>
     </header>
-    <form method="<?=$form_method?>" action="<?=$form_action?>">
-    <? foreach($inputs2 as $i){?>
-        <? echo $page->displayVar($i)?>
-    <?}?>
+    <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+    <?php  foreach($inputs2 as $i){?>
+        <?php  echo $page->displayVar($i)?>
+    <?php }?>
     </form>
-    <? if($result){?>
+    <?php  if($result){?>
         <h2 class="success">Success!</h2>
         <section>Refresh page to see changes take effect</section>
-    <?}?>
+    <?php }?>

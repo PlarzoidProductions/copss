@@ -1,19 +1,19 @@
 <aside id="main_aside">
     <ul>
-    <? foreach($tabs as $label=>$link){?>
-        <li <? if(!strcmp($link, $view)){?>id="active_tab"<?}?>>
-            <a href="home.php?view=<?=$link?>"><?=$label?></a>
+    <?php  foreach($tabs as $label=>$link){?>
+        <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+            <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
         </li>
-    <?}?>
+    <?php }?>
     </ul>
-    <? if(Session::isAdmin()){?>
+    <?php  if(Session::isAdmin()){?>
         <div id="admin_panel">--- Admin Panel ---</div>
         <ul>
-        <? foreach($admin_tabs as $label=>$link){?>
-            <li <? if(!strcmp($link, $view)){?>id="active_tab"<?}?>>
-                <a href="home.php?view=<?=$link?>"><?=$label?></a>
+        <?php  foreach($admin_tabs as $label=>$link){?>
+            <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+                <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
             </li>
-        <?}?>
+        <?php }?>
         </ul>
-    <?}?>
+    <?php }?>
 </aside>

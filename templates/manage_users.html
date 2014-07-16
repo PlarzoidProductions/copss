@@ -1,15 +1,15 @@
 <section id="main_section">
     <header>
         <hgroup>
-            <h1><? echo $title?></h1>
-            <? if(!empty($error)){?><h3 class="warning"><?=$error?></h3><?}?>
+            <h1><?php  echo $title?></h1>
+            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
         </hgroup>
     </header>
     <section id="inputs_section">
-        <form method="<?=$form_method?>" action="<?=$form_action?>">
-        <? foreach($inputs as $i){?>
-            <? echo $page->displayVar($i)?>
-        <?}?>
+        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        <?php  foreach($inputs as $i){?>
+            <?php  echo $page->displayVar($i)?>
+        <?php }?>
         </form>
     </section>
 </section>
@@ -22,21 +22,21 @@
             <th>Admin?</th>
             <th>Last Login</th>
         </tr>
-    <?foreach($users as $u){?>
-        <tr class="<?=$u[style]?>">
+    <?php foreach($users as $u){?>
+        <tr class="<?php echo $u[style]?>">
             <td>
-                <?=$u[id]?> 
-                (<a href="home.php?view=manage_users&action=edit_user&user_id=<?=$u[id]?>">Edit</a>)
+                <?php echo $u[id]?> 
+                (<a href="home.php?view=manage_users&action=edit_user&user_id=<?php echo $u[id]?>">Edit</a>)
             </td>
-            <td><?=$u[username]?></td>
-            <td><?=$u[name]?></td>
-            <td><?if($u[admin]){?>Y<?}?></td>
-            <td><?=$u[last_login]?></td>
+            <td><?php echo $u[username]?></td>
+            <td><?php echo $u[name]?></td>
+            <td><?php if($u[admin]){?>Y<?php }?></td>
+            <td><?php echo $u[last_login]?></td>
             <td>
-                <a href="home.php?view=manage_users&action=delete&user_id=<?=$u[id]?>">Delete</a>
+                <a href="home.php?view=manage_users&action=delete&user_id=<?php echo $u[id]?>">Delete</a>
             </td>
         </tr>
-    <?}?>
+    <?php }?>
     </table>
 </section>
 

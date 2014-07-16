@@ -41,6 +41,11 @@ body {
 
 /* -- Header & Footer Nav Bar -- */
 
+#main_footer {
+    text-align: center;
+	padding: 20px;
+}
+
 #header_nav, #footer_nav {
     clear: both;
     overflow: hidden;

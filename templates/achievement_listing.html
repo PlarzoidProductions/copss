@@ -20,33 +20,33 @@
             <th><div class="rotated">Played vs VIP</div></th>
             <th>Completed Event</th>
         </tr>
-    <?foreach($achievements as $a){?>
-        <tr class="<?=$a[style]?>">
+    <?php foreach($achievements as $a){?>
+        <tr class="<?php echo $a[style]?>">
             <td>
-                <?=$a[name]?> 
-                (<a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?=$a[id]?>">Edit</a>)
+                <?php echo $a[name]?> 
+                (<a href="home.php?view=achievement_config&action=edit_ach&ach_id=<?php echo $a[id]?>">Edit</a>)
             </td>
-            <td><?=$a[points]?></td>
-            <td><?if($a[per_game]){?>Yes<?} else {?>No<?}?></td>
-            <td><?=$a[game_system_name]?></td>
-            <td><?if($a[is_meta]){?>Meta<?} else {?>Standard<?}?></td>
-            <td><?if($a[game_count] > 0){?><?=$a[game_count]?><?}?></td>
-            <td><?=$a[game_size]?></td>
-            <td><?=$a[faction]?></td>
-            <td><?if($a[unique_opponent]){?>Y<?}?></td>
-            <td><?if($a[unique_opponent_locations]){?>Y<?}?></td>
-            <td><?if($a[played_theme_force]){?>Y<?}?></td>
-            <td><?if($a[fully_painted]){?>Y<?}?></td>
-            <td><?if($a[fully_painted_battle]){?>Y<?}?></td>
-            <td><?if($a[played_scenario]){?>Y<?}?></td>
-            <td><?if($a[multiplayer]){?>Y<?}?></td>
-            <td><?if($a[vs_vip]){?>Y<?}?></td>
-            <td><?=$a[event_name]?></td>
+            <td><?php echo $a[points]?></td>
+            <td><?php if($a[per_game]){?>Yes<?php } else {?>No<?php }?></td>
+            <td><?php echo $a[game_system_name]?></td>
+            <td><?php if($a[is_meta]){?>Meta<?php } else {?>Standard<?php }?></td>
+            <td><?php if($a[game_count] > 0){?><?php echo $a[game_count]?><?php }?></td>
+            <td><?php echo $a[game_size]?></td>
+            <td><?php echo $a[faction]?></td>
+            <td><?php if($a[unique_opponent]){?>Y<?php }?></td>
+            <td><?php if($a[unique_opponent_locations]){?>Y<?php }?></td>
+            <td><?php if($a[played_theme_force]){?>Y<?php }?></td>
+            <td><?php if($a[fully_painted]){?>Y<?php }?></td>
+            <td><?php if($a[fully_painted_battle]){?>Y<?php }?></td>
+            <td><?php if($a[played_scenario]){?>Y<?php }?></td>
+            <td><?php if($a[multiplayer]){?>Y<?php }?></td>
+            <td><?php if($a[vs_vip]){?>Y<?php }?></td>
+            <td><?php echo $a[event_name]?></td>
             <td>
-                <a href="home.php?view=achievement_config&action=delete&ach_id=<?=$a[id]?>">Delete</a>
+                <a href="home.php?view=achievement_config&action=delete&ach_id=<?php echo $a[id]?>">Delete</a>
             </td>
         </tr>
-    <?}?>
+    <?php }?>
     </table>
 </section>
 

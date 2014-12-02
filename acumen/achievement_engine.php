@@ -9,6 +9,7 @@
     require_once("classes/db_game_players.php");
     require_once("classes/db_events.php");
     require_once("classes/db_prize_redemptions.php");
+	require_once("classes/views.php");
 
     require_once("classes/check.php");
    
@@ -22,7 +23,7 @@ class Ach_Engine {
     var $earned_db = null;
     var $events_db = null;
     var $redems_db = null;
-
+	var $views = null;
 
     function Ach_Engine(){
         $this->player_db = new Players();
@@ -33,6 +34,7 @@ class Ach_Engine {
         $this->earned_db = new Achievements_earned();
         $this->events_db = new Events();
         $this->redems_db = new Prize_redemptions();
+		$this->views = new Views();
     }
 
     function __destruct(){}
@@ -264,28 +266,27 @@ class Ach_Engine {
 
         //Things that can be earned multiple times in one game
         if($achievement[unique_opponent]){
-            $history = $this->getPlayerHistory($player[player_id]);
+			//Not sure this is needed
+            //$history = $this->getPlayerHistory($player[player_id]);
 
-            $opponents = array();
+			//Get list of DISTINCT opponent IDs for the player
+			$sql = 'SELECT DISTINCT(player_id) AS pid
+					FROM game_player_data
+					WHERE game_id IN 
+						(SELECT game_id
+					 	 FROM game_players
+					 	 WHERE player_id = :player_id
+						 	AND game_id < :game_id)';
+			$opponents = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
+			$opponents = array_column($opponents, "pid");
 
-            //establish history 
-            foreach($history[games] as $g){
-                if($g[id] >= $game[id]) continue;
-                foreach($g[players] as $p){
-                    if($p[player_id] == $player[player_id]) continue;
-                    
-                    $opponents[] = $p[player_id];
-                }
-            }
-            
-            //detect new
+            //detect new opponents by querying against history
             $new_opponents = 0;
             foreach($game[players] as $gp){
-                if(strcmp($gp[player_id], $player[player_id])){
-                    if(!in_array($gp[player_id], $opponents)){
-                          $new_opponents++;
-                          $opponents[] = $player[player_id];
-                    }
+                if($gp[player_id] == $player[player_id]) continue; //why strcmp???
+                
+				if(!in_array($gp[player_id], $opponents)){
+                    $new_opponents++;
                 }
             }
             
@@ -294,34 +295,34 @@ class Ach_Engine {
 
         }
         if($achievement[unique_opponent_locations]){
-            $history = $this->getPlayerHistory($player[player_id]);
 
-            $locations = array();
-
-            //establish history 
-            foreach($history[games] as $g){
-                if($g[id] >= $game[id]) continue;
-                foreach($g[players] as $p){
-                    if($p[player_id] == $player[player_id]) continue;
-                    
-                    $locations[] = $p[player_details][country]."-".$p[player_details][state];
-                }
-            }
+			//Get list of DISTINCT opponent IDs for the player
+            $sql = 'SELECT DISTINCT(CONCAT(opponents.country, "-", opponents.state)) AS loc
+					FROM (
+						SELECT player_id, country, state
+                    	FROM game_player_data
+                    	WHERE game_id IN (
+							SELECT game_id
+                         	FROM game_players
+                         	WHERE player_id = :player_id
+								AND game_id < :game_id)
+						AND player_id != :player_id2) AS opponents';
+            $locations = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id], ":player_id2"=>$player[player_id]));
+			$locations = array_column($locations, "loc");
 
             //detect new
             $new_locs = 0;
             foreach($game[players] as $gp){
-                if(strcmp($gp[player_id], $player[player_id])){
-                    $gp_loc = $gp[player_details][country]."-".$gp[player_details][state];
+                if($gp[player_id] == $player[player_id]) continue; 
 
-                    if(!in_array($gp_loc, $locations)){
-                          $new_locs++;
-                          $locations[] = $gp_loc;
-                    }
+                $gp_loc = $gp[player_details][country]."-".$gp[player_details][state];
+
+                if(!in_array($gp_loc, $locations)){
+                     $new_locs++;
                 }
             }
 
-            //in the odd case someone make an achievement with (new opponent && new location)
+            //in the odd case someone made an achievement with (new opponent && new location)
             //Let's take the minimum of the two to get the number of times to award the new achievement
             if($achievement[unique_opponent]){
                 $earned = min($earned, $new_locs);
@@ -330,20 +331,20 @@ class Ach_Engine {
             }
         }
         if($achievement[vs_vip]){
+            
+			//Get list of DISTINCT opponent IDs for the player                                                                                        
+            $sql = 'SELECT DISTINCT(player_id) AS pid
+                    FROM game_player_data
+                    WHERE game_id IN 
+                        (SELECT game_id
+                         FROM game_players
+                         WHERE player_id = :player_id
+						 	AND game_id < :game_id)
+					AND vip=1';
+            $played = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
+			$played = array_column($played, "pid");
 
-            $count = 0;
-            $played = array();
-
-            $history = $this->getPlayerHistory($player[player_id]);
-            foreach($history[games] as $hgame){
-                if($hgame[id] == $game[id]) continue;
-                foreach($hgame[players] as $gpl){
-                    if($gpl[player_details][vip]){
-                        $played[] = $gpl[player_details][id];
-                    }
-                }
-            }
-
+			$count = 0;
             foreach($game[players] as $p){
                 if($p[player_id] == $player[player_id]) continue;
                 if($p[player_details][vip]){

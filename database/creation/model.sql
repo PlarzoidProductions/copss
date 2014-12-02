@@ -359,6 +359,11 @@ CREATE TABLE IF NOT EXISTS `iron_arena`.`game_counter` (`player_id` INT, `game_c
 CREATE TABLE IF NOT EXISTS `iron_arena`.`leaderboard` (`player_id` INT, `last_name` INT, `first_name` INT, `game_count` INT, `earned` INT, `spent` INT, `points` INT);
 
 -- -----------------------------------------------------
+-- Placeholder table for view `iron_arena`.`game_player_data`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `iron_arena`.`game_player_data` (`game_id` INT, `player_id` INT, `country` INT, `state` INT, `vip` INT, `faction_id` INT, `size_id` INT, `theme_force` INT, `fully_painted` INT);
+
+-- -----------------------------------------------------
 -- View `iron_arena`.`earned`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `iron_arena`.`earned`;
@@ -411,6 +416,29 @@ LEFT OUTER JOIN `iron_arena`.`earned`
 LEFT OUTER JOIN `iron_arena`.`spent` 
         ON spent.player_id=players.id
 ORDER BY points DESC, last_name ASC;
+;
+
+
+-- -----------------------------------------------------
+-- View `iron_arena`.`game_player_data`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `iron_arena`.`game_player_data`;
+USE `iron_arena`;
+CREATE  OR REPLACE VIEW `game_player_data` AS
+SELECT 
+	gp.game_id as game_id,
+	gp.player_id as player_id,
+	p.country AS country, 
+	p.state AS state, 
+	p.vip AS vip,
+	gp.faction_id AS faction_id,
+	gp.game_size AS size_id,
+	gp.theme_force AS theme_force,
+	gp.fully_painted AS fully_painted
+FROM 
+	game_players as gp,
+	players as p
+WHERE gp.player_id = p.id
 ;
 
 

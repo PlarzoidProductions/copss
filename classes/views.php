@@ -65,6 +65,18 @@ public function queryByColumns($view, $columns){
 }
 
 
+/**************************************************
+
+Custom Query function
+
+**************************************************/
+public function customQuery($sql, $values){
+
+	//Nothing to sanitize, just do it.
+
+	return $this->db->query($sql, $values);
+}
+
 
 }//close class
 

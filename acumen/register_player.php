@@ -6,6 +6,7 @@
     require_once("classes/db_countries.php");
 
     $page = new Page();
+	$p_db = new Players();
 
     /***************************************
 
@@ -17,7 +18,6 @@
     $defaults = array("country"=>244);
    
     if(!strcmp($action, "edit")){
-        $p_db = new Players();
         $defaults = $p_db->getById($pl_id);
         $defaults = $defaults[0];
     }
@@ -49,12 +49,14 @@
     if(empty($pl_id)) $pl_id = $page->getvar("edit_id");
 
     if($pl_id){
+		//set the defaults
+		$defaults = $p_db->getById($pl_id);
+		$defaults = $defaults[0];
         $page->register("register", "submit", array("value"=>"Update!"));
     } else {
         $page->register("register", "submit", array("value"=>"Register!"));
     }
     $page->getChoices();
-
 
     /***************************************
 
@@ -71,7 +73,6 @@
         $state = $page->getVar("state");
         $vip = $page->getVar("vip");
         
-        $db = new Players();
         if($pl_id){
             $nameChars = "a-zA-Z0-9' -";
             if(!preg_match("~^[$nameChars]+$~", $first)){
@@ -87,7 +88,7 @@
             if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
 				$columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
 				if(!empty($state))  $columns["state"]=$state;
-                $exists = $db->existsByColumns($columns);
+                $exists = $p_db->existsByColumns($columns);
 
                 if($exists){
                     $error = "Player with that name & location exists!";
@@ -105,7 +106,7 @@
                                  "state"=>$state,
                                  "vip"=>$vip);
 
-                $result = $db->updatePlayersById($pl_id, $columns);
+                $result = $p_db->updatePlayersById($pl_id, $columns);
             }
         } else {
 
@@ -123,7 +124,7 @@
             {
                 $columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
                 if(!empty($state)) $columns["state"] = $state;
-                $exists = $db->existsByColumns($columns);
+                $exists = $p_db->existsByColumns($columns);
 
                 if($exists){
                     $error = "Player with that name & location exists!";
@@ -132,7 +133,7 @@
 
 
             if(empty($error))
-                $result = $db->create($first, $last, $country, $state, $vip);
+                $result = $p_db->create($first, $last, $country, $state, $vip);
         }
     }
 

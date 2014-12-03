@@ -268,9 +268,6 @@ class Choices {
 
         function leaderboardSortChoices(){
             $columns = array("Name (L, F)"=>"name",
-                         "# Games"=>"game_count",
-                         "Points Earned"=>"earned",
-                         "Points Spent"=>"spent",
                          "Points"=>"points");
 
             $ret = array();

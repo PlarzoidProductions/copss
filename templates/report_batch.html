@@ -25,12 +25,17 @@
         </header>
         <section id="inputs_section">
             <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
-            <?php  foreach($inputs as $i){?>
-                <?php  echo $page->displayVar($i)?>
-            <?php }?>
+			<?php  echo $page->displayVar("ach_id")?>
 			<em>Any player slots left set to "Please select..." will be skipped</em>
             <hr>
-            <?php  for($i=1; $i <= $num_players; $i++){?>
+			<header><hgroup><h3>Podium</h3></hgroup></header>
+			<?php  echo $page->displayVar("first_place")?>
+			<?php  echo $page->displayVar("second_place")?>
+			<?php  echo $page->displayVar("third_place")?>
+			<hr>
+			<header><hgroup><h3>Participation</h3></hgroup></header>
+			<?php  echo $page->displayVar("num_players")?>
+			<?php  for($i=1; $i <= $num_players; $i++){?>
                 <?php  echo $page->displayVar("player_".$i."_id")?>
             <?php }?>
             <hr>

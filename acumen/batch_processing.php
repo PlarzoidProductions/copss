@@ -38,13 +38,13 @@ if(!strcmp($action, "delete")){
 Basic Inputs
 
 **************************************/
-$page->register("ach_id", "select", array("label"=>"Achievement",
+$page->register("ach_id", "select", array("label"=>"Tournament",
                                           "get_choices_array_func"=>"getEventAchievementChoices",
                                           "get_choices_array_func_args"=>array()));
 
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>5,
                                                 "get_choices_array_func"=>"getIntegerChoices",
-                                                "get_choices_array_func_args"=>array(5, 15, 5)));
+                                                "get_choices_array_func_args"=>array(5, 30, 5)));
 
 $page->getChoices();
 
@@ -64,6 +64,16 @@ if(Check::isNull($num_players)){
     $num_players = 5;
 }
 
+
+$page->register("first_place", "select", array("label"=>"First",
+                                                        "get_choices_array_func"=>"getPlayerChoices",
+                                                        "get_choices_array_func_args"=>array()));
+$page->register("second_place", "select", array("label"=>"Second",
+                                                        "get_choices_array_func"=>"getPlayerChoices",
+                                                        "get_choices_array_func_args"=>array()));
+$page->register("third_place", "select", array("label"=>"Third",
+                                                        "get_choices_array_func"=>"getPlayerChoices",
+                                                        "get_choices_array_func_args"=>array()));
 
 for($i=1; $i <= $num_players; $i++){
     $page->register("player_".$i."_id", "select", array("label"=>"Player $i",
@@ -87,7 +97,23 @@ if($page->submitIsSet("submit_batch")){
 		$errors[] = "Must pick an Achievement!";
 	}
 
+	//Next, get our podium
+	if(empty($errors)){
+		$first = $page->getVar("first_place");
+		$second = $page->getVar("second_place");
+		$third = $page->getVar("third_place");
+	
 
+		if(Check::isNull($first)){ $errors[] = "Must pick a First Place finisher!"; }
+		if(Check::isNull($second)){ $errors[] = "Must pick a Second Place finisher!"; }
+		if(Check::isNull($third)){ $errors[] = "Must pick a Third Place finisher!"; }
+
+		if(($first == $second) || ($second == $third) || ($first == $third)){
+			$errors[] = "Same player cannot be awarded two podium spots!";
+		}
+	}
+
+	//Then, get all our participants
 	if(empty($errors)){
 		$num_players = intval($page->getVar("num_players"));
 
@@ -95,24 +121,33 @@ if($page->submitIsSet("submit_batch")){
     	for($i=1; $i <= $num_players; $i++){
         	$id = $page->getVar("player_".$i."_id");
 	        if(Check::isNull($id)){ continue;}
+			if(($id == $first) || ($id == $second) || ($id == $third)) continue;
 
     	    $player = $p_db->getById($id);
         	$players[$id] = $player[0];
 	    }
 
+		//DB interation Status flag
     	$end_result = true;
 
-	$achievement = $a_db->getById($ach_id);
+		//Achievement details
+		$achievement = $a_db->getById($ach_id);
         $achievement = $achievement[0];
 
-    	foreach($players as $id=>$p){
 
+		//Award Participation
+    	foreach($players as $id=>$p){
         	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
         	if(!$exists || $achievement["per_game"]){
             	$result = $ae_db->create($id, $ach_id);
 	            $end_result = $end_result && $result;
     	    }
     	}
+
+		//Award Podium
+		$result = $ae_db->create($first, $ach_id+1); $end_result = $end_result && $result;
+		$result = $ae_db->create($second, $ach_id+2); $end_result = $end_result && $result;
+		$result = $ae_db->create($third, $ach_id+3); $end_result = $end_result && $result;
 	}
 }
 
@@ -129,9 +164,18 @@ $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
 
 if($page->submitIsSet("submit_batch") && $end_result){
-    $success_str = "Successfully awarded ".$achievement[name]." to:<br>";
+	
+	$first_winner = $p_db->getById($first);
+	$success_str = "Successfully awarded First Place to ".$first_winner[0][last_name].", ".$first_winner[0][first_name]."<br>";
+	$second_winner = $p_db->getById($second);
+    $success_str .= "Successfully awarded Second Place to ".$second_winner[0][last_name].", ".$second_winner[0][first_name]."<br>";
+	$third_winner = $p_db->getById($third);
+    $success_str .= "Successfully awarded Third Place to ".$third_winner[0][last_name].", ".$third_winner[0][first_name]."<br>";
+
+	$success_str .= "<br>Successfully awarded ".$achievement[name]." to:<br>";
 
     foreach($players as $p){
+		if(($p[id] == $first) || ($p[id] == $second) || ($p[id] == $third)) continue;
         $success_str .= $p[last_name].", ".$p[first_name]."<br>";
     }
 }

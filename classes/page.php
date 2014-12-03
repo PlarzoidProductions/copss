@@ -102,19 +102,17 @@ class Page {
 
         $tabs = array(
             "Register Player"=>"register_player",
+			"Leaderboard"=>"leaderboard",
             "View Player Profile"=>"view_player",
-            "Report Game"=>"report_game",
-            "Redeem Skulls"=>"redeem",
-            "Event Achievements"=>"batch_processing",
             "Software Feedback"=>"feedback"
             );
 
 
         if(Session::isAdmin()){
             $admin_tabs = array(
-                "Leaderboard"=>"leaderboard",
                 "Manage Users"=>"manage_users",
-                "General Configuration"=>"general_config",
+                "Award Points"=>"batch_processing",
+				"General Configuration"=>"general_config",
                 "Achievement Configuration"=>"achievement_config",
                 "Export & Reset Database"=>"export_reset"
             );

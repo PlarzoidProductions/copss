@@ -16,7 +16,7 @@ if(!Session::isLoggedIn()){
 if(isset($_REQUEST["view"])){
 	$view = $_REQUEST["view"];
 } else {
-    $view = "register_player";
+    $view = "leaderboard";
 }
 
 if((@include("acumen/$view.php")) == false){;

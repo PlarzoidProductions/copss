@@ -23,7 +23,7 @@ hgroup {
 body {
     text-align: center;
     color: #FFFFFF;
-    background: #000000;
+    background: #110C25;
     background-image: url(../images/PP_SmallWaterMark.png)
 }
 
@@ -49,9 +49,9 @@ body {
 #header_nav, #footer_nav {
     clear: both;
     overflow: hidden;
-    background: #000000;
+    background: #110C25;
     padding: 5px 15px;
-    border: 1px solid #444444;
+    border: 1px solid #291D5A;
 }
 
 #header_nav li, #footer_nav li {
@@ -81,8 +81,8 @@ body {
     width: 220px;
     margin: 20px 0px;
     padding: 20px;
-    background: #000000;
-    border: 1px solid #444444;
+    background: #110C25;
+    border: 1px solid #291D5A;
 }
 
 #main_aside li {
@@ -96,7 +96,7 @@ body {
 }
 
 #main_aside #active_tab {
-    background: #444444;
+    background: #291D5A;
 }
 
 
@@ -107,7 +107,7 @@ body {
     text-align: center;
     width: 660px;
     margin: 20px 0px;
-    background: #000000;
+    background: #110C25;
 }
 
 #main_section header {
@@ -119,7 +119,7 @@ body {
     width: 660px;
     padding: 0px 150px;
     margin: 20px 0px;
-    background: #000000;
+    background: #110C25;
 }
 
 
@@ -167,7 +167,7 @@ div.simple {
     text-align: center;
     padding: 10px;
     margin: 20px 30px;
-    background: #000000;
+    background: #110C25;
     overflow: hidden;
 }
 
@@ -178,7 +178,7 @@ div.simple {
     text-align: center;
     padding: 10px;
     margin: 20px 0px;
-    background: #000000;
+    background: #110C25;
     overflow: hidden;
 }
 
@@ -205,7 +205,7 @@ th {
 }
 
 tr.odd{
-    background: #333;
+    background: #291D5A;
 }
 
 td, th {
@@ -220,15 +220,15 @@ td, th {
 
 /* -- Link Colors -- */
 
-a:link {color:#0BE5FF;}      /* unvisited link */
-a:visited {color:#01FF8D;}  /* visited link */
-a:hover {color:#0AE8C3;}  /* mouse over link */
-a:active {color:#10FF0B;}  /* selected link */
+a:link {color:#D8B13B;}      /* unvisited link */
+a:visited {color:#826F22;}  /* visited link */
+a:hover {color:#FF0000;}  /* mouse over link */
+a:active {color:#FFFFFF;}  /* selected link */
 
 /* -- Old Stuff, REFERENCE ONLY -- */
 
 /*
-body {background-color: #000000;
+body {background-color: #110C25;
 background-image: url(images/PP_SmallWaterMark.png)}
 h1 {color: #ffffff}
 eckCreationDate
@@ -272,7 +272,7 @@ td.current_tab{
 border-width: 3px 3px 0px 3px; 
 border-style: solid; 
 border-color: #ffffff;
-background-color: #000000;
+background-color: #110C25;
 text-align: center;
 width: 15%;
 }
@@ -281,7 +281,7 @@ td.tab{
 border-width: 1px 1px 3px 1px;
 border-style: solid;
 border-color: #aaaaaa;
-background-color: #000000;
+background-color: #110C25;
 text-align: center;
 width: 15%;
 }
@@ -297,14 +297,14 @@ td.current_page{
 border-width: 0px 3px 3px 3px;
 border-style: solid;
 border-color: #ffffff;
-background-color: #000000;
+background-color: #110C25;
 text-align: center;
 }
 
 table.basic_table{
 border-width: 2px 2px 0px 2px;
 border-style: solid;
-background-color: #000000;
+background-color: #110C25;
 border-color: #ffffff
 border-spacing: 0px;
 text-align: center;
@@ -313,7 +313,7 @@ text-align: center;
 table.basic_bottom_table{
 border-width: 2px 2px 2px 2px;
 border-style: solid;
-background-color: #000000;
+background-color: #110C25;
 border-color: #ffffff
 border-spacing: 0px;
 text-align: center;
@@ -322,7 +322,7 @@ checkCreationDate
 td.separator{
 border-width: 0px 0px 2px 0px;
 border-style: solid;
-background-color: #000000;
+background-color: #110C25;
 border-color: #ffffff;
 text-align: center;
 width: 50%;

@@ -173,7 +173,7 @@
     
     } else {
     
-        $inputs = array("edit_id", "first_name", "last_name", "country", "state", "vip", "register");
+        $inputs = array("edit_id", "first_name", "last_name", "country", "state", /*"vip",*/ "register");
         $page->setDisplayMode("form");
         $template = "templates/default_section.html";
     }

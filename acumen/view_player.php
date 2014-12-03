@@ -48,10 +48,11 @@ if($pl_id){
 } else {
     $selected_player = $page->getVar("player");
 }
-
 if($selected_player){
 
     $player = $engine->getPlayerHistory($selected_player);
+
+	/* -- Not necessary for Brawltimore
 
     foreach($player[games] as $i=>$g){
         foreach($g[players] as $j=>$gp){
@@ -70,9 +71,9 @@ if($selected_player){
                 $player[games][$i][players][$j][faction_name] = $faction[0][name];
             }
         }
-    }       
+    } 
+	*/
 }
-
 
 /********************************************
 
@@ -81,7 +82,7 @@ Prep the page
 ********************************************/
 if($selected_player){
 
-
+/* -- Not necessary for Brawltimore
     //Game Data
     $odd=true;
     foreach($player[games] as $a=>$game){
@@ -141,13 +142,19 @@ if($selected_player){
 
     $stats[points] = $earned[0][earned] + $spent[0][spent]; //addition, since poinst spent are stored as negative numbers
 
+	*/
+
+	//Hijack this section for Brawltimore
+
     //Event Achievements
-    $event_achs = $engine->getEventAchievementsByPlayerId($selected_player);
+    $event_achs = $engine->getAchievementsByPlayerId($selected_player);
     $odd = true;
     foreach($event_achs as $k=>$ea){
         if($odd)$event_achs[$k][style]="odd";
         $odd = !$odd;
     }
+
+	/* -- Not necessary for Brawltimore
 
     //Prize Redemptions
     $redemptions = $pr_db->queryByColumns(array("player_id"=>$selected_player));
@@ -156,6 +163,9 @@ if($selected_player){
         if($odd)$redemptions[$k][style]="odd";
         $odd = !$odd;
     }
+
+	*/
+
 }    
 
 //Usual stuff

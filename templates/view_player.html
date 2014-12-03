@@ -12,86 +12,28 @@
         <?php }?>
         </form>
     <?php if($selected_player){?>
-        <header><h1>Statistics for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1>(<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $player[id]?>">Edit player registration</a>)</header>
-        <div class="simple">Games Played: <strong><?php echo $stats[games]?></strong></div>
-        <div class="simple">Unique Opponents Played: <strong><?php echo $stats[opponents]?></strong></div>
-        <div class="simple">Unique Opponent Locations: <strong><?php echo $stats[locations]?></strong></div>
-        <div class="simple">Factions Played Against: <strong><?php echo $stats[faction_list]?></strong></div>
+        <header><h1>Statistics for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1><?php if(Session::isAdmin()){?>(<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $player[id]?>">Edit player registration</a>)<?php }?></header>
         <div class="simple"><font <?php if($stats[points] > 0){?>class="success"<?php  } else {?>class="warning"<?php }?>>Current Points: <strong><?php echo $stats[points]?></font></strong></div>
     <?php }?>
     </section>
 </section>
 <?php if($selected_player){?>
 <section id="listing">
-    <header><h1>Game Details for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
+    <header><h1>Achievements for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
     <table>
         <tr class="header">
-            <th>Game ID</th>
-            <th>Time</th>
-            <th>Players</th>
-            <th>Achievements Earned</th>
-            <th>Points Earned</th>
-        </tr>
-    <?php foreach($player[games] as $gp){?>
-        <tr class="<?php echo $gp[style]?>">
-            <td>
-                <?php echo $gp[id]?> 
-                (<a href="home.php?view=report_game&action=edit_game&game_id=<?php echo $gp[id]?>">Edit</a>)
-            </td>
-            <td><?php echo $gp[creation_time]?></td>
-            <td><?php echo $gp[player_listing]?></td>
-            <td><?php echo $gp[achievement_listing]?></td>
-            <td><h1><?php echo $gp[points_earned]?></h1></td>
-            <?php if(Session::isAdmin()){?>
-            <td>
-                <a href="home.php?view=report_game&action=delete&game_id=<?php echo $gp[id]?>">Delete</a>
-            </td>
-            <?php }?>
-        </tr>
-    <?php }?>
-    </table>
-</section>
-<section id="listing">
-    <header><h1>Event & Misc Achievements for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
-    <table>
-        <tr class="header">
-            <th>Event</th>
             <th>Achievement</th>
             <th>Points Earned</th>
         </tr>
     <?php foreach($event_achs as $ea){?>
         <tr class="<?php echo $ea[style]?>">
-            <td><?php echo $ea[event_name]?></th>
             <td><?php echo $ea[name]?></td>
             <td></h1><?php echo $ea[points]?></h1></td>
-            <td>
+            <?php if(Session::isAdmin()){?>
+			<td>
                 <a href="home.php?view=batch_processing&action=delete&ach_id=<?php echo $ea[earned_id]?>">Delete</a>
             </td>
-        </tr>
-    <?php }?>
-    </table>
-</section>
-<section id="listing">
-    <header><h1>Prize Redemptions for <?php echo $player[last_name]?>, <?php echo $player[first_name]?></h1></header>
-    <table>
-        <tr class="header">
-            <th>Redemption ID</th>
-            <th>Time</th>
-            <th>Amount</th>
-            <th>Description</th>
-        </tr>
-    <?php foreach($redemptions as $pr){?>
-        <tr class="<?php echo $pr[style]?>">
-            <td>
-                <?php echo $pr[id]?>
-                (<a href="home.php?view=redeem&action=edit&pr_id=<?php echo $pr[id]?>">Edit</a>)
-            </td>
-            <td><?php echo $pr[creation_time]?></th>
-            <td><h1><?php echo $pr[cost]?></h1></td>
-            <td><?php echo $pr[description]?></td>
-            <td>
-                <a href="home.php?view=redeem&action=delete&pr_id=<?php echo $pr[id]?>">Delete</a>
-            </td>
+			<?php }?>
         </tr>
     <?php }?>
     </table>

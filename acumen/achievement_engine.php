@@ -580,6 +580,18 @@ class Ach_Engine {
 
     }
 
+	function getAchievementsByPlayerId($player_id){
+		$achs = $this->earned_db->queryByColumns(array("player_id"=>$player_id));
+
+        $achievements = array();
+        foreach($achs as $a){
+            $achievement = $this->getAchievementDetails($a[achievement_id]);
+            $achievements[] = $achievement;
+        }
+
+        return $achievements;
+
+    }
 
 
 }//class close 

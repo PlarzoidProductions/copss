@@ -17,21 +17,15 @@
         <tr class="header">
             <th>Player ID</th>
             <th>Name</th>
-            <th># Games</th>
-            <th>Points Earned</th>
-            <th>Points Spent</th>
             <th>Points</th>
         </tr>
     <?php foreach($players as $id=>$p){?>
         <tr class="<?php echo $p[style]?>">
             <td>
                 <?php echo $p[player_id]?> 
-                (<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $p[player_id]?>">Edit</a>)
+                <?php if(Session::isAdmin()){?>(<a href="home.php?view=register_player&action=edit&pl_id=<?php echo $p[player_id]?>">Edit</a>)<?php }?>
             </td>
             <td><?php echo $p[last_name]?>, <?php echo $p[first_name]?></td>
-            <td><?php echo $p[game_count]?></td>
-            <td><?php echo $p[earned]?></td>
-            <td><?php echo $p[spent]?></td>
             <td><h1><?php echo $p[points]?></h1></td>
             <td>
                 <a href="home.php?view=view_player&pl_id=<?php echo $p[player_id]?>">Details</a>

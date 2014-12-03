@@ -102,13 +102,11 @@ if($page->submitIsSet("submit_batch")){
 		$first = $page->getVar("first_place");
 		$second = $page->getVar("second_place");
 		$third = $page->getVar("third_place");
-	
 
-		if(Check::isNull($first)){ $errors[] = "Must pick a First Place finisher!"; }
-		if(Check::isNull($second)){ $errors[] = "Must pick a Second Place finisher!"; }
-		if(Check::isNull($third)){ $errors[] = "Must pick a Third Place finisher!"; }
-
-		if(($first == $second) || ($second == $third) || ($first == $third)){
+		if(
+			(Check::notNull($first) && Check::notNull($second) && ($first == $second)) || 
+			(Check::notNull($second) && Check::notNull($third) && ($second == $third)) ||
+			(Check::notNull($first) && Check::notNull($third) && ($first == $third))){
 			$errors[] = "Same player cannot be awarded two podium spots!";
 		}
 	}
@@ -145,9 +143,9 @@ if($page->submitIsSet("submit_batch")){
     	}
 
 		//Award Podium
-		$result = $ae_db->create($first, $ach_id+1); $end_result = $end_result && $result;
-		$result = $ae_db->create($second, $ach_id+2); $end_result = $end_result && $result;
-		$result = $ae_db->create($third, $ach_id+3); $end_result = $end_result && $result;
+		if(Check::notNull($first)){$result = $ae_db->create($first, $ach_id+1); $end_result = $end_result && $result;}
+		if(Check::notNull($second)){$result = $ae_db->create($second, $ach_id+2); $end_result = $end_result && $result;}
+		if(Check::notNull($third)){$result = $ae_db->create($third, $ach_id+3); $end_result = $end_result && $result;}
 	}
 }
 

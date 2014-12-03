@@ -15,7 +15,7 @@ class Query{
 ***********************/
 
 var $mysql_user = "brawltimore";
-var $mysql_host = "localhost";
+var $mysql_host = "brawltimore.plarzoid.com";
 var $mysql_password = "tehRavenzSuxx!";
 
 var $mysql_database = "brawltimore";

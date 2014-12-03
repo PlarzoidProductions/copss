@@ -2,14 +2,14 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `iron_arena` ;
-CREATE SCHEMA IF NOT EXISTS `iron_arena` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
-USE `iron_arena` ;
+DROP SCHEMA IF EXISTS `brawltimore` ;
+CREATE SCHEMA IF NOT EXISTS `brawltimore` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
+USE `brawltimore` ;
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`countries`
+-- Table `brawltimore`.`countries`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`countries` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`countries` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`id`) )
@@ -17,9 +17,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`states`
+-- Table `brawltimore`.`states`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`states` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`states` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   `parent` INT UNSIGNED NOT NULL ,
@@ -27,16 +27,16 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`states` (
   INDEX `fk_parent_id` (`parent` ASC) ,
   CONSTRAINT `fk_parent_id`
     FOREIGN KEY (`parent` )
-    REFERENCES `iron_arena`.`countries` (`id` )
+    REFERENCES `brawltimore`.`countries` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`players`
+-- Table `brawltimore`.`players`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`players` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`players` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `first_name` VARCHAR(255) NOT NULL ,
   `last_name` VARCHAR(255) NOT NULL ,
@@ -49,12 +49,12 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`players` (
   INDEX `fk_state_id` (`state` ASC) ,
   CONSTRAINT `fk_country_id`
     FOREIGN KEY (`country` )
-    REFERENCES `iron_arena`.`countries` (`id` )
+    REFERENCES `brawltimore`.`countries` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_state_id`
     FOREIGN KEY (`state` )
-    REFERENCES `iron_arena`.`states` (`id` )
+    REFERENCES `brawltimore`.`states` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -63,9 +63,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`game_systems`
+-- Table `brawltimore`.`game_systems`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_systems` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`game_systems` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`id`) )
@@ -73,9 +73,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`game_sizes`
+-- Table `brawltimore`.`game_sizes`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_sizes` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`game_sizes` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `parent_game_system` INT(10) UNSIGNED NOT NULL ,
   `size` INT(11) NOT NULL ,
@@ -84,7 +84,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_sizes` (
   INDEX `fk_game_system_id` (`parent_game_system` ASC) ,
   CONSTRAINT `fk_game_system_id`
     FOREIGN KEY (`parent_game_system` )
-    REFERENCES `iron_arena`.`game_systems` (`id` )
+    REFERENCES `brawltimore`.`game_systems` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -93,9 +93,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`game_system_factions`
+-- Table `brawltimore`.`game_system_factions`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_system_factions` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`game_system_factions` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `parent_game_system` INT(10) UNSIGNED NOT NULL ,
   `name` VARCHAR(255) NOT NULL ,
@@ -104,7 +104,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_system_factions` (
   INDEX `fk_game_system_id` (`parent_game_system` ASC) ,
   CONSTRAINT `fk_faction_parent_game_system_id`
     FOREIGN KEY (`parent_game_system` )
-    REFERENCES `iron_arena`.`game_systems` (`id` )
+    REFERENCES `brawltimore`.`game_systems` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -113,9 +113,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`games`
+-- Table `brawltimore`.`games`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`games` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `creation_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   `game_system` INT(10) UNSIGNED NOT NULL ,
@@ -124,7 +124,7 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`games` (
   INDEX `fk_parent_game_system_id` (`game_system` ASC) ,
   CONSTRAINT `fk_parent_game_system_id`
     FOREIGN KEY (`game_system` )
-    REFERENCES `iron_arena`.`game_systems` (`id` )
+    REFERENCES `brawltimore`.`game_systems` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -133,9 +133,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`game_players`
+-- Table `brawltimore`.`game_players`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_players` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`game_players` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `game_id` INT(10) UNSIGNED NOT NULL ,
   `player_id` INT(10) UNSIGNED NOT NULL ,
@@ -150,22 +150,22 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`game_players` (
   INDEX `fk_game_players_game_size_id` (`game_size` ASC) ,
   CONSTRAINT `fk_game_players_game_id`
     FOREIGN KEY (`game_id` )
-    REFERENCES `iron_arena`.`games` (`id` )
+    REFERENCES `brawltimore`.`games` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_game_players_player_id`
     FOREIGN KEY (`player_id` )
-    REFERENCES `iron_arena`.`players` (`id` )
+    REFERENCES `brawltimore`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_game_players_faction_id`
     FOREIGN KEY (`faction_id` )
-    REFERENCES `iron_arena`.`game_system_factions` (`id` )
+    REFERENCES `brawltimore`.`game_system_factions` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_game_players_game_size_id`
     FOREIGN KEY (`game_size` )
-    REFERENCES `iron_arena`.`game_sizes` (`id` )
+    REFERENCES `brawltimore`.`game_sizes` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -174,9 +174,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`events`
+-- Table `brawltimore`.`events`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`events` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`events` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`id`) )
@@ -184,9 +184,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`achievements`
+-- Table `brawltimore`.`achievements`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`achievements` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NOT NULL ,
   `points` INT(11) NOT NULL ,
@@ -212,22 +212,22 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements` (
   INDEX `fk_ach_event_id` (`event_id` ASC) ,
   CONSTRAINT `fk_ach_game_system_id`
     FOREIGN KEY (`game_system_id` )
-    REFERENCES `iron_arena`.`game_systems` (`id` )
+    REFERENCES `brawltimore`.`game_systems` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_game_size_id`
     FOREIGN KEY (`game_size_id` )
-    REFERENCES `iron_arena`.`game_sizes` (`id` )
+    REFERENCES `brawltimore`.`game_sizes` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_faction_id`
     FOREIGN KEY (`faction_id` )
-    REFERENCES `iron_arena`.`game_system_factions` (`id` )
+    REFERENCES `brawltimore`.`game_system_factions` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_event_id`
     FOREIGN KEY (`event_id` )
-    REFERENCES `iron_arena`.`events` (`id` )
+    REFERENCES `brawltimore`.`events` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -236,9 +236,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`achievements_earned`
+-- Table `brawltimore`.`achievements_earned`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`achievements_earned` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `player_id` INT(10) UNSIGNED NOT NULL ,
   `achievement_id` INT(10) UNSIGNED NOT NULL ,
@@ -249,17 +249,17 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`achievements_earned` (
   INDEX `fk_ach_earned_game_id` (`game_id` ASC) ,
   CONSTRAINT `fk_ach_earned_player_id`
     FOREIGN KEY (`player_id` )
-    REFERENCES `iron_arena`.`players` (`id` )
+    REFERENCES `brawltimore`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_earned_achievement_id`
     FOREIGN KEY (`achievement_id` )
-    REFERENCES `iron_arena`.`achievements` (`id` )
+    REFERENCES `brawltimore`.`achievements` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_ach_earned_game_id`
     FOREIGN KEY (`game_id` )
-    REFERENCES `iron_arena`.`games` (`id` )
+    REFERENCES `brawltimore`.`games` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -268,9 +268,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`meta_achievement_criteria`
+-- Table `brawltimore`.`meta_achievement_criteria`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`meta_achievement_criteria` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`meta_achievement_criteria` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `parent_achievement` INT(10) UNSIGNED NOT NULL ,
   `child_achievement` INT(10) UNSIGNED NOT NULL ,
@@ -280,12 +280,12 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`meta_achievement_criteria` (
   INDEX `fk_child_ach_id` (`child_achievement` ASC) ,
   CONSTRAINT `fk_parent_ach_id`
     FOREIGN KEY (`parent_achievement` )
-    REFERENCES `iron_arena`.`achievements` (`id` )
+    REFERENCES `brawltimore`.`achievements` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_child_ach_id`
     FOREIGN KEY (`child_achievement` )
-    REFERENCES `iron_arena`.`achievements` (`id` )
+    REFERENCES `brawltimore`.`achievements` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -294,9 +294,9 @@ COLLATE = latin1_swedish_ci;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`users`
+-- Table `brawltimore`.`users`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`users` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NULL ,
   `username` VARCHAR(20) NOT NULL ,
@@ -309,9 +309,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`prize_redemptions`
+-- Table `brawltimore`.`prize_redemptions`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`prize_redemptions` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `player_id` INT UNSIGNED NOT NULL ,
   `cost` INT NOT NULL ,
@@ -321,16 +321,16 @@ CREATE  TABLE IF NOT EXISTS `iron_arena`.`prize_redemptions` (
   INDEX `fk_prize_redemptions_player_id` (`player_id` ASC) ,
   CONSTRAINT `fk_prize_redemptions_player_id`
     FOREIGN KEY (`player_id` )
-    REFERENCES `iron_arena`.`players` (`id` )
+    REFERENCES `brawltimore`.`players` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `iron_arena`.`feedback`
+-- Table `brawltimore`.`feedback`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `iron_arena`.`feedback` (
+CREATE  TABLE IF NOT EXISTS `brawltimore`.`feedback` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `type` VARCHAR(45) NOT NULL ,
   `comment` LONGTEXT NOT NULL ,
@@ -339,68 +339,68 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`earned`
+-- Placeholder table for view `brawltimore`.`earned`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`earned` (`player_id` INT, `earned` INT);
+CREATE TABLE IF NOT EXISTS `brawltimore`.`earned` (`player_id` INT, `earned` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`spent`
+-- Placeholder table for view `brawltimore`.`spent`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`spent` (`player_id` INT, `spent` INT);
+CREATE TABLE IF NOT EXISTS `brawltimore`.`spent` (`player_id` INT, `spent` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`game_counter`
+-- Placeholder table for view `brawltimore`.`game_counter`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`game_counter` (`player_id` INT, `game_count` INT);
+CREATE TABLE IF NOT EXISTS `brawltimore`.`game_counter` (`player_id` INT, `game_count` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`leaderboard`
+-- Placeholder table for view `brawltimore`.`leaderboard`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`leaderboard` (`player_id` INT, `last_name` INT, `first_name` INT, `game_count` INT, `earned` INT, `spent` INT, `points` INT);
+CREATE TABLE IF NOT EXISTS `brawltimore`.`leaderboard` (`player_id` INT, `last_name` INT, `first_name` INT, `game_count` INT, `earned` INT, `spent` INT, `points` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `iron_arena`.`game_player_data`
+-- Placeholder table for view `brawltimore`.`game_player_data`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `iron_arena`.`game_player_data` (`game_id` INT, `player_id` INT, `country` INT, `state` INT, `vip` INT, `faction_id` INT, `size_id` INT, `theme_force` INT, `fully_painted` INT);
+CREATE TABLE IF NOT EXISTS `brawltimore`.`game_player_data` (`game_id` INT, `player_id` INT, `country` INT, `state` INT, `vip` INT, `faction_id` INT, `size_id` INT, `theme_force` INT, `fully_painted` INT);
 
 -- -----------------------------------------------------
--- View `iron_arena`.`earned`
+-- View `brawltimore`.`earned`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`earned`;
-USE `iron_arena`;
-CREATE  OR REPLACE VIEW `iron_arena`.`earned` AS 
+DROP TABLE IF EXISTS `brawltimore`.`earned`;
+USE `brawltimore`;
+CREATE  OR REPLACE VIEW `brawltimore`.`earned` AS 
 SELECT ae.player_id as `player_id`, sum(a.points) as earned
-FROM `iron_arena`.`achievements_earned` ae, `iron_arena`.`achievements` a
+FROM `brawltimore`.`achievements_earned` ae, `brawltimore`.`achievements` a
 WHERE ae.achievement_id=a.id
 GROUP BY ae.player_id;
 
 -- -----------------------------------------------------
--- View `iron_arena`.`spent`
+-- View `brawltimore`.`spent`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`spent`;
-USE `iron_arena`;
-CREATE  OR REPLACE VIEW `iron_arena`.`spent` AS
+DROP TABLE IF EXISTS `brawltimore`.`spent`;
+USE `brawltimore`;
+CREATE  OR REPLACE VIEW `brawltimore`.`spent` AS
 SELECT pr.player_id as `player_id`, sum(pr.cost) as `spent`
 FROM prize_redemptions pr
 GROUP BY `player_id`
 ;
 
 -- -----------------------------------------------------
--- View `iron_arena`.`game_counter`
+-- View `brawltimore`.`game_counter`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`game_counter`;
-USE `iron_arena`;
-CREATE  OR REPLACE VIEW `iron_arena`.`game_counter` AS
+DROP TABLE IF EXISTS `brawltimore`.`game_counter`;
+USE `brawltimore`;
+CREATE  OR REPLACE VIEW `brawltimore`.`game_counter` AS
 SELECT player_id, count(1) AS game_count
 FROM game_players
 GROUP BY player_id;
 
 -- -----------------------------------------------------
--- View `iron_arena`.`leaderboard`
+-- View `brawltimore`.`leaderboard`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`leaderboard`;
-USE `iron_arena`;
-CREATE  OR REPLACE VIEW `iron_arena`.`leaderboard` AS
+DROP TABLE IF EXISTS `brawltimore`.`leaderboard`;
+USE `brawltimore`;
+CREATE  OR REPLACE VIEW `brawltimore`.`leaderboard` AS
 SELECT players.id AS `player_id`,
 players.last_name AS last_name,
 players.first_name AS first_name,
@@ -408,22 +408,22 @@ game_counter.game_count AS game_count,
 earned.earned AS earned,
 spent.spent AS spent,
 earned - spent as points
-FROM `iron_arena`.`players`
-LEFT OUTER JOIN `iron_arena`.`game_counter` 
+FROM `brawltimore`.`players`
+LEFT OUTER JOIN `brawltimore`.`game_counter` 
         ON game_counter.player_id=players.id
-LEFT OUTER JOIN `iron_arena`.`earned` 
+LEFT OUTER JOIN `brawltimore`.`earned` 
         ON earned.player_id=players.id
-LEFT OUTER JOIN `iron_arena`.`spent` 
+LEFT OUTER JOIN `brawltimore`.`spent` 
         ON spent.player_id=players.id
 ORDER BY points DESC, last_name ASC;
 ;
 
 
 -- -----------------------------------------------------
--- View `iron_arena`.`game_player_data`
+-- View `brawltimore`.`game_player_data`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `iron_arena`.`game_player_data`;
-USE `iron_arena`;
+DROP TABLE IF EXISTS `brawltimore`.`game_player_data`;
+USE `brawltimore`;
 CREATE  OR REPLACE VIEW `game_player_data` AS
 SELECT 
 	gp.game_id as game_id,

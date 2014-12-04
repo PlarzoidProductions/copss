@@ -586,6 +586,7 @@ class Ach_Engine {
         $achievements = array();
         foreach($achs as $a){
             $achievement = $this->getAchievementDetails($a[achievement_id]);
+	    $achievement[earned_id] = $a[id];
             $achievements[] = $achievement;
         }
 

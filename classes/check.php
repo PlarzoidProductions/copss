@@ -38,7 +38,7 @@ class Check
         return false;
     }
 
-	public static function notNull($v){ return !isNull($v); {
+    public static function notNull($v){ return !Check::isNull($v); }
 
     public static function isInt($v) {
         if (preg_match("/^[0-9]+$/", $v)) return true;

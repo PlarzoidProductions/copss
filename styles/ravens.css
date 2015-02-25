@@ -189,7 +189,7 @@ table {
 }
 
 #achievement_listing tr.header {
-    height: 175px;
+    /*height: 175px;*/
 }
 
 th {

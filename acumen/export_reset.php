@@ -25,7 +25,7 @@
 
     $tables = array();
     foreach($raw_tables as $rt){
-        $tables[] = $rt["Tables_in_iron_arena"];
+        $tables[] = $rt["Tables_in_brawltimore"];
     }
 
 
@@ -34,7 +34,7 @@
     Get the Data from the tables, construct a string
 
     ***********************************/
-    $data = "USE copss;\n\n";
+    $data = "USE brawltimore;\n\n";
     foreach ($tables as $t){
 
         $table_data = $db->query("SELECT * FROM $t", array());

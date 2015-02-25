@@ -334,18 +334,20 @@
         }
 
         //Build the Inputs Array
-        $inputs = array("ach_id", "name", "ach_type", "points", "per_game", "game_system");
+        $inputs = array("ach_id", "name", "ach_type", "points", "per_game"); //, "game_system");
         if($is_meta){
             foreach($children as $child){
                 if($child[is_meta]) continue;
                 $inputs[] = "child_".$child[id]."_count";
             }
         } else {
-            $inputs = array_merge($inputs, array("game_count", "game_size", "faction",
+            /*$inputs = array_merge($inputs, array("game_count", "game_size", "faction",
                             "unique_opponent", "unique_opponent_location", "played_theme_force", 
                             "played_fully_painted", "fully_painted_battle", "played_scenario",
                             "multiplayer", "vs_vip", "completed_event")
                         );
+	*/
+	    $inputs = array_merge($inputs, array("completed_event"));
         
         }
         $inputs[] = "submit_ach";

@@ -4,6 +4,7 @@ require_once("classes/page.php");
 require_once("classes/db_achievements.php");
 require_once("classes/db_achievements_earned.php");
 require_once("classes/db_players.php");
+require_once("classes/check.php");
 
 $page = new Page();
 $a_db = new Achievements();
@@ -107,11 +108,9 @@ if($page->submitIsSet("submit_batch")){
 		$second = $page->getVar("second_place");
 		$third = $page->getVar("third_place");
 
-var_dump("here");
-		if(
-			(Check::notNull($first) && Check::notNull($second) && ($first == $second)) || 
-			(Check::notNull($second) && Check::notNull($third) && ($second == $third)) ||
-			(Check::notNull($first) && Check::notNull($third) && ($first == $third))){
+		if((Check::notNull($first) && Check::notNull($second) && ($first == $second)) ||
+		(Check::notNull($second) && Check::notNull($third) && ($second == $third)) ||
+		(Check::notNull($first) && Check::notNull($third) && ($first == $third))){
 			$errors[] = "Same player cannot be awarded two podium spots!";
 		}
 	}
@@ -168,12 +167,19 @@ $form_action = $_SERVER[PHP_SELF]."?view=$view";
 
 if($page->submitIsSet("submit_batch") && $end_result){
 	
-	$first_winner = $p_db->getById($first);
-	$success_str = "Successfully awarded First Place to ".$first_winner[0][last_name].", ".$first_winner[0][first_name]."<br>";
-	$second_winner = $p_db->getById($second);
-    $success_str .= "Successfully awarded Second Place to ".$second_winner[0][last_name].", ".$second_winner[0][first_name]."<br>";
-	$third_winner = $p_db->getById($third);
-    $success_str .= "Successfully awarded Third Place to ".$third_winner[0][last_name].", ".$third_winner[0][first_name]."<br>";
+	$sucess_str = "";
+	if(Check::notNull($first)){
+		$first_winner = $p_db->getById($first);
+		$success_str .= "Successfully awarded First Place to ".$first_winner[0][last_name].", ".$first_winner[0][first_name]."<br>";
+	}
+	if(Check::notNull($second)){
+		$second_winner = $p_db->getById($second);
+    		$success_str .= "Successfully awarded Second Place to ".$second_winner[0][last_name].", ".$second_winner[0][first_name]."<br>";
+	}
+	if(Check::notNull($third)){
+		$third_winner = $p_db->getById($third);
+		$success_str .= "Successfully awarded Third Place to ".$third_winner[0][last_name].", ".$third_winner[0][first_name]."<br>";
+	}
 
 	$success_str .= "<br>Successfully awarded ".$achievement[name]." to:<br>";
 

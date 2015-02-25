@@ -83,6 +83,9 @@ for($i=1; $i <= $num_players; $i++){
 $page->getChoices();
 
 
+
+var_dump("here");
+
 /**************************************
 
 Handle the Submit
@@ -92,6 +95,7 @@ if($page->submitIsSet("submit_batch")){
 
     //First, extract all our inputs
     $ach_id = $page->getVar("ach_id");
+
 
 	if(empty($ach_id)){
 		$errors[] = "Must pick an Achievement!";
@@ -103,6 +107,7 @@ if($page->submitIsSet("submit_batch")){
 		$second = $page->getVar("second_place");
 		$third = $page->getVar("third_place");
 
+var_dump("here");
 		if(
 			(Check::notNull($first) && Check::notNull($second) && ($first == $second)) || 
 			(Check::notNull($second) && Check::notNull($third) && ($second == $third)) ||
@@ -141,7 +146,7 @@ if($page->submitIsSet("submit_batch")){
 	            $end_result = $end_result && $result;
     	    }
     	}
-
+var_dump("here");
 		//Award Podium
 		if(Check::notNull($first)){$result = $ae_db->create($first, $ach_id+1); $end_result = $end_result && $result;}
 		if(Check::notNull($second)){$result = $ae_db->create($second, $ach_id+2); $end_result = $end_result && $result;}

@@ -16,26 +16,26 @@
                 </div>
             <?php }?>
         </section>
-    <?php }?>
-    <header>
-        <hgroup>
-            <h1><?php  echo $title?></h1>
-            <?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
-        </hgroup>
-    </header>
-    <section id="inputs_section">
-        <form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
-        <?php  echo $page->displayVar("player")?>
-        <?php if($selected_player){?>
-            <?php if($available){?>
+    <?php } else {?>
+    	<header>
+        	<hgroup>
+            	<h1><?php  echo $title?></h1>
+            	<?php  if(!empty($error)){?><h3 class="warning"><?php echo $error?></h3><?php }?>
+        	</hgroup>
+    	</header>
+    	<section id="inputs_section">
+        	<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+        	<?php  echo $page->displayVar("player")?>
+        	<?php if($selected_player){?>
                 <h1 class="success"><?php echo $available?>pts Available!</h1>
                 <?php  foreach($inputs as $i){?>
-                    <?php  echo $page->displayVar($i)?>
+                   	<?php  echo $page->displayVar($i)?>
                 <?php }?>
-            <?php } else {?>
-                <h1 class="warning">Play more games!</h1>
-            <?php }?>
-        <?php }?>
-        </form>
-    </section>
+            	<?php if(!$available){?>
+               		<h1 class="warning">Play more games!</h1>
+            	<?php }?>
+        	<?php }?>
+        	</form>
+    	</section>
+	<?php }?>
 </section>

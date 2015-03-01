@@ -16,7 +16,7 @@
         <div class="simple">Games Played: <strong><?php echo $stats[games]?></strong></div>
         <div class="simple">Unique Opponents Played: <strong><?php echo $stats[opponents]?></strong></div>
         <div class="simple">Unique Opponent Locations: <strong><?php echo $stats[locations]?></strong></div>
-        <div class="simple">Factions Played Against: <strong><?php echo $stats[faction_list]?></strong></div>
+        <div class="simple">Factions Played Against:<br/><strong><?php echo $stats[faction_list]?></strong></div>
         <div class="simple"><font <?php if($stats[points] > 0){?>class="success"<?php  } else {?>class="warning"<?php }?>>Current Points: <strong><?php echo $stats[points]?></font></strong></div>
     <?php }?>
     </section>

@@ -11,7 +11,7 @@ class Page {
     var $vars;
     var $root=null;
 
-    var $version = "v1.0.0";
+    var $version = "v1.0.1";
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
         Session::init();
@@ -540,9 +540,13 @@ class Page {
         
         global $$v;
 
+		//if($attr["id"]) $id = "id=\"".$attr["id"]."\" ";
+
+		if($attr["confirm"]){ $confirm = "onclick=\"return confirm('".$attr["confirm"]."');\""; }
+
         if($disp_type == "form") {
     
-            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\">";
+            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\" $confirm>";
             
             $this->printSimpleInput($str);
         }

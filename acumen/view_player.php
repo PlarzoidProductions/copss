@@ -21,7 +21,28 @@ $pr_db = new Prize_redemptions();
 $engine = new Ach_Engine();
 $views_db = new Views();
 
+/*********************************************
+
+Initialize the cheatable stuff
+
+*********************************************/
+$raw_factions = $faction_db->getAll();
+$factions= array();
+foreach($raw_factions as $fac){ $factions[$fac["id"]] = $fac; }
+
+$raw_sizes = $size_db->getAll();
+$sizes = array();
+foreach($raw_sizes as $size){ $sizes[$size["id"]] = $size; }
+
+
+/*********************************************
+
+Get the player to look at
+
+*********************************************/
+
 $pl_id = $_REQUEST[pl_id];
+
 
 /*********************************************
 
@@ -60,13 +81,13 @@ if($selected_player){
      
             //Fetch game size
             if($gp[game_size]){
-                $size = $size_db->getById($gp[game_size]);
+                $size = $sizes[$gp[game_size]];
                 $player[games][$i][players][$j][size] = $size[0][size];
             }
 
             //Fetch faction
             if($gp[faction_id]){
-                $faction = $faction_db->getById($gp[faction_id]);
+                $faction = $factions[$gp[faction_id]];
                 $player[games][$i][players][$j][faction_name] = $faction[0][name];
             }
         }
@@ -126,14 +147,18 @@ if($selected_player){
     //Stats
     $stats = $engine->getPlayerStats($selected_player);
 
-    $faction_list = "";
-    foreach($stats[factions] as $f){
-        $faction_details = $faction_db->getById($f);
-        $faction_list .= $faction_details[0][acronym];
-        if($f != end($stats[factions])){
-            $faction_list .= ", ";
-        }
-    }
+	$raw_factions = $faction_db->queryByColumns(array("parent_game_system"=>1));  //1 is default for WM/H
+	$wmfactions = array();
+	foreach($raw_factions as $fac){ $wmfactions[$fac["id"]] = $fac; }  //get an array keyed by db id
+
+	foreach($stats[factions] as $f){ $wmfactions[$f["id"]]["played"]=1; }  //flag the db list if it's been played
+	
+	$faction_list = "";
+	foreach($wmfactions as $f){ 
+		$faction_list .= "<font color=\"".($f["played"] ? "green" : "red")."\">".$f["acronym"]."</font>";
+		if($f != end($wmfactions)){ $faction_list .= ", "; }
+	}
+
     $stats[faction_list] = $faction_list;
 
     $earned = $views_db->queryByColumns("earned", array("player_id"=>$selected_player));

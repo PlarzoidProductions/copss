@@ -514,14 +514,20 @@ class Ach_Engine {
         $achievements[n][criteria][m][child_details][criteria][j][child_details][criteria][k][child_details] ... etc
     ****************************************************/
 
+	//IMPORTANT - we have to do standard achievements before meta, because a standard we award for this game may trigger a meta
+	//	so they have to go in that order
+
     function getAchievements(){
-        $achs = $this->ach_db->getAll();
-        //$achs = $achs[0];  //strip wrapper
-        
+        $standard_achs = $this->ach_db->queryByColumn(array("is_meta"=>0));
+		$meta_achievements = $this->ach_db->queryByColumn(array("is_meta"=>1));
+       
         $achievements = array();
-        foreach($achs as $a){
+        foreach($standard_achs as $a){
             $achievements[] = $this->getAchievementDetails($a[id]);
         }
+		foreach($meta_achievements as $a){
+			$achievements[] = $this->getAchievementDetails($a[id]);
+		}
 
         return $achievements;
 

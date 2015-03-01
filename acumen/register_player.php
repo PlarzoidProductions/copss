@@ -53,7 +53,9 @@
 		$defaults = $p_db->getById($pl_id);
 		$defaults = $defaults[0];
         $page->register("register", "submit", array("value"=>"Update!"));
-    } else {
+    	$page->register("delete", "submit", array("value"=>"Delete Player", "confirm"=>"Are you sure you want to delete this player?"));
+
+	} else {
         $page->register("register", "submit", array("value"=>"Register!"));
     }
     $page->getChoices();
@@ -88,17 +90,17 @@
             if(($defaults[first_name] != $first) || ($defaults[last_name] != $last)){
 				$columns = array("first_name"=>$first, "last_name"=>$last, "country"=>$country);
 				if(!empty($state))  $columns["state"]=$state;
-                $exists = $p_db->existsByColumns($columns);
+                $exists = $p_db->queryByColumns($columns);  //case insensitive due to MySql
 
-                if($exists){
+				//If our existance check didn't return who we're working on, we've got a problem
+                if(count($exists) && ($exists[0]["id"] != $pl_id)){   
                     $error = "Player with that name & location exists!";
                 }
             }
 
             if(empty($error)){
 				
-				if(empty($state))
-					$state=null;
+				if(empty($state))  $state=null;
                 
 				$columns = array("first_name"=>$first,
                                  "last_name"=>$last,
@@ -137,9 +139,28 @@
         }
     }
 
+	/**************************************
 
+	Handle player deletion
+
+	**************************************/
+	if($page->submitIsSet("delete")){
+
+		try{
+			$success = $p_db->deleteById($pl_id);	
+			$success_str = "Successfully Deleted ".$defaults["last_name"].", ".$defaults["first_name"]."!";
+			$page->setDisplayMode("text");
+			$template = "templates/success.html";
+		} catch (PDOException $e){
+			$error = "Unable to delete player until all games and achievements are removed!";
+
+			$inputs = array("edit_id", "first_name", "last_name", "country", "state", "vip", "register", "delete");
+        	$page->setDisplayMode("form");
+        	$template = "templates/default_section.html";
+		}
+	} else
+	
     /**************************************
-
     Create and Show the Page
 
     **************************************/
@@ -174,7 +195,8 @@
     } else {
     
         $inputs = array("edit_id", "first_name", "last_name", "country", "state", "vip", "register");
-        $page->setDisplayMode("form");
+ 		if(Session::isAdmin() && $pl_id){ $inputs[] = "delete"; }  //Add in the delete option if an admin is logged in
+ 		$page->setDisplayMode("form");
         $template = "templates/default_section.html";
     }
     
@@ -183,7 +205,7 @@
     $title = "Player Registration";
 
     //display it
-    $page->startTemplate();
+    $page->startTemplate($meta);
     $page->doTabs();
     include $template;
     $page->displayFooter();

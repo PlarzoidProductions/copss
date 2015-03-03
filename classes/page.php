@@ -11,7 +11,7 @@ class Page {
     var $vars;
     var $root=null;
 
-    var $version = "v1.0.1";
+    var $version = "v1.0.2";
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
         Session::init();
@@ -112,7 +112,8 @@ class Page {
 
         if(Session::isAdmin()){
             $admin_tabs = array(
-                "Leaderboard"=>"leaderboard",
+                "Bulk Registration"=>"bulk_registration",
+				"Leaderboard"=>"leaderboard",
                 "Manage Users"=>"manage_users",
                 "General Configuration"=>"general_config",
                 "Achievement Configuration"=>"achievement_config",
@@ -164,7 +165,7 @@ class Page {
             case "file":     
                 if(!Check::arrayKeysFormat(array("filedir", "filedir_webpath"), $attributes)) return false;
                 if(!preg_match("/\/$/", $attributes["filedir"])) $attributes["filedir"] .= "/";
-                break;
+				break;
             case "reset":
             case "submit":    
                 if(!Check::arrayKeysFormat(array("value"), $attributes)) return false;

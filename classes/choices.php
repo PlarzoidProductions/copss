@@ -19,17 +19,17 @@ class Choices {
 		//do nothing, really
 	}
 
-        function getConfigureModes(){
-            $ret = array(   array("text"=>"Countries", "value"=>"countries"),
-                            array("text"=>"States", "value"=>"states"),
-                            array("text"=>"Game Systems", "value"=>"game_systems"),
-                            array("text"=>"Factions", "value"=>"game_system_factions"),
-                            array("text"=>"Game Sizes", "value"=>"game_sizes"),
-                            array("text"=>"Events", "value"=>"events")
-                        );
+    function getConfigureModes(){
+        $ret = array(   array("text"=>"Countries", "value"=>"countries"),
+                        array("text"=>"States", "value"=>"states"),
+                        array("text"=>"Game Systems", "value"=>"game_systems"),
+                        array("text"=>"Factions", "value"=>"game_system_factions"),
+                        array("text"=>"Game Sizes", "value"=>"game_sizes"),
+                        array("text"=>"Events", "value"=>"events")
+                    );
 
-            return $ret;
-        }
+        return $ret;
+    }
 
 
 	function getRedeemFunctionChoices(){
@@ -50,17 +50,17 @@ class Choices {
 	}
 
 
-        function getFeedbackTypes(){
-            $types = array("Comment", "Bug", "Question", "Suggestion", "Praise");
+    function getFeedbackTypes(){
+        $types = array("Comment", "Bug", "Question", "Suggestion", "Praise");
 
-            $ret = array();
-            foreach($types as $t){
-                $ret[] = array("text"=>$t, "value"=>$t);
-            }
-
-            return $ret;
-
+        $ret = array();
+        foreach($types as $t){
+            $ret[] = array("text"=>$t, "value"=>$t);
         }
+
+        return $ret;
+
+    }
 
 	
 	function getPlayerChoices(){
@@ -95,7 +95,8 @@ class Choices {
 
 	    return $ret;
 	}
-	
+
+
 	function getIntegerChoices($min, $max, $step){
 		$ret = array();
                 if(Check::notInt($min)){echo "Bad min value!";}
@@ -108,28 +109,29 @@ class Choices {
 
 		return $ret;
 	}
-	
-        function getStates($parent_id){
 
-            if(Check::isNull($parent_id)){
-                return array(array("text"=>"No States Exist", "value"=>"null"));
+
+    function getStates($parent_id){
+
+        if(Check::isNull($parent_id)){
+            return array(array("text"=>"No States Exist", "value"=>"null"));
+        }
+
+        $s = new States();
+
+        $states = $s->getByParent($parent_id);
+
+        if($states){
+            $ret = array();
+
+            foreach($states as $state){
+                $ret[] = array("value"=>$state[id], "text"=>$state[name]);
             }
 
-            $s = new States();
+			return $ret;
+        }
 
-            $states = $s->getByParent($parent_id);
-
-            if($states){
-                $ret = array();
-
-                foreach($states as $state){
-                    $ret[] = array("value"=>$state[id], "text"=>$state[name]);
-                }
-
-		return $ret;
-            }
-
-            return null;
+        return null;
 	}
 
 	function getCountries(){
@@ -287,5 +289,18 @@ class Choices {
         }
 
 
+	function getFileModes(){
+		$columns = array("First, Last, State, Country"=>"FLSC",
+						 "First, Last, Country, State"=>"FLCS",
+						 "Last, First, State, Country"=>"LFSC",
+						 "Last, First, Country, State"=>"LFCS");
+		$ret = array(array("text"=>"Please Select", "value"=>"NULL"));
+		foreach($columns as $t=>$v){
+			$ret[] = array("text"=>$t, "value"=>$v);
+		}
+
+		return $ret;
+	}
+			
 }
 ?>

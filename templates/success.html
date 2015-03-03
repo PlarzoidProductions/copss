@@ -7,7 +7,12 @@
         <div class="simple">
             <?php echo $success_str?> 
         </div>
-        <div class="simple">
+		<?php if(!empty($error_str)){?>
+			<div class="simple">
+			     <font class="warning"><?php echo $error_str?></font>
+			</div>
+		<?php }?>
+		<div class="simple">
             <a href="<?php echo $link[href]?>"><h1><?php echo $link[text]?></h1></a>
         </div>
     </section>

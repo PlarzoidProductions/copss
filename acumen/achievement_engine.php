@@ -518,8 +518,8 @@ class Ach_Engine {
 	//	so they have to go in that order
 
     function getAchievements(){
-        $standard_achs = $this->ach_db->queryByColumn(array("is_meta"=>0));
-		$meta_achievements = $this->ach_db->queryByColumn(array("is_meta"=>1));
+        $standard_achs = $this->ach_db->queryByColumns(array("is_meta"=>0));
+	$meta_achievements = $this->ach_db->queryByColumns(array("is_meta"=>1));
        
         $achievements = array();
         foreach($standard_achs as $a){

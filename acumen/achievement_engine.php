@@ -277,8 +277,10 @@ class Ach_Engine {
 					 	 FROM game_players
 					 	 WHERE player_id = :player_id
 						 	AND game_id < :game_id)';
-			$opponents = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
-			$opponents = array_column($opponents, "pid");
+			$r_opponents = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
+			//$opponents = array_column($opponents, "pid"); //Doesn't work with Server2Go
+			$opponents = array();
+			foreach($r_opponents as $ro){ $opponents[] = $ro["pid"]; }
 
             //detect new opponents by querying against history
             $new_opponents = 0;
@@ -307,8 +309,11 @@ class Ach_Engine {
                          	WHERE player_id = :player_id
 								AND game_id < :game_id)
 						AND player_id != :player_id2) AS opponents';
-            $locations = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id], ":player_id2"=>$player[player_id]));
-			$locations = array_column($locations, "loc");
+            $r_locations = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id], ":player_id2"=>$player[player_id]));
+	    //$locations = array_column($locations, "loc"); //Doesn't work with Server2Go
+	    $locations = array();
+	    foreach($r_locations as $rl){ $locations[] = $rl["loc"]; }
+	    
 
             //detect new
             $new_locs = 0;

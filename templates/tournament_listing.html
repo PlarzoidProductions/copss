@@ -1,0 +1,37 @@
+<section id="achievement_listing">
+    <header><h1>Tournament</h1></header>
+    <table>
+        <tr class="header">
+            <th>Name</th>
+			<th>Game System</th>
+            <th><div class="rotated">Max Num Players</div></th>
+            <th><div class="rotated">Max Num Rounds</div></th>
+            <th><div class="rotated">Num Lists Required</div></th>
+            <th><div class="rotated">Divide &amp; Conquer</div></th>
+			<th>Final Standings<br>Type</th>
+			<th><div class="rotated">Final Tables</div></th>
+			<th><div class="rotated">Large Event Scoring</div></th>
+			<th></th>
+        </tr>
+    <?php foreach($tournaments as $t){?>
+        <tr class="<?php echo $t[style]?>">
+            <td>
+                <?php echo $t[name]?> 
+                (<a href="home.php?view=tournament_config&action=edit&t_id=<?php echo $t[id]?>">Edit</a>)
+            </td>
+            <td><?php echo $t[game_system_name]?></td>
+            <td><?php echo $t[max_num_players]?></td>
+            <td><?php echo $t[max_num_rounds]?></td>
+            <td><?php echo $t[num_lists_required]?></td>
+            <td><?php if($t[divide_and_conquer]){?>Y<?php } else {?>N<?php }?></td>
+            <td><?php echo $t[standings_type]?></td>
+            <td><?php if($t[final_tables]){?>Y<?php } else {?>N<?php }?></td>
+            <td><?php if($t[large_event_scoring]){?>Y<?php } else {?>N<?php }?></td>
+            <td>
+                <a href="home.php?view=tournament_config&action=delete&t_id=<?php echo $t[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+

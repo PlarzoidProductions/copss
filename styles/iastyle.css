@@ -95,6 +95,11 @@ body {
     color: #FF0000;
 }
 
+.aside_separator {
+	text-align: center;
+	font-weight: bold;
+}
+
 #main_aside #active_tab {
     background: #444444;
 }
@@ -198,7 +203,8 @@ th {
 
 .rotated {
     -webkit-transform:rotate(-90deg);
-    white-space:nowrap;
+	text-align: center;
+	white-space:nowrap;
     padding: 2px;
     width: 20px;
     height: 100%;

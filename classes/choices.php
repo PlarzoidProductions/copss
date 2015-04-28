@@ -286,6 +286,21 @@ class Choices {
                          array("text"=>"Ascending", "value"=>"0"));
         }
 
+	function getTournamentStandingsTypes(){
+		$types = array(
+			"Baseline"=>"STANDARD",
+			"Assassin"=>"ASSASSIN",
+			"Control Point"=>"CONTROLPOINT",
+			"Destruction"=>"DESTRUCTION"
+			);
+
+		$ret = array();
+        foreach($types as $t=>$v){
+            $ret[] = array("text"=>$t, "value"=>$v);
+        }
+
+        return $ret;
+    }
 
 }
 ?>

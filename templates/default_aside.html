@@ -1,12 +1,27 @@
 <aside id="main_aside">
+	<div class="aside_separator">--- General ---</div>
     <ul>
-    <?php  foreach($tabs as $label=>$link){?>
-        <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
-            <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
-        </li>
+	<?php  foreach($general_tabs as $label=>$link){?>
+	<li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+		<a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+	</li>
+	<?php }?>
+	</ul>
+	<div class="aside_separator">--- Iron Arena ---</div>
+	<?php  foreach($arena_tabs as $label=>$link){?>
+    <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+        <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+    </li>
     <?php }?>
     </ul>
-    <?php  if(Session::isAdmin()){?>
+    <div class="aside_separator">--- Tournaments ---</div>
+    <?php  foreach($tournament_tabs as $label=>$link){?>
+    <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
+        <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
+    </li>
+    <?php }?>
+    </ul>
+	<?php  if(Session::isAdmin()){?>
         <div id="admin_panel">--- Admin Panel ---</div>
         <ul>
         <?php  foreach($admin_tabs as $label=>$link){?>

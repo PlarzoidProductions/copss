@@ -100,15 +100,23 @@ class Page {
 
     function doTabs(){
 
-        $tabs = array(
+        $general_tabs = array(
             "Register Player"=>"register_player",
             "View Player Profile"=>"view_player",
-            "Report Game"=>"report_game",
-            "Redeem Skulls"=>"redeem",
-            "Event Achievements"=>"batch_processing",
             "Software Feedback"=>"feedback"
             );
 
+		$arena_tabs = array(
+			"Report Game"=>"report_game",
+            "Redeem Skulls"=>"redeem",
+            "Event Achievements"=>"batch_processing"
+			);
+
+		$tournament_tabs = array(
+			"Configure Tournaments"=>"tournament_config",
+			"Tournament Registration"=>"tournament_registration",
+			"Manage Tournament"=>"manage_tournament"
+			);
 
         if(Session::isAdmin()){
             $admin_tabs = array(

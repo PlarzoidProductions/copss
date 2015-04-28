@@ -288,7 +288,7 @@ class Page {
 
         
     //set disp_type to either "form" or "success"
-    function displayVar($varname, $disp_type = false, $args = array()) {
+    function printVar($varname, $disp_type = false, $args = array()) {
 
         if ($disp_type == false) {
             if (!$this->disp_mode) {
@@ -305,30 +305,22 @@ class Page {
         switch ($type) {
             //Special cases
             case "hidden": 
-                $this->printHidden($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printHidden($varname, $this->vars[$varname], $disp_type);
             case "submit": 
-                $this->printSubmit($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printSubmit($varname, $this->vars[$varname], $disp_type);
             case "select": 
-                $this->printSelect($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printSelect($varname, $this->vars[$varname], $disp_type);
             case "checkbox_array": 
-                $this->printCheckboxArray($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printCheckboxArray($varname, $this->vars[$varname], $disp_type);
             case "radio": 
-                $this->printRadio($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printRadio($varname, $this->vars[$varname], $disp_type);
             case "reset":
-                $this->printReset($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printReset($varname, $this->vars[$varname], $disp_type);
             case "textarea":
-                $this->printTextarea($varname, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printTextarea($varname, $this->vars[$varname], $disp_type);
             //Everything else
             default: 
-                $this->printGenericInput($varname, $type, $this->vars[$varname], $disp_type);
-                break;
+                return $this->printGenericInput($varname, $type, $this->vars[$varname], $disp_type);
         }
     }
 
@@ -394,26 +386,17 @@ class Page {
         if(($lvar===null) || (empty($lvar) && !is_numeric($lvar))){  //empty(0) == true, but we may want the number 0
             
             //If it's not there, set it to the default
-	    if(in_array("default_val", array_keys($attrs))){
+	    	if(in_array("default_val", array_keys($attrs))){
             	$lvar = $attrs["default_val"];
-	    } else {
-		$lvar = null;
-	    }
+	    	} else {
+				$lvar = null;
+	    	}
         }
 
         //if we're just showing data, do it and quit now
         if(strcmp($disp_type, "form")){ //returns 0 on true
             echo $lvar;
             return;
-        }
-
-        //else, generate the input form:
-
-        //Use or make up a label for the input
-        if(in_array("label", array_keys($attrs))){
-            $label = $attrs["label"];
-        } else {
-            $label = $this->generateLabel($v);
         }
 
         //detect units
@@ -479,15 +462,33 @@ class Page {
         //Close the input
         $str.="> $units";
 
-	//Detect if this is one of the hidden inputs
-	$is_hidden = false;
-	if(in_array("hidden", array_keys($attrs))){
-		$is_hidden = $attrs["hidden"];
+    	return $str;
 	}
 
+
+	function displayVar($varname, $disp_type = false, $args = array()){
+
+		$str = $this->printVar($varname, $disp_type, $args);
+       
+		$attrs = $this->vars[$varname];
+ 
+		//Detect if this is one of the hidden inputs
+        $is_hidden = false;
+        if(in_array("hidden", array_keys($attrs))){
+            $is_hidden = $attrs["hidden"];
+        }
+
+        //Use or make up a label for the input
+        if(in_array("label", array_keys($attrs))){
+            $label = $attrs["label"];
+        } else {
+            $label = $this->generateLabel($v);
+        }
+
         //Finally, echo the HTML
-        $this->printComplexInput($v, $label, $str, $is_hidden);
-    }
+        $this->printComplexInput($varname, $label, $str, $is_hidden);
+	}
+
 
     function printComplexInput($name, $label, $input, $hidden=null){
         if($hidden==1){
@@ -577,12 +578,6 @@ class Page {
         global $$vchoices;
         $choices = $$vchoices;
 
-        if($attr["label"]){
-            $label = $attr["label"];
-        } else {
-            $label = $this->generateLabel($v);
-        }
-
         if($disp_type == "form"){
 
             //Build the open select tag
@@ -620,7 +615,7 @@ class Page {
             //Close the select tag
             $str.= "</select>";
            
-            $this->printComplexInput($v, $label, $str);
+            return $str;
 
         } else {
             foreach($choices as $c) {
@@ -628,7 +623,7 @@ class Page {
                     if($args["lowercase"] == true) $text = strtolower($c["text"]);
                     else $text = $c["text"];
 
-                    $this->printComplexInput($v, $label, $text);
+                    return $text;
                 }
             }            
         }

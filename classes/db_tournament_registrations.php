@@ -151,6 +151,27 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
+public function getRegistrationsByTournamentId($t_id){
+
+	$sql = "select  
+				`tr`.`id` as `id`, 
+				`tr`.`tournament_id` as tournament_id, 
+				`tr`.`has_dropped` as has_dropped, 
+				`tr`.`had_buy` as had_buy, 
+				`p`.`first_name` as first_name, 
+				`p`.`last_name` as last_name, 
+				`f`.`name` as faction_name 
+			from 
+				`tournament_registrations` `tr` 
+			left join `players` `p` 
+				on `tr`.`player_id`=`p`.`id` 
+			left join `game_system_factions` `f` 
+				on `tr`.`faction_id`=`f`.`id` 
+			where tournament_id=:id
+			order by last_name, first_name;";
+
+	return $this->db->query($sql, array(":id"=>$t_id));
+}
 
 /**************************************************
 

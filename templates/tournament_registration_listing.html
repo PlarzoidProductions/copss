@@ -1,0 +1,25 @@
+<section id="listing">
+    <header><h1>Current Registrations (<?php echo count($registrations)?> / <?php echo $tournament[0][max_num_players]?>)</h1></header>
+    <table>
+        <tr class="header">
+			<th></th>
+            <th>Name</th>
+			<th>Faction</th>
+			<th>Dropped</th>
+			<th></th>
+        </tr>
+		<?php $i=1; $odd=true;?>
+    <?php foreach($registrations as $r){?>
+        <tr <?php if($odd){?>class="odd"<?php } $odd = !$odd;?>>
+			<td><?php echo $i; $i++;?></td>
+            <td><?php echo $r[last_name]?>, <?php echo $r[first_name]?></td>
+            <td><?php echo $r[faction_name]?></td>
+            <td><?php if($r[has_dropped]){?><font class="warning">Y</font><?php }?></td>
+            <td>
+                <a href="home.php?view=tournament_registration&action=delete&t_id=<?php echo $r[id]?>">Delete</a>
+            </td>
+        </tr>
+    <?php }?>
+    </table>
+</section>
+

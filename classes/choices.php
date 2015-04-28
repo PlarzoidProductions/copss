@@ -9,6 +9,9 @@ require_once("db_game_system_factions.php");
 require_once("db_game_sizes.php");
 require_once("db_events.php");
 require_once("db_achievements.php");
+require_once("db_tournaments.php");
+require_once("db_tournament_registrations.php");
+
 
 class Choices {
 
@@ -302,5 +305,35 @@ class Choices {
         return $ret;
     }
 
+	function getTournamentChoices(){
+		$t_db = new Tournaments();
+
+		$tournaments = $t_db->getAll();
+
+		$choices = array(array("text"=>"Please select...", "value"=>null));
+		foreach($tournaments as $t){
+			$choices[] = array("value"=>$t["id"], "text"=>$t["name"]);
+		}
+
+		return $choices;
+	}
+
+
+/*
+
+	Needs a view that left joins registrations with players and tournaments
+
+	function getTournamentPlayerChoices($t_id){
+		$tr_db = new Tournament_Registrations();
+		$p_db = new Players();
+		$regs = $tr_db->getByTournamentId($t_id);
+
+		$ret = array(array("text"=>"Please select...", "value"=>null));
+		foreach($regs as $r){
+			
+			$ret[] = array("text"
+	}
+
+*/
 }
 ?>

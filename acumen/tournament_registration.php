@@ -6,12 +6,15 @@ require_once("classes/db_game_system_factions.php");
 require_once("classes/db_tournaments.php");
 require_once("classes/db_tournament_registrations.php");
 
+require_once("tournament_engine.php");
+
 $page = new Page();
 $t_db = new Tournaments();
 $tr_db = new Tournament_Registrations();
 $p_db = new Players();
 $f_db = new Game_system_factions();
 
+$te = Tournament_Engine();
 
 /**************************************
 
@@ -106,7 +109,7 @@ if($page->submitIsSet("submit_batch")){
        	if(!$exists){
 
 			//If not, do so
-           	$result = $tr_db->create($p_id, $t_id, $p["faction_id"], false, false);
+           	$result = $te->addPlayer($t_id, $p_id, $p["faction_id"]);
 			$end_result = $end_result && $result;
     	}
     }

@@ -115,7 +115,8 @@ class Page {
 		$tournament_tabs = array(
 			"Configure Tournaments"=>"tournament_config",
 			"Tournament Registration"=>"tournament_registration",
-			"Manage Tournament"=>"manage_tournament"
+			"Record Game"=>"record_tournament_game",
+			"View Standings"=>"view_tournament_standings"
 			);
 
         if(Session::isAdmin()){

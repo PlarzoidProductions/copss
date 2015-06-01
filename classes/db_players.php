@@ -78,6 +78,23 @@ public function create($first_name, $last_name, $country, $state, $vip){
 				:vip,
 				NOW())";
 
+
+echo "INSERT INTO $this->table (
+                first_name,
+                last_name,
+                country,
+                state,
+                vip,
+                creation_date
+            ) VALUES (
+                '$first_name',
+                '$last_name',
+                $country,
+                $state,
+                0,
+                NOW())";
+
+
 	return $this->db->insert($sql, $values);
 }
 

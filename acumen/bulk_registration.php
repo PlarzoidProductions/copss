@@ -5,7 +5,9 @@
     require_once("classes/db_states.php");
     require_once("classes/db_countries.php");
 
-    $page = new Page("Admin");
+
+    $page = new Page();
+    //$page = new Page("Admin");
 	$p_db = new Players();
 	$s_db = new States();
 	$c_db = new Countries();
@@ -36,7 +38,7 @@ AZ  ARIZONA
 CA  CALIFORNIA
 CO  COLORADO
 CT  CONNECTICUT
-DC  WASHINGTON, DISTRICT OF COLUMBIA
+DC  DISTRICT OF COLUMBIA
 DE  DELAWARE
 FL  FLORIDA
 FM  FEDERATED STATES OF MICRONESIA
@@ -125,7 +127,6 @@ foreach($p_codes as $pcode){
     ***************************************/
 
     if($page->submitIsSet("upload")){
-
 		//Check for upload errors
 		try{
 			if(!isset($_FILES["inputfile"]["error"]) || is_array($_FILES["inputfile"]["error"])){
@@ -156,16 +157,28 @@ foreach($p_codes as $pcode){
 		} catch (RuntimeException $e){
 			echo $e->getMessage();
 		}
+	}
 
+	if(true){
+
+		$filepath="/home/user/Documents/IronArenaImport.csv";
 
 		//Load the file
 		if(isset($filepath)){
 			$players = file($filepath);
 
+			/*
+
 			//Load the user_inputs
 			$file_mode = $page->getVar("file_format");
     	    $default_country = $page->getVar("default_country");
         	$default_state = $page->getVar("default_state");
+
+			*/
+
+			$file_mode = "FLSC";
+			$default_country = 244;
+			$default_state=47;
 
 
 		    //Prep some lookup data
@@ -309,7 +322,6 @@ foreach($p_codes as $pcode){
 
 				//Load the new player into the database
 				if(!isset($reg_errors[$i])){
-					var_dump($i);
             		$result = $p_db->create($pl[$first], $pl[$last], $pl["country_id"], $pl["state_id"], 0);
 					if($result) $successes++;
 				}
@@ -317,7 +329,7 @@ foreach($p_codes as $pcode){
 				$i++;
         	}
 		}
-
+exit;
 		$success_str = "Successfully registered ".$successes." players!";
 
 		if($successes != $i){

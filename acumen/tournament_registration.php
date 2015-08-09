@@ -53,7 +53,7 @@ $t_id = $page->getVar("t_id");
 
 /**************************************
 
-Player Inputs
+Additional Inputs
 
 **************************************/
 if(!empty($t_id)){
@@ -61,6 +61,10 @@ if(!empty($t_id)){
 	$tournament = $t_db->getById($t_id);
 	
 	$page->register("submit_batch", "submit", array("value"=>"Submit"));
+
+	$page->register("use_clubs", "checkbox", array("on_text"=>"Use Clubs", "off_text"=>"Don't use Clubs", 
+					"default_val"=>"1", "units"=>"(try to not pair clubmates Round 1)"));
+	$page->register("start_tournament", "submit", array("value"=>"Start the Tournament!", "confirm"=>"Are you sure?"));
 
 	$clubs_raw = $tr_db->getClubOptionsByTournamentId($t_id);
 	$clubs = array();
@@ -127,6 +131,17 @@ if($page->submitIsSet("submit_batch")){
     }
 }
 
+/**************************************
+
+Start the Tournament
+
+**************************************/
+if($page->submitIsSet("start_tournament")){
+
+	$use_clubs = $page->getVar("use_clubs");
+
+	$success = $te->startTournament($t_id, $use_clubs);
+}
 
 /**************************************
 
@@ -139,31 +154,52 @@ $inputs = array("t_id");
 $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
 
+
+//If the user registered new players...
 if($page->submitIsSet("submit_batch") && $end_result){
     $success_str = "Successfully registered the following players for ".$tournament[0][name].":<br>";
 
     foreach($players as $p){
         $success_str .= $p[last_name].", ".$p[first_name]."<br>";
     }
+
 }
 
+//Default template, may be overridden later
 $page->setDisplayMode("form");
+
 $link = array("href"=>"home.php?view=$view", "text"=>"Register more players?");
 
 $registrations = $tr_db->getRegistrationsByTournamentId($t_id);
+
+$meta = '<link rel="stylesheet"  href="'.$page->getWebRoot().'styles/awesomplete.css">
+	<script src="'.$page->getWebRoot().'js/awesomplete.js" async></script>';
+
+$template = "templates/tournament_registration.html";
+
+
+//If the user is starting the tournament...
+if($page->submitIsSet("start_tournament") && $success){
+	$success_str = "Successfully Started the Tournament!  Redirecting you to the pairings ...";
+
+	$page->setDisplayMode("text");
+
+	$link = array("href"=>$_SERVER[PHP_SELF]."?view=manage_tournament", "text"=>"View the Pairings!");
+
+	$meta = '<META http-equiv="refresh" content="5;URL='.$_SERVER[PHP_SELF].'?view=manage_tournament">';
+
+	$template = "templates/default_section.html";
+}
+
 
 /***************************************
 
 Display the page
 
 ***************************************/
-
-$meta = '<link rel="stylesheet"  href="'.$page->getWebRoot().'styles/awesomplete.css">
-<script src="'.$page->getWebRoot().'js/awesomplete.js" async></script>';
-
 $page->startTemplate($meta);
 $page->doTabs();
-include("templates/tournament_registration.html");
+include($template);
 if(!empty($t_id)){
 	include("templates/tournament_registration_listing.html");
 }

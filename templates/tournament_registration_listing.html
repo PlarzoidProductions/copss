@@ -24,4 +24,14 @@
     <?php }?>
     </table>
 </section>
-
+<section id="only_section">
+	<header>
+		<h1>Start the Tournament!</h1>
+	</header>
+	<section id="inputs_section">
+		<form method="<?php echo $form_method?>" action="<?php echo $form_action?>">
+			<?php echo $page->displayVar("use_clubs")?>
+			<?php echo $page->displayVar("start_tournament")?>
+		</form>
+	</section>
+</section>

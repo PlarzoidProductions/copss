@@ -706,8 +706,14 @@ class Page{
         global $$v;
 
         if($disp_type == "form") {
+
+			if(in_array("confirm", array_keys($attr))){
+				$confirm = 'onClick="return confirm(\''.$attr["confirm"].'\')"';
+			} else {
+				$confirm = "";
+			}
     
-            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\">";
+            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\"".$confirm.">";
             
             $this->printSimpleInput($str);
         }

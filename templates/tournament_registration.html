@@ -32,15 +32,24 @@
 				<em>Any player slots left set to "Please select..." will be skipped</em>
     	        <hr>
 	            <br/>
+				<table>
+					<tr>
+						<th></th>
+						<th>Player Name</th>
+						<th>Faction</th>
+						<th>Club (Optional)</th>
+					</tr>
 				<?php for($i=1; $i <= 5; $i++){?>
-					<div class="input_container">
-						Player <?php echo $i?>: 
-                		<?php echo $page->printVar("player_".$i."_id")?>
-						playing 
-						<?php echo $page->printVar("faction_".$i."_id")?>
-					</div>
-					<br/>
+					<!--<div class="input_container">--!>
+					<tr>
+						<td><?php echo $i?>:</td>
+                		<td><?php echo $page->printVar("player_".$i."_id")?></td>
+						<td><?php echo $page->printVar("faction_".$i."_id")?></td>
+						<td><?php echo $page->printVar("club_".$i."_id")?></td>
+					</tr>
+					<!--</div>--!>
             	<?php }?>
+				</table>
             	<hr>
             	<?php echo $page->printVar("submit_batch")?>
 			<?php }?>

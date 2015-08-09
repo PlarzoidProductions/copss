@@ -67,7 +67,7 @@ class Session {
 
 	public static function isAuthorized($level) {
 		//Firstly, everyone is authorized to see public pages
-                if(!strcmp($level, "PUBLIC")){return true;}//remember, strcmp returns 0 on match :p
+        if(!strcmp($level, "PUBLIC")){return true;}//remember, strcmp returns 0 on match :p
 
 		if(Session::isLoggedIn()){
 			//before we go any further, admins are always authorized

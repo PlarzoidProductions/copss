@@ -8,13 +8,14 @@ require_once("classes/db_tournament_registrations.php");
 
 require_once("tournament_engine.php");
 
+
 $page = new Page();
 $t_db = new Tournaments();
 $tr_db = new Tournament_Registrations();
 $p_db = new Players();
 $f_db = new Game_system_factions();
 
-$te = Tournament_Engine();
+$te = new Tournament_Engine();
 
 /**************************************
 
@@ -61,6 +62,13 @@ if(!empty($t_id)){
 	
 	$page->register("submit_batch", "submit", array("value"=>"Submit"));
 
+	$clubs_raw = $tr_db->getClubOptionsByTournamentId($t_id);
+	$clubs = array();
+	foreach($clubs_raw as $club){
+		$clubs[] = $club["name"];
+	}
+	$club_list_string = implode(',', $clubs);
+
 
 	for($i=1; $i <= 5; $i++){
     	$page->register("player_".$i."_id", "select", array("label"=>"Player $i",
@@ -69,6 +77,8 @@ if(!empty($t_id)){
 		$page->register("faction_".$i."_id", "select", array("label"=>"Faction",
 														"get_choices_array_func"=>"getGameSystemFactions",
 														"get_choices_array_func_args"=>array($tournament[0]["game_system_id"])));
+		$page->register("club_".$i."_id", "textbox", array("label"=>"Club", "class"=>"awesomplete",
+														"data-list"=>$club_list_string));
 	}
 }
 
@@ -87,6 +97,7 @@ if($page->submitIsSet("submit_batch")){
     for($i=1; $i <= 5; $i++){
         $p_id = $page->getVar("player_".$i."_id");
 		$faction_id = $page->getVar("faction_".$i."_id");
+		$club = $page->getVar("club_".$i."_id");
 
 	    if(Check::isNull($p_id)){ continue;}
 		if(Check::isNull($faction_id)){
@@ -100,6 +111,7 @@ if($page->submitIsSet("submit_batch")){
        	$players[$p_id] = $player[0];
 		$players[$p_id]["faction_id"] = $faction_id;
 		$players[$p_id]["faction_name"] = $faction[0]["name"];
+		$players[$p_id]["club"] = $club;
 
 	}
 
@@ -109,7 +121,7 @@ if($page->submitIsSet("submit_batch")){
        	if(!$exists){
 
 			//If not, do so
-           	$result = $te->addPlayer($t_id, $p_id, $p["faction_id"]);
+           	$result = $te->addPlayer($t_id, $p_id, $p["faction_id"], $p["club"]);
 			$end_result = $end_result && $result;
     	}
     }
@@ -145,7 +157,11 @@ $registrations = $tr_db->getRegistrationsByTournamentId($t_id);
 Display the page
 
 ***************************************/
-$page->startTemplate();
+
+$meta = '<link rel="stylesheet"  href="'.$page->getWebRoot().'styles/awesomplete.css">
+<script src="'.$page->getWebRoot().'js/awesomplete.js" async></script>';
+
+$page->startTemplate($meta);
 $page->doTabs();
 include("templates/tournament_registration.html");
 if(!empty($t_id)){

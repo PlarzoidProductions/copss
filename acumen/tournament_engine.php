@@ -27,7 +27,7 @@ class Tournament_Engine {
 	var $tournament_registrations_db = null;
 	var $views = null;
 
-    function Ach_Engine(){
+    function Tournament_Engine(){
         $this->player_db = new Players();
         $this->ach_db = new Achievements();
         $this->meta_criteria_db = new Meta_achievement_criteria();
@@ -36,7 +36,7 @@ class Tournament_Engine {
 
 		$this->tournaments_db = new Tournaments();
 		$this->tournament_games_db = new Tournament_Games();
-		$this->tournament_game_details_db = new Tournaments_Game_Details();
+		$this->tournament_game_details_db = new Tournament_Game_Details();
 		$this->tournament_registrations_db = new Tournament_Registrations();
 		
 		$this->views = new Views();
@@ -54,13 +54,15 @@ class Tournament_Engine {
 
 	****************************************************/
 
-	public function addPlayer($t_id, $p_id, $f_id){
-		
-		//First, check to see if the tournament is already running
+	public function addPlayer($t_id, $p_id, $f_id, $club){
+
+		//Add the player
+		$result = $this->registerPlayer($t_id, $p_id, $f_id, $club);
+
+		//Check to see if the tournament is already running
 		$games = $this->getTournamentGames($t_id);
 
-		$result = $this->registerPlayer($t_id, $p_id, $f_id);
-
+		//If so, award the new player a buy for the current round
 		if(count($games)){
 			$round = end(array_keys($games));
 			$result &= $this->addBuy($t_id, $p_id, $round);
@@ -69,8 +71,10 @@ class Tournament_Engine {
 		return $result;
 	}
 
-	private function registerPlayer($t_id, $p_id, $f_id){
-		return $this->tournament_registrations_db->create($p_id, $t_id, $f_id, false, false);	
+
+	//Convenient Wrapper
+	private function registerPlayer($t_id, $p_id, $f_id, $club){
+		return $this->tournament_registrations_db->create($p_id, $t_id, $f_id, false, false, $club);	
 	}
 
 
@@ -80,18 +84,42 @@ class Tournament_Engine {
 
 	***************************************************/
 	public function startGame($t_id, $round, $p1_id, $p2_id){
-		
+	
+		//Create a new game for the round
 		$game_id = $this->tournament_games_db->create($t_id, $round);
 
 		if(empty($game_id)) return false;
 
+
+		//Initialize the results columns in the DB for each player
 		$result = $this->tournament_game_details_db->create($game_id, $p1_id);
 		$result &= $this->tournament_game_details_db->create($game_id, $p2_id);
 
 		return $result;
 	}
 
-	
+
+	/****************************************************
+
+    Get Tournament
+
+    Retrieves data on the selected Tournament, placing it in a nested array
+
+    ****************************************************/
+	public function getTournament($t_id){
+		if(Check::notInt($t_id)){ echo "Invalid Tournament ID: $t_id!";}
+
+		//First, get the top level Tournament entity
+		$tournament = $this->tournaments_db->getById($t_id);
+		$tournament = $tournament[0];
+
+		//Retrieve the games, store them one level down
+		$tournament["games"] = $this->getTournamentGames($t_id);
+
+		return $tournament;
+	}
+
+
 
 	/***************************************************
 
@@ -126,26 +154,6 @@ class Tournament_Engine {
 		return $games;
 	}
 		
-
-	/****************************************************
-
-    Get Tournament
-
-    Retrieves data on the selected Tournament, placing it in a nested array
-
-    ****************************************************/
-	public function getTournament($t_id){
-		if(Check::notInt($t_id)){ echo "Invalid Tournament ID: $t_id!";}
-
-		//First, get the top level Tournament entity
-		$tournament = $this->tournaments_db->getById($t_id);
-		$tournament = $tournament[0];
-
-		$tournament["games"] = $this->getTournamentGames($t_id);
-
-		return $tournament;
-	}
-
 
 }//class close 
 

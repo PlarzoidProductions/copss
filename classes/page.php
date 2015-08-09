@@ -1,34 +1,53 @@
 <?php
 
+/******************************
+*
+*	Page Class
+*
+*	The master class that coordinates pretty much everything
+*
+******************************/
+
+//Relies on...
+
 require_once("session.php");
 require_once("check.php");
 require_once("choices.php");
 
-class Page {
+class Page{
 
-    var $sysClass;
-    var $authLevel;
-    var $vars;
-    var $root=null;
+	//Global Variables
 
-    var $version = "v1.0.0";
+    var $authLevel;				//Page's required authority level
+    var $vars;					//Array to contain all the global variables used by the page
+    var $root=null;				//The document root
+
+    var $version = "v1.0.0";	//Software version number - in one place for easy updates/changes
+
+
+	/********************************
+	*
+	* Class Contructor
+	*
+	********************************/
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
+
+		//Initialize the PHP Session system
         Session::init();
 
-        //set the webroot
+        //set the webroot & document root
         $this->servername = $_SERVER["HTTP_HOST"];
-
         if (preg_match("/\/~(\w+)\//", $_SERVER["PHP_SELF"], $matches)) {
             $this->root = "/~" . $matches["1"] . "/";
         } else {
             //$this->root = "/";
         }
 
-        //set the vars array to empty
+        //initialize an empty vars array
         $vars = array();
 
-        //set internal authority level
+        //set page required authority level
         switch((string)$authentication_level) {
             case "Public"    : 
             case "public"    : $this->authLevel="PUBLIC";
@@ -38,18 +57,37 @@ class Page {
                 break;
             default: $this->authLevel=$authentication_level;
                 break;
-        }//switch($authentication_level) {
+        }
 
-        //authentication checking
+        //Now that we have parsed the required authorization level, make sure the current user
+		// 		is allowed to see the page
         if($this->isNotAuthorized()){
+
+			//FAIL show the not authorized page and quit
             $this->startTemplate();
             include("include/templates/authError.html");    
             $this->displayFooter();
             exit;
         }
+
+		/*
+		Done initializing the page
+			* we've snagged the required wuth levekl and ensured that the user has proper credentials
+			* we've initialized the vars array, which will contain all the 
+			* we've set up the webroot and document root, for URL and INCLUDE purposes
+			* we're now ready for register() calls
+		*/
     }
 
+
+	/************************************
+	*
+	*	User Auth vs Page Auth Required Check
+	*
+	************************************/
+
     function isNotAuthorized(){
+		//NOTE THE NOT IN THE FUNCTION NAME
         //returns true if user is NOT authorized
         //returns false if they are
 
@@ -59,6 +97,10 @@ class Page {
         //for the rest of the tests, a user must be logged in, so stop now if we're not logged in
         if(!Session::isLoggedIn()){return true;}
     
+		//TODO Private (must be logged in) level??
+
+		//TODO Tournament authorization level??
+
         //if page is admin page, check for admin logged in
         if(!strcmp($this->authLevel,"ADMIN")){
             if(Session::isNotAdmin()){
@@ -67,36 +109,56 @@ class Page {
             }
         }
 
-
         //at this point, it's not a public or admin page,
-        //so check user's auth_level vs page's authLevel
+        //so check user's auth_level vs page's authLevel - using numbers, if applicable
         if(!Session::isAuthorized($this->authLevel)){
             //echo "You are not authorized to view this page!";
             return true;
         }
 
-        //user fell through all the traps above, so is authorized.
+        //user passed through all the traps above, so is authorized.
         return false;
     }
+
+
+	/*******************************
+	*
+	*	Get the Webroot, useful for #including templates and dependencies
+	*
+	*******************************/
 
     function getWebRoot(){
         return $this->root;
     }
 
+	/******************************
+	*
+	*	Get Version, for printing in headers and footers
+	*
+	******************************/
+
     function getVersion(){
         return $this->version;
     }
 
-    function printView() {
-        if ($this->print == "Y") return true;
-        else return false;
-    }
+
+	/******************************
+	*
+	*	Start Template (ie, display the default header)
+	*
+	******************************/
 
     function startTemplate($meta=NULL) {
 
         include("templates/default_header.html");
     }
 
+
+	/******************************
+	*
+	*	doTabs - Generates & Builds the side tabs 
+	*
+	******************************/
 
     function doTabs(){
 
@@ -107,17 +169,17 @@ class Page {
             );
 
 		$arena_tabs = array(
-			"Report Game"=>"report_game",
+	    	"Report Game"=>"report_game",
             "Redeem Skulls"=>"redeem",
             "Event Achievements"=>"batch_processing"
 			);
 
 		$tournament_tabs = array(
-			"Configure Tournaments"=>"tournament_config",
-			"Tournament Registration"=>"tournament_registration",
-			"Record Game"=>"record_tournament_game",
-			"View Standings"=>"view_tournament_standings"
-			);
+	    	"Configure Tournaments"=>"tournament_config",
+	    	"Tournament Registration"=>"tournament_registration",
+	    	"Record Game"=>"record_tournament_game",
+	    	"View Standings"=>"view_tournament_standings"
+	    	);
 
         if(Session::isAdmin()){
             $admin_tabs = array(
@@ -136,25 +198,64 @@ class Page {
     }
 
 
+	/***************************************
+	*
+	*	Close - closes the page
+	*
+	***************************************/
+
     function close($noheader=false) {
         $this->displayFooter($noheader);
         $this->closeDatabase();
     }
     
+
+	/***************************************
+	*
+	*	displayFooter - displays the footer for the page
+	*
+	***************************************/
+
     function displayFooter($noheader=false) {
 
         include("templates/default_footer.html");
 
     }
     
-    function closeDatabase() {
-    }
+
+	/***************************************
+	*
+	*	closeDatabase - does nothing, right now
+	*
+	***************************************/
+
+    function closeDatabase() {}
     
+	/**************************************
+	*
+	*	pageName - returns the name of the php page being executed
+	*
+	**************************************/
+
     function pageName() {
         return $_SERVER["PHP_SELF"];
     }
 
-    //HTML FORM Functions
+    
+	/**************************************
+	***************************************
+	*
+	*	Register Function
+	*
+	*	Takes parameters that configure a user input from the page
+	*		Validates those input parameters
+	*		Establishes a default value for the inputs, if necessary
+	*		Stores the parameters & configurations into global space for use later
+	*
+	***************************************
+	**************************************/
+
+
     function register($varname, $type, $attributes=array()) {
 
         //first, first, add the damn use_post
@@ -238,15 +339,15 @@ class Page {
         global $$varname;
 
         //Snag POST values
-	if(array_key_exists("use_post", $attributes) 
-            && $attributes["use_post"]
-            && in_array($varname, array_keys($_POST))){
+		if(array_key_exists("use_post", $attributes) 
+            	&& $attributes["use_post"]
+            	&& in_array($varname, array_keys($_POST))){
 	        
             $$varname = trim($_POST[$varname]);
 
         //Snag REQUEST values
-	} else if(in_array($varname, array_keys($_REQUEST))){
-	    $$varname = trim($_REQUEST[$varname]);
+		} else if(in_array($varname, array_keys($_REQUEST))){
+	    	$$varname = trim($_REQUEST[$varname]);
 	
         //else, set to null
         } else {
@@ -268,11 +369,23 @@ class Page {
         return true;
     }
 
+	/****************************************
+	*
+	*	Unregister - destroys the variable from global space, deleting it
+	*
+	****************************************/
+
     function unregister($varname) {
         global $$varname;
         unset($$varname);
         unset($this->vars[$varname]);
     }
+
+	/***************************************
+	*
+	*	SubmitIsSet - Checks if the provided button was the one that was clicked
+	*
+	***************************************/
 
     function submitIsSet($submitvar_name) {
         global $$submitvar_name;
@@ -283,12 +396,130 @@ class Page {
         return false;
     }
 
+	/**************************************
+	*
+	*	setDisplayMode - Sets display mode (typ. "text" or "form")
+	*
+	**************************************/
+
     function setDisplayMode($mode) {
         $this->disp_mode = $mode;
     }
 
-        
-    //set disp_type to either "form" or "success"
+    
+	/*************************************
+	*
+	*	getVar - returns the value sent by the user for an input variable
+	*
+	*************************************/
+
+    function getVar($v) {
+        global $$v;
+       
+        /* 
+        if(Check::isNull($_REQUEST[$v])){
+            $_REQUEST[$v] = $$v;
+        } else {
+            $$v = $_REQUEST[$v];
+        }
+        */
+
+        return stripslashes($$v);
+    }
+
+
+	/***********************************************
+	************************************************
+	*
+	*	DisplayVar
+	*
+	*	Displays the input variable to the user
+	*		Generates the HTML for the input using the registered configuration data		
+	*		Generates a label, if one is not specified
+	*		Wraps the HTML in the CSS tagged DIVs for pretty-ness
+	*
+	************************************************
+	***********************************************/
+    
+    function displayVar($varname, $disp_type = false, $args = array()){
+
+		$str = $this->printVar($varname, $disp_type, $args);
+
+		if($str == false) return false;	//quit here if we're told to
+
+		$attrs = $this->vars[$varname];
+
+		//Detect if this is one of the hidden inputs
+        $is_hidden = false;
+        if(in_array("hidden", array_keys($attrs))){
+            $is_hidden = $attrs["hidden"];
+        } else if(!strcmp($attrs["type"], "hidden")){//returns 0 on match
+			echo $str;
+			return;
+		}
+
+        //Use or make up a label for the input
+        if(in_array("label", array_keys($attrs))){
+            $label = $attrs["label"];
+        } else {
+			$label = $this->generateLabel($varname);
+		}
+
+        //Finally, echo the HTML
+        $this->printComplexInput($varname, $label, $str, $is_hidden);
+    }
+
+	/************************************************
+	*
+	*	printComplexInput - Wraps HTML input in DIVs
+	*
+	************************************************/
+
+    function printComplexInput($name, $label, $input, $hidden=null){
+        if($hidden==1){
+            $class = "hidden_input_container";
+        } else {
+            $class = "input_container";
+        }
+
+        $str = "<div class=\"$class\" name=\"$name\">";
+        $str.=     "<div class=\"label\"><label for=\"$name\">$label:</label></div>";
+        $str.=     "<div class=\"input\">$input</div>";
+        $str.= "</div>";
+
+        echo $str;
+    }
+
+	/***********************************************
+	*
+	*	generateLabel - turns a [variable_name] into a label: [Variable Name]
+	*
+	***********************************************/
+
+    function generateLabel($v){
+        $label = "";
+        $name_parts = preg_split("~_~", $v);
+        foreach($name_parts as $part){
+            $label .= ucfirst(strtolower($part));
+            if(strcmp($part, end($name_parts))){
+                $label.= " ";
+            }
+        }
+        return $label;
+    }    
+    
+    
+    /**********************************************
+	***********************************************
+	*
+	*	printVar
+	*		
+	*	Generates the HTML input form
+	*		Determines the proper display mode to use (text or form)
+	*		Farms out HTML generation based on input types, for those that have special forms (select, for example)
+	*
+	***********************************************
+	**********************************************/
     function printVar($varname, $disp_type = false, $args = array()) {
 
         if ($disp_type == false) {
@@ -306,7 +537,7 @@ class Page {
         switch ($type) {
             //Special cases
             case "hidden": 
-                return $this->printHidden($varname, $this->vars[$varname], $disp_type);
+                echo $this->printHidden($varname, $this->vars[$varname], $disp_type); return false;
             case "submit": 
                 return $this->printSubmit($varname, $this->vars[$varname], $disp_type);
             case "select": 
@@ -325,54 +556,13 @@ class Page {
         }
     }
 
-
-    function getVar($v) {
-        global $$v;
-       
-        /* 
-        if(Check::isNull($_REQUEST[$v])){
-            $_REQUEST[$v] = $$v;
-        } else {
-            $$v = $_REQUEST[$v];
-        }
-        */
-
-        return stripslashes($$v);
-    }
-
-
-    function getChoices() {
-        foreach ($this->vars as $v=>$attr) {
-            if($attr["type"]=="select" || $attr["type"]=="checkbox_array" || $attr["type"]=="radio"){
-
-                if(strlen($attr["choices_array_var"]) > 0){
-                    $cname = $attr["choices_array_var"];
-                } else {
-                    $cname = $v . "_choices";
-                }
-                if(isset($$cname)){//variable already exists, let's clear it??
-                    continue;
-                }
-
-                $cfunc = $attr["get_choices_array_func"];
-                $ch = new Choices();
-                global $$cname;
-                $a = $attr["get_choices_array_func_args"];
-        
-                if(!is_array($a)) $a = array();
-                switch(count($a)) {
-                    case 0: $$cname = $ch->$cfunc(); break;
-                    case 1: $$cname = $ch->$cfunc($a["0"]); break;
-                    case 2: $$cname = $ch->$cfunc($a["0"], $a["1"]); break;
-                    case 3: $$cname = $ch->$cfunc($a["0"], $a["1"], $a["2"]); break;
-                    case 4: $$cname = $ch->$cfunc($a["0"], $a["1"], $a["2"], $a["3"]); break;
-                    default: $$cname = $ch->$cfunc();
-                }
-            }//if
-        }//foreach
-    }//function
-
-
+    
+    /***********************************
+	*
+	*	printGenericInput - generates the generic <input> HTML for a variable
+	*
+	***********************************/
+    
     function printGenericInput($v, $type, $attrs, $disp_type = "form"){
         //Pull out the requested variable's registered data from teh global variable space
         global $$v;
@@ -464,63 +654,28 @@ class Page {
         $str.="> $units";
 
     	return $str;
-	}
-
-
-	function displayVar($varname, $disp_type = false, $args = array()){
-
-		$str = $this->printVar($varname, $disp_type, $args);
-       
-		$attrs = $this->vars[$varname];
- 
-		//Detect if this is one of the hidden inputs
-        $is_hidden = false;
-        if(in_array("hidden", array_keys($attrs))){
-            $is_hidden = $attrs["hidden"];
-        }
-
-        //Use or make up a label for the input
-        if(in_array("label", array_keys($attrs))){
-            $label = $attrs["label"];
-        } else {
-            $label = $this->generateLabel($v);
-        }
-
-        //Finally, echo the HTML
-        $this->printComplexInput($varname, $label, $str, $is_hidden);
-	}
-
-
-    function printComplexInput($name, $label, $input, $hidden=null){
-        if($hidden==1){
-            $class = "hidden_input_container";
-        } else {
-            $class = "input_container";
-        }
-
-        $str = "<div class=\"$class\" name=\"$name\">";
-        $str.=     "<div class=\"label\"><label for=\"$name\">$label:</label></div>";
-        $str.=     "<div class=\"input\">$input</div>";
-        $str.= "</div>";
-
-        echo $str;
     }
 
-    function generateLabel($v){
-        $label = "";
-        $name_parts = preg_split("~_~", $v);
-        foreach($name_parts as $part){
-            $label .= ucfirst(strtolower($part));
-            if(strcmp($part, end($name_parts))){
-                $label.= " ";
-            }
-        }
-        return $label;
-    }
+
+	/*******************************************
+	*
+	*	printSimpleInput - generates HTML for inputs that don't have labels, like buttons
+	*
+	*******************************************/
 
     function printSimpleInput($input){
         echo "<div class=\"input_container\"><div class=\"simple\">$input</div></div>";
     }
+
+	/*******************************************
+	********************************************
+	*
+	*	Specific Printers
+	*
+	*	Generate HTML for the unique input forms
+	*
+	********************************************
+	*******************************************/
 
     function printHidden($v, $attr, $disp_type = "form"){
         if($disp_type == "form"){
@@ -630,6 +785,39 @@ class Page {
         }
     }        
 
+    
+    function getChoices() {
+        foreach ($this->vars as $v=>$attr) {
+            if($attr["type"]=="select" || $attr["type"]=="checkbox_array" || $attr["type"]=="radio"){
+
+                if(strlen($attr["choices_array_var"]) > 0){
+                    $cname = $attr["choices_array_var"];
+                } else {
+                    $cname = $v . "_choices";
+                }
+                if(isset($$cname)){//variable already exists, let's clear it??
+                    continue;
+                }
+
+                $cfunc = $attr["get_choices_array_func"];
+                $ch = new Choices();
+                global $$cname;
+                $a = $attr["get_choices_array_func_args"];
+        
+                if(!is_array($a)) $a = array();
+                switch(count($a)) {
+                    case 0: $$cname = $ch->$cfunc(); break;
+                    case 1: $$cname = $ch->$cfunc($a["0"]); break;
+                    case 2: $$cname = $ch->$cfunc($a["0"], $a["1"]); break;
+                    case 3: $$cname = $ch->$cfunc($a["0"], $a["1"], $a["2"]); break;
+                    case 4: $$cname = $ch->$cfunc($a["0"], $a["1"], $a["2"], $a["3"]); break;
+                    default: $$cname = $ch->$cfunc();
+                }
+            }//if
+        }//foreach
+    }//function
+    
+    
     function printTextarea($v, $attr, $disp_type = "form"){
         global $$v;
         $_REQUEST[$v] = $$v;
@@ -727,6 +915,6 @@ class Page {
         }
     }
 
-}
+}//class close
 
 ?>

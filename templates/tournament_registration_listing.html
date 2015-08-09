@@ -5,6 +5,7 @@
 			<th></th>
             <th>Name</th>
 			<th>Faction</th>
+			<th>Club</th>
 			<th>Dropped</th>
 			<th></th>
         </tr>
@@ -14,6 +15,7 @@
 			<td><?php echo $i; $i++;?></td>
             <td><?php echo $r[last_name]?>, <?php echo $r[first_name]?></td>
             <td><?php echo $r[faction_name]?></td>
+			<td><?php echo $r[club]?></td>
             <td><?php if($r[has_dropped]){?><font class="warning">Y</font><?php }?></td>
             <td>
                 <a href="home.php?view=tournament_registration&action=delete&t_id=<?php echo $r[id]?>">Delete</a>

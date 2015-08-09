@@ -16,6 +16,7 @@
 *	faction_id - INT
 *	has_dropped - TINYINT
 *	had_buy - TINYINT
+*	club - VARCHAR
 *
 **************************************************/
 require_once("query.php");
@@ -43,7 +44,7 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($player_id, $tournament_id, $faction_id, $has_dropped, $had_buy){
+public function create($player_id, $tournament_id, $faction_id, $has_dropped, $had_buy, $club){
 
 	//Validate the inputs
 	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
@@ -51,6 +52,7 @@ public function create($player_id, $tournament_id, $faction_id, $has_dropped, $h
 	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 	$has_dropped = $this->filterHasDropped($has_dropped); if($has_dropped === false){return false;}
 	$had_buy = $this->filterHadBuy($had_buy); if($had_buy === false){return false;}
+	$club = $this->filterClub($club); if($club === false){return false;}
 
 	//Create the values Array
 	$values = array(
@@ -58,7 +60,8 @@ public function create($player_id, $tournament_id, $faction_id, $has_dropped, $h
  		":tournament_id"=>$tournament_id,
  		":faction_id"=>$faction_id,
  		":has_dropped"=>$has_dropped,
- 		":had_buy"=>$had_buy
+ 		":had_buy"=>$had_buy,
+		":club"=>$club
 	);
 
 	//Build the query
@@ -67,13 +70,15 @@ public function create($player_id, $tournament_id, $faction_id, $has_dropped, $h
 				tournament_id,
 				faction_id,
 				has_dropped,
-				had_buy
+				had_buy,
+				club
 			) VALUES (
 				:player_id,
 				:tournament_id,
 				:faction_id,
 				:has_dropped,
-				:had_buy)";
+				:had_buy,
+				:club)";
 
 	return $this->db->insert($sql, $values);
 }
@@ -158,6 +163,7 @@ public function getRegistrationsByTournamentId($t_id){
 				`tr`.`tournament_id` as tournament_id, 
 				`tr`.`has_dropped` as has_dropped, 
 				`tr`.`had_buy` as had_buy, 
+				`tr`.`club` as club,
 				`p`.`first_name` as first_name, 
 				`p`.`last_name` as last_name, 
 				`f`.`name` as faction_name 
@@ -171,6 +177,20 @@ public function getRegistrationsByTournamentId($t_id){
 			order by last_name, first_name;";
 
 	return $this->db->query($sql, array(":id"=>$t_id));
+}
+
+
+public function getClubOptionsByTournamentId($t_id){
+
+	$sql = "SELECT
+				DISTINCT(club) as name
+			FROM
+				$this->table
+			WHERE
+				tournament_id=:t_id AND club IS NOT NULL
+			ORDER BY name ASC";
+
+	return $this->db->query($sql, array(":t_id"=>$t_id));
 }
 
 /**************************************************
@@ -253,6 +273,13 @@ public function getByHadBuy($had_buy){
     return $this->queryByColumns(array("had_buy"=>$had_buy));
 }
 
+public function getByClub($club){
+	
+	//Validate Inputs
+	$club = $this->filterClub($club); if($club === false){return false;}
+
+	return $this->queryByColumns(array("club"=>$club));
+}
 
 /**************************************************
 
@@ -359,6 +386,14 @@ function filterHadBuy($had_buy){
     return intVal($had_buy);
 }
 
+function filterClub($club){
+	//Allowed to be null
+	if(Check::isNull($club)){
+		return null;
+	}
+
+	return strval($club);
+}
 
 
 }//close class

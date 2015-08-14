@@ -8,7 +8,6 @@ require_once("classes/db_tournament_registrations.php");
 
 require_once("tournament_engine.php");
 
-
 $page = new Page();
 $t_db = new Tournaments();
 $tr_db = new Tournament_Registrations();
@@ -137,6 +136,9 @@ Start the Tournament
 
 **************************************/
 if($page->submitIsSet("start_tournament")){
+
+	//TODO WHY DOESN"T THIS WORK?!?
+	var_dump("here");
 
 	$use_clubs = $page->getVar("use_clubs");
 

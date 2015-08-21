@@ -78,6 +78,69 @@ class Tournament_Engine {
 	}
 
 
+
+	public function startTournament($t_id, $use_clubs=false){
+
+		//First, let's get all the info we'll need to do the pairings
+		$tournament = $this->getTournament($t_id);
+
+
+		//All the different ways we can influence the initial pairings
+		$keys = array(
+			"country"=>array(),
+			"state"=>array(),
+			"faction_id"=>array(),
+			"club"=>array());
+
+
+		//Run through the registrations
+		foreach($tournament["registrations"] as $reg){
+
+			//Run through the keys
+			foreach(array_keys($keys) as $key){
+
+
+				//If the unique value the registrant has for this key is not yet in the list of values, add it.
+				if(!array_key_exists($reg[$key], $keys[$key])){
+					$keys[$key][$reg[$key]] = array();
+				}
+
+				//Track the registrant under this unique value for the key
+				$keys[$key][$reg[$key]][] = $reg["registration_id"];
+
+			}
+		}
+
+		//Decide the pairing criteria priority
+		if(count($keys["country"]) > 1){
+			$first = "country";
+			$second = "state";
+			$third = "faction";
+		} else {
+			$first = "state";
+			$third = "faction";
+		}
+		if($use_clubs){
+			$third = $second;
+			$second = $first;
+			$first = $keys["club"];
+		}
+
+		//Do the thing
+		$paired = array();	//track who's been paired thus far
+		if($use_clubs){
+			
+
+
+		}
+
+
+
+
+
+
+	}
+
 	/***************************************************
 
 	Start Game
@@ -112,6 +175,9 @@ class Tournament_Engine {
 		//First, get the top level Tournament entity
 		$tournament = $this->tournaments_db->getById($t_id);
 		$tournament = $tournament[0];
+
+		//Retrieve the registrations
+		$tournament["registrations"] = $this->getTournamentRegistrations($t_id);
 
 		//Retrieve the games, store them one level down
 		$tournament["games"] = $this->getTournamentGames($t_id);
@@ -153,7 +219,25 @@ class Tournament_Engine {
 
 		return $games;
 	}
-		
+
+	public function getTournamentRegistrations($t_id){
+
+		$sql = "SELECT 
+					`p`.*,
+					`p`.`id` as player_id,
+					`tr`.*,
+					`tr`.`id` as registration_id
+				FROM
+					`tournament_registrations` `tr`
+				LEFT JOIN `players` `p`
+					ON `tr`.`player_id`=`p`.`id`
+				WHERE
+					`tr`.`tournament_id`=:t_id";
+
+		return $this->views->customQuery($sql, array(":t_id"=>$t_id));
+	}
+
+
 
 }//class close 
 

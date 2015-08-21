@@ -50,6 +50,8 @@ $page->register("t_id", "select", array("reloading"=>1, "label"=>"Tournament",
 
 $t_id = $page->getVar("t_id");
 
+
+
 /**************************************
 
 Additional Inputs
@@ -136,9 +138,6 @@ Start the Tournament
 
 **************************************/
 if($page->submitIsSet("start_tournament")){
-
-	//TODO WHY DOESN"T THIS WORK?!?
-	var_dump("here");
 
 	$use_clubs = $page->getVar("use_clubs");
 

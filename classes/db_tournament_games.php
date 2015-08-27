@@ -13,6 +13,7 @@
 *	id - INT - PRIMARY KEY
 *	tournament_id - INT
 *	round - INT
+*	table_number - INT
 *	winner_id - INT
 *
 **************************************************/
@@ -41,17 +42,19 @@ public function __destruct(){}
 Create Function
 
 **************************************************/
-public function create($tournament_id, $round, $winner_id){
+public function create($tournament_id, $round, $table_number, $winner_id){
 
 	//Validate the inputs
 	$tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
 	$round = $this->filterRound($round); if($round === false){return false;}
+	$table_round = $this->filterTableNumber($table_number); if($table_number === false){return false;}
 	$winner_id = $this->filterWinnerId($winner_id); if($winner_id === false){return false;}
 
 	//Create the values Array
 	$values = array(
 		":tournament_id"=>$tournament_id,
  		":round"=>$round,
+		":table_number"=>$table_number,
  		":winner_id"=>$winner_id
 	);
 
@@ -59,10 +62,12 @@ public function create($tournament_id, $round, $winner_id){
 	$sql = "INSERT INTO $this->table (
 				tournament_id,
 				round,
+				table_number,
 				winner_id
 			) VALUES (
 				:tournament_id,
 				:round,
+				:table_number,
 				:winner_id)";
 
 	return $this->db->insert($sql, $values);
@@ -196,6 +201,15 @@ public function getByRound($round){
 }
 
 
+public function getByTableNumber($table_number){
+	
+	//validate Inputs
+	$table_number = $this->filterTableNumber($table_number); if($table_number === false){return false;}
+
+	return $this->queryByColumns(array("table_number"=>$table_number));
+}
+
+
 public function getByWinnerId($winner_id){
 	
     //Validate Inputs
@@ -265,6 +279,19 @@ function filterRound($round){
     return intVal($round);
 }
 
+
+function filterTableNumber($table_number){
+    //Not allowed to be null
+    if(Check::isNull($table_number)){
+        echo "table_number cannot be null!"; return false;
+    }
+
+    if(Check::notInt($table_number)){
+        echo "table_number was invalid!"; return false;
+    }
+
+    return intVal($table_number);
+}
 
 
 function filterWinnerId($winner_id){

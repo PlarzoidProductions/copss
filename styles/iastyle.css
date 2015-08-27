@@ -216,6 +216,7 @@ tr.odd{
 
 td, th {
     padding: 0px 2px;
+	text-align: center;
 }
 
 

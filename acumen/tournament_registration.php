@@ -185,7 +185,7 @@ if($page->submitIsSet("start_tournament") && $success){
 
 	$page->setDisplayMode("text");
 
-	$link = array("href"=>$_SERVER[PHP_SELF]."?view=manage_tournament", "text"=>"View the Pairings!");
+	$link = array("href"=>$_SERVER[PHP_SELF]."?view=manage_tournament&t_id=".$t_id, "text"=>"View the Pairings!");
 
 	$meta = '<META http-equiv="refresh" content="5;URL='.$_SERVER[PHP_SELF].'?view=manage_tournament">';
 

@@ -177,6 +177,7 @@ class Page{
 		$tournament_tabs = array(
 	    	"Configure Tournaments"=>"tournament_config",
 	    	"Tournament Registration"=>"tournament_registration",
+			"Manage Tournament"=>"manage_tournament",
 	    	"Record Game"=>"record_tournament_game",
 	    	"View Standings"=>"view_tournament_standings"
 	    	);
@@ -713,9 +714,7 @@ class Page{
 				$confirm = "";
 			}
     
-            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\"".$confirm.">";
-            
-            $this->printSimpleInput($str);
+            return "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\"".$confirm.">";
         }
     }
 

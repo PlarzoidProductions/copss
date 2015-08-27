@@ -324,10 +324,8 @@ function filterPlayerId($player_id){
 
 
 function filterListPlayed($list_played){
-    //Not allowed to be null
-    if(Check::isNull($list_played)){
-        echo "list_played cannot be null!"; return false;
-    }
+    //Allowed to be null
+    if(Check::isNull($list_played)){ return null; }
 
     if(Check::notInt($list_played)){
         echo "list_played was invalid!"; return false;
@@ -339,10 +337,8 @@ function filterListPlayed($list_played){
 
 
 function filterControlPoints($control_points){
-    //Not allowed to be null
-    if(Check::isNull($control_points)){
-        echo "control_points cannot be null!"; return false;
-    }
+    //Allowed to be null
+    if(Check::isNull($control_points)){ return null; }
 
     if(Check::notInt($control_points)){
         echo "control_points was invalid!"; return false;
@@ -354,10 +350,8 @@ function filterControlPoints($control_points){
 
 
 function filterDestructionPoints($destruction_points){
-    //Not allowed to be null
-    if(Check::isNull($destruction_points)){
-        echo "destruction_points cannot be null!"; return false;
-    }
+    //Allowed to be null
+    if(Check::isNull($destruction_points)){ return null; }
 
     if(Check::notInt($destruction_points)){
         echo "destruction_points was invalid!"; return false;
@@ -382,10 +376,8 @@ function filterAssassinationEfficiency($assassination_efficiency){
 
 
 function filterTimedOut($timed_out){
-    //Not allowed to be null
-    if(Check::isNull($timed_out)){
-        echo "timed_out cannot be null!"; return false;
-    }
+    //Allowed to be null
+    if(Check::isNull($timed_out)){ return null; }
 
     if(Check::notBool($timed_out)){
         echo "timed_out was invalid!"; return false;

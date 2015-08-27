@@ -1,0 +1,58 @@
+<form action="<?php echo $form_action ?>" method="<?php echo $form_method ?>">
+<section id="main_section">
+    <header>
+        <hgroup>
+            <h1><?php echo $title ?></h1>
+            <?php if(!empty($errors)){ foreach($errors as $error){ ?><h3 class="warning"><?php echo $error?></h3><br/><?php } } ?>
+        </hgroup>
+    </header>
+    <section id="inputs_section">
+        <?php  foreach($inputs as $i){ ?>
+            <?php  echo $page->displayVar($i)?>
+        <?php } ?>
+    </section>
+</section>
+<section id="listing">
+	<table>
+		<tr>
+			<th>Table</th>
+			<th>Player Name</th>
+			<th>Faction</th>
+			<th>List Used</th>
+			<th>Won</th>
+			<th>CP</th>
+			<th>AP</th>
+			<th>MH</th>
+			<th>Clocked</th>
+			<th></th>
+		</tr>
+		
+	<?php for($i=0; $i < count($tournament["games"]); $i++ ){ ?>
+		<tr><td colspan="10"><hr></td></tr>
+		<tr>
+			<td rowspan="2"><?php echo $tournament["games"][$i]["table_number"] ?></td>
+			<td><?php echo $tournament["games"][$i]["last_name"] ?>, <?php echo $tournament["games"][$i]["first_name"] ?></td>
+			<td><?php echo $tournament["registrations"][$tournament["games"][$i]["id"]]["faction"] ?></td>
+			<td><?php echo $page->printVar("list_used_".$i) ?></td>
+			<td alt="Won"><?php echo $page->printVar("won_".$i) ?></td>
+			<td><?php echo $page->printVar("cp_earned_".$i) ?></td>
+			<td><?php echo $page->printVar("ap_earned_".$i) ?></td>
+			<td><?php echo $page->printVar("mage_hunter_score_".$i) ?></td>
+			<td><?php echo $page->printVar("timed_out_".$i) ?></td>
+			<td rowspan="2"><?php echo $page->printVar("submit_game_".$tournament["games"][$i]["game_id"]) ?></td>
+		</tr>
+		<?php $i++; ?>
+		<tr>
+			<td><?php echo $tournament["games"][$i]["last_name"] ?>, <?php echo $tournament["games"][$i]["first_name"] ?></td>
+            <td><?php echo $tournament["registrations"][$tournament["games"][$i]["id"]]["faction"] ?></td>
+            <td><?php echo $page->printVar("list_used_".$i) ?></td>
+            <td><?php echo $page->printVar("won_".$i) ?></td>
+			<td><?php echo $page->printVar("cp_earned_".$i) ?></td>
+            <td><?php echo $page->printVar("ap_earned_".$i) ?></td>
+            <td><?php echo $page->printVar("mage_hunter_score_".$i) ?></td>
+            <td><?php echo $page->printVar("timed_out_".$i) ?></td>
+		</tr>
+	<?php } ?>
+	</table>
+</section>
+</form>

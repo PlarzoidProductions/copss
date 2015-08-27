@@ -135,6 +135,16 @@ class Choices {
             return null;
 	}
 
+	function getListChoices($count){
+		$ret = array();
+
+		for($i=1; $i<=$count; $i++){
+			$ret[] = array("value"=>$i, "text"=>"List $i");
+		}
+
+		return $ret;
+	}
+
 	function getCountries(){
 
                 $c = new Countries();

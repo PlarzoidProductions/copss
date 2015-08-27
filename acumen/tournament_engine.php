@@ -83,7 +83,7 @@ class Tournament_Engine {
 
 		//First, let's get all the info we'll need to do the pairings
 		$tournament = $this->getTournament($t_id);
-
+		$table=1;
 
 		//All the different ways we can influence the initial pairings
 		$keys = array(
@@ -118,41 +118,153 @@ class Tournament_Engine {
 			$third = "faction";
 		} else {
 			$first = "state";
-			$third = "faction";
+			$second = "faction";
+			$third = "country";//gotta have a third, and this nicely bunches everyone up for detection later
 		}
-		if($use_clubs){
+
+		//If we're using clubs, shuffle the order
+		//However, we need to actually have clubs, on top of checking the "use_clubs" checkbox (which is checked by default)
+		//Since we have <empty string> as no club, a club size=1 indicates no clubs, so we need clubs to have a size of at least 2
+		if($use_clubs && (count($keys["club"])>1)){	
 			$third = $second;
 			$second = $first;
-			$first = $keys["club"];
+			$first = "club";
 		}
 
-		//Do the thing
 		$paired = array();	//track who's been paired thus far
-		if($use_clubs){
-			
+
+		//While we have people not yet paired
+		while(count($paired) < count($tournament["registrations"])){
+
+			//Use the priority and keys to make two groups
+			$pools = $this->make_pools($keys, array($first, $second, $third), $paired);
+			$largest = $pools["largest"];
+			$pool = $pools["pool"];
+
+			//Something (potentially) went wrong, or we're close to done, 
+			//		and we need to pair the entire pool, and quit
+			if($largest == null){
+	
+				//Check for an odd number, let's snag the bye now
+				if(count($pool) % 2 == 1){
+					shuffle($pool);
+					$bye = array_pop($pool);
+					$this->awardBye($t_id, 1, $bye);
+				}
+				
+				while(count($pool)){
+					//Snag two people
+					shuffle($pool);
+					$p1 = array_pop($pool);
+					shuffle($pool);
+					$p2 = array_pop($pool);
+
+					//Toss 'em in the ring
+                	$this->startGame($t_id, 1, $table, $p1, $p2);$table++;
+
+                	//Add 'em to the done pile
+                	$paired[] = $p1;
+                	$paired[] = $p2;
+				}
+			} else {
 
 
+				//We have the largest group that shouldn't be paired together, pair them to anyone in the pool
+				//Until we run out of one group or the other
+				while((count($largest)>0) && (count($pool)>0)){
+
+					//mix 'em up
+					shuffle($largest);
+					shuffle($pool);
+
+					//yank one out of each
+					$p1 = array_pop($largest);
+					$p2 = array_pop($pool);
+
+					//Toss 'em in the ring
+					$this->startGame($t_id, 1, $table, $p1, $p2);$table++;
+
+					//Add 'em to the done pile
+					$paired[] = $p1;
+					$paired[] = $p2;
+				}
+			}
+		}
+
+		return "Successfully paired up ".count($paired)." players!";
+	}
+
+	private function make_pools($keys, $key_priority, $paired){
+
+        $largest=array();   $pool=array();
+        foreach($keys[$key_priority[0]] as $key){
+            if(count($key) > count($largest)){
+                $pool = $this->exclusive_merge($pool, $largest, $paired);
+                $largest = $this->exclusive_merge(array(), $key, $paired);
+            } else {
+                $pool = $this->exclusive_merge($pool, $key, $paired);
+            }
+        }
+
+		//We never found a sub-set larger than one, so everyone can be put into one pool
+		if(count($largest) == 0){
+			$pool=array();
+			foreach($keys[$first] as $key){
+				$pool = $this->exclusive_merge($pool, $key, $paired);
+			}
+
+			return array("largest"=>null, "pool"=>$pool);
 		}
 
 
+		//We found only one large grouping remaining
+		if(count($pool) == 0){
+
+			//If possible, we go to the next deciding factor
+			if(count($key_priority) > 1){
+				$key_priotity = array_reverse($key_priority);
+				array_pop($key_priority);
+				$key_priotity = array_reverse($key_priority);
+
+				return $this->make_pools($keys, $key_priority, $paired);
+			}
+
+			//We're at the last deciding factor, so there's no choice but to pair within the group
+			return array("largest"=>null, "pool"=>$largest);
+		}
 
 
-
-
+		//if we're here, the pools were made fine, so hand them back
+		return array("largest"=>$largest, "pool"=>$pool);		
+	
 	}
+
+	//Merge new data into existing array, minus any matching data from a third set
+	//ie:  add a set of new players to an existing set, but don't add in the ones that have already been matched
+
+	private function exclusive_merge($existing, $new, $exclusions){
+		foreach($new as $n){
+			if(!in_array($n, $exclusions)){
+				$existing[] = $n;
+			}
+		}
+		
+		return $existing;
+	}
+
+
 
 	/***************************************************
 
 	Start Game
 
 	***************************************************/
-	public function startGame($t_id, $round, $p1_id, $p2_id){
+	public function startGame($t_id, $round, $table, $p1_id, $p2_id){
 	
 		//Create a new game for the round
-		$game_id = $this->tournament_games_db->create($t_id, $round);
+		$game_id = $this->tournament_games_db->create($t_id, $round, $table);
 
 		if(empty($game_id)) return false;
-
 
 		//Initialize the results columns in the DB for each player
 		$result = $this->tournament_game_details_db->create($game_id, $p1_id);
@@ -161,6 +273,12 @@ class Tournament_Engine {
 		return $result;
 	}
 
+
+	public function awardBye($t_id, $round, $player_id){
+
+		//TODO
+
+	}
 
 	/****************************************************
 
@@ -198,26 +316,22 @@ class Tournament_Engine {
 
 		$games = array();
 
-		$sql =  "select 
+		$sql =  "SELECT 
+					`tg`.`table_number` as `table_number`,
 					`tg`.`round` as `round`,
 					`tg`.`winner_id` as `winner_id`,
 					`tgd`.*,
 					`p`.*
-				from 
+				FROM
 					`tournament_games` `tg`
-				left join `tournament_game_details` `tgd`
-					on `tg`.`id`=`tgd`.`game_id`
-				left join `players` `p`
-					on `tgd`.`player_id`=`p`.`id`
-				where `tg`.`tournament_id`=:t_id and `round`=:round";
+				LEFT JOIN `tournament_game_details` `tgd`
+					ON `tg`.`id`=`tgd`.`game_id`
+				LEFT JOIN `players` `p`
+					ON `tgd`.`player_id`=`p`.`id`
+				WHERE `tg`.`tournament_id`=:t_id 
+				ORDER BY `round`, `table_number`";
 
-		$i=1;
-		do{
-			$set = $this->views->customQuery($sql, array(":t_id"=>$t_id, ":round"=>$i));
-			if(!empty($set)){ $games[$i]=$set; }
-		} while(!empty($set));
-
-		return $games;
+		return $this->views->customQuery($sql, array(":t_id"=>$t_id));
 	}
 
 	public function getTournamentRegistrations($t_id){
@@ -226,15 +340,26 @@ class Tournament_Engine {
 					`p`.*,
 					`p`.`id` as player_id,
 					`tr`.*,
-					`tr`.`id` as registration_id
+					`tr`.`id` as registration_id,
+					`f`.`name` as `faction`
 				FROM
 					`tournament_registrations` `tr`
 				LEFT JOIN `players` `p`
 					ON `tr`.`player_id`=`p`.`id`
+				LEFT JOIN `game_system_factions` `f`
+                    ON `tr`.`faction_id`=`f`.`id`
 				WHERE
 					`tr`.`tournament_id`=:t_id";
 
-		return $this->views->customQuery($sql, array(":t_id"=>$t_id));
+		$raw_regs = $this->views->customQuery($sql, array(":t_id"=>$t_id));
+
+		$registrations = array();
+
+		foreach($raw_regs as $reg){
+			$registrations[$reg["id"]] = $reg;
+		}
+
+		return $registrations;
 	}
 
 

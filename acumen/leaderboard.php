@@ -43,18 +43,30 @@ Gather all the data on the players
 
 $players = $views_db->getAll("leaderboard");
 
-$sorter = array();
-$names = array();
 $points = array();
 
 foreach($players as $k=>$p){
-    $players[$k][name] = $p[last_name].", ".$p[first_name];
     $players[$k][points] = $players[$k][earned] + $players[$k][spent];
+    $points[$k] = $players[$k][points];
+}
+
+//Sort by points first
+array_multisort($points, SORT_NUMERIC, SORT_DESC, $players);
+
+for($i=0; $i < 16; $i++){
+	$players[$i]["rank"] = $i+1;
+}
+
+//Prepare for the real sort
+$sorter = array();
+$names = array();
+
+foreach($players as $k=>$p){
+    $players[$k][name] = $p[last_name].", ".$p[first_name];
 
     //Arrays for sorting
     $sorter[$k] = $players[$k][$sortby];
     $names[$k] = strtolower($players[$k][name]);
-    $points[$k] = $players[$k][points];
 }
 
 //Sort stuff

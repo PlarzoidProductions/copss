@@ -1,6 +1,7 @@
 <aside id="main_aside">
     <ul>
-    <?php  foreach($tabs as $label=>$link){?>
+    <li><a href="http://www.brawltimore.com">Brawltimore Home</a></li>
+	<?php  foreach($tabs as $label=>$link){?>
         <li <?php  if(!strcmp($link, $view)){?>id="active_tab"<?php }?>>
             <a href="home.php?view=<?php echo $link?>"><?php echo $label?></a>
         </li>

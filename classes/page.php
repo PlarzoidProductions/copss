@@ -101,10 +101,11 @@ class Page {
     function doTabs(){
 
         $tabs = array(
-            "Register Player"=>"register_player",
-			"Leaderboard"=>"leaderboard",
+            "Leaderboard"=>"leaderboard",
+	    "Register Player"=>"register_player",
             "View Player Profile"=>"view_player",
-            "Software Feedback"=>"feedback"
+            "Event Calendar"=>"event_calendar",
+	    "Software Feedback"=>"feedback"
             );
 
 

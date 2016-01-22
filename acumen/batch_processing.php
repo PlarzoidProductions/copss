@@ -55,6 +55,9 @@ $page->register("second_place", "select", array("label"=>"Second",
 $page->register("third_place", "select", array("label"=>"Third",
                                                         "get_choices_array_func"=>"getPlayerChoices",
                                                         "get_choices_array_func_args"=>array()));
+$page->register("fourth_place", "select", array("label"=>"Fourth",
+                                                        "get_choices_array_func"=>"getPlayerChoices",
+                                                        "get_choices_array_func_args"=>array()));
 
 for($i=1; $i <= $num_players; $i++){
     $page->register("player_".$i."_id", "select", array("label"=>"Player $i",
@@ -83,11 +86,22 @@ if($page->submitIsSet("submit_batch")){
 		$first = $page->getVar("first_place");
 		$second = $page->getVar("second_place");
 		$third = $page->getVar("third_place");
+		$fourth = $page->getVar("fourth_place");
 
-		if((Check::notNull($first) && Check::notNull($second) && ($first == $second)) ||
-		(Check::notNull($second) && Check::notNull($third) && ($second == $third)) ||
-		(Check::notNull($first) && Check::notNull($third) && ($first == $third))){
-			$errors[] = "Same player cannot be awarded two podium spots!";
+		//Make sure nothing's null
+		if(Check::isNull($first)){ $errors[] = "Missing First Place Player!"; }
+		if(Check::isNull($second)){ $errors[] = "Missing Second Place Player!"; }
+		if(Check::isNull($third)){ $errors[] = "Missing Third Place Player!"; }
+		if(Check::isNull($fourth)){ $errors[] = "Missing Fourth Place Player!"; }
+
+
+		//If we have four players, check for duplication
+		if(empty($errors)){
+
+			$podium = array($first, $second, $third, $fourth);
+			if(count(array_unique($podium)) != 4){
+				$errors[] = "Same player cannot be awarded two podium spots!";
+			}
 		}
 	}
 
@@ -118,7 +132,8 @@ if($page->submitIsSet("submit_batch")){
 		//						$fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $event_id)
 		$first_id =  $a_db->create("1st @ ".$event["name"], 6, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
 		$second_id = $a_db->create("2nd @ ".$event["name"], 5, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
-		$third_id =  $a_db->create("3rd @ ".$event["name"], 4, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		$third_id =  $a_db->create("3rd @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		$fourth_id = $a_db->create("4th @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
 		$part_id =   $a_db->create($event["name"]." Participation", 2, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
 
 
@@ -135,6 +150,7 @@ if($page->submitIsSet("submit_batch")){
 		if(Check::notNull($first)){$result = $ae_db->create($first, $first_id); $end_result = $end_result && $result;}
 		if(Check::notNull($second)){$result = $ae_db->create($second, $second_id); $end_result = $end_result && $result;}
 		if(Check::notNull($third)){$result = $ae_db->create($third, $third_id); $end_result = $end_result && $result;}
+		if(Check::notNull($fourth)){$result = $ae_db->create($fourth, $fourth_id); $end_result = $end_result && $result;}
 	}
 }
 
@@ -165,8 +181,12 @@ if($page->submitIsSet("submit_batch") && $end_result){
 		$third_winner = $p_db->getById($third);
 		$success_str .= "Successfully awarded Third Place to ".$third_winner[0][last_name].", ".$third_winner[0][first_name]."<br>";
 	}
+	if(Check::notNull($fourth)){
+        $fourth_winner = $p_db->getById($fourth);
+        $success_str .= "Successfully awarded Fourth Place to ".$fourth_winner[0][last_name].", ".$fourth_winner[0][first_name]."<br>";
+    }
 
-	$success_str .= "<br>Successfully awarded points for ".$event["name"]." to:<br>";
+	$success_str .= "<br>Successfully awarded Participation points for ".$event["name"]." to:<br>";
 
     foreach($players as $p){
 		if(($p[id] == $first) || ($p[id] == $second) || ($p[id] == $third)) continue;

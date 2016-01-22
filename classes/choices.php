@@ -241,6 +241,23 @@ class Choices {
             return array(array("text"=>"None Exist!", "value"=>null));
         }
 
+		function getAchievements(){
+
+			$adb = new Achievements();
+            $achs = $adb->getAll();
+
+			if($achs){
+                $ret = array(array("text"=>"Please select...", "value"=>null));
+                foreach($achs as $ach){
+                    $ret[] = array("value"=>$ach[id], "text"=>$ach[name]." (".$ach[points].")");
+                }
+
+                return $ret;
+            }
+
+            return array(array("text"=>"None Exist!", "value"=>null));
+        }
+
 
         function getEventAchievementChoices(){
             $adb = new Achievements();

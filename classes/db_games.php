@@ -142,19 +142,6 @@ public function getAll(){
 
 /**************************************************
 
-Check Last Game Time
-
-**************************************************/
-public function getMinutesFromGameTime($game_id){
-    $sql = "SELECT TIME_TO_SEC(TIMEDIFF(NOW(), creation_time))/60 AS minutes ";
-    $sql.= "FROM $this->table WHERE id=:id";
-    $values = array(":id"=>$game_id);
-
-    return $this->db->query($sql, $values);
-}
-
-/**************************************************
-
 Query by Column(s) Function
 
 **************************************************/

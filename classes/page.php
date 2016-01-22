@@ -111,10 +111,11 @@ class Page {
 
         if(Session::isAdmin()){
             $admin_tabs = array(
-                "Award Points"=>"batch_processing",
-		"Manage Users"=>"manage_users",
+                "Report Event"=>"batch_processing",
+				"Award Achievement"=>"award_ach",
+				"Manage Users"=>"manage_users",
 				"General Configuration"=>"general_config",
-                "Achievement Configuration"=>"achievement_config",
+        //        "Achievement Configuration"=>"achievement_config",
                 "Export & Reset Database"=>"export_reset"
             );
 

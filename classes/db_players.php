@@ -154,15 +154,13 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
 public function getAllSorted(){
+	
+	//Generate the query
+	$sql = "SELECT * FROM $this->table ORDER BY last_name, first_name";
 
-    //Generate the query
-    $sql = "SELECT * FROM $this->table ORDER BY LOWER(last_name) ASC, LOWER(first_name) ASC";
-
-    return $this->db->query($sql, array());
+	return $this->db->query($sql, array());
 }
-
 
 /**************************************************
 

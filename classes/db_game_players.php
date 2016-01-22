@@ -363,6 +363,8 @@ function filterFullyPainted($fully_painted){
     return intVal($fully_painted);
 }
 
+
+
 }//close class
 
 ?>

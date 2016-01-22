@@ -126,7 +126,7 @@ Query Everything
 public function getAll(){
 
     //Generate the query
-    $sql = "SELECT * FROM $this->table ORDER BY name ASC";
+    $sql = "SELECT * FROM $this->table";
 
     return $this->db->query($sql, array());
 }

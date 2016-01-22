@@ -4,34 +4,14 @@ require_once("classes/page.php");
 require_once("classes/db_achievements.php");
 require_once("classes/db_achievements_earned.php");
 require_once("classes/db_players.php");
+require_once("classes/db_events.php");
 require_once("classes/check.php");
 
 $page = new Page();
 $a_db = new Achievements();
 $ae_db = new Achievements_earned();
 $p_db = new Players();
-
-
-/**************************************
-
-Handle Deletions
-
-**************************************/
-$action = $_REQUEST[action];
-$ach_id = $_REQUEST[ach_id];
-
-if(!strcmp($action, "delete")){
-
-	$achievement_e = $ae_db->getById($ach_id);
-
-	$player = $p_db->getById($achievement_e[0]["player_id"]);
-	$achievement = $a_db->getById($achievement_e[0]["achievement_id"]);
-
-	if($ae_db->deleteById($ach_id)){
-		$success_str = "Successfully deleted '".$achievement[0]["name"]."' from:</br>";
-		$success_str .= $player[0]["last_name"].", ".$player["first_name"]."'s record!";
-	}
-}
+$e_db = new Events();
 
 
 /**************************************
@@ -39,8 +19,8 @@ if(!strcmp($action, "delete")){
 Basic Inputs
 
 **************************************/
-$page->register("ach_id", "select", array("label"=>"Tournament",
-                                          "get_choices_array_func"=>"getEventAchievementChoices",
+$page->register("event_id", "select", array("label"=>"Tournament",
+                                          "get_choices_array_func"=>"getEvents",
                                           "get_choices_array_func_args"=>array()));
 
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>5,
@@ -83,10 +63,6 @@ for($i=1; $i <= $num_players; $i++){
 }
 $page->getChoices();
 
-
-
-var_dump("here");
-
 /**************************************
 
 Handle the Submit
@@ -94,11 +70,11 @@ Handle the Submit
 **************************************/
 if($page->submitIsSet("submit_batch")){
 
-    //First, extract all our inputs
-    $ach_id = $page->getVar("ach_id");
+    //First, extract the event ID
+    $event_id = $page->getVar("event_id");
 
-
-	if(empty($ach_id)){
+	//Check for null
+	if(empty($event_id)){
 		$errors[] = "Must pick an Achievement!";
 	}
 
@@ -129,27 +105,36 @@ if($page->submitIsSet("submit_batch")){
         	$players[$id] = $player[0];
 	    }
 
-		//DB interation Status flag
+		//DB interaction Status flag
     	$end_result = true;
 
-		//Achievement details
-		$achievement = $a_db->getById($ach_id);
-        $achievement = $achievement[0];
+		//Snag Event details
+		$event = $e_db->getById($event_id);
+        $event = $event[0];
+
+		//Generate the Achievements
+		//public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, 
+		//						$faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, 
+		//						$fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $event_id)
+		$first_id =  $a_db->create("1st @ ".$event["name"], 6, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		$second_id = $a_db->create("2nd @ ".$event["name"], 5, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		$third_id =  $a_db->create("3rd @ ".$event["name"], 4, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		$part_id =   $a_db->create($event["name"]." Participation", 2, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
 
 
 		//Award Participation
     	foreach($players as $id=>$p){
-        	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$ach_id));
-        	if(!$exists || $achievement["per_game"]){
-            	$result = $ae_db->create($id, $ach_id);
+        	$exists = $ae_db->queryByColumns(array("player_id"=>$id, "achievement_id"=>$part_id));
+        	if(!$exists){
+            	$result = $ae_db->create($id, $part_id);
 	            $end_result = $end_result && $result;
     	    }
     	}
-var_dump("here");
+		
 		//Award Podium
-		if(Check::notNull($first)){$result = $ae_db->create($first, $ach_id+1); $end_result = $end_result && $result;}
-		if(Check::notNull($second)){$result = $ae_db->create($second, $ach_id+2); $end_result = $end_result && $result;}
-		if(Check::notNull($third)){$result = $ae_db->create($third, $ach_id+3); $end_result = $end_result && $result;}
+		if(Check::notNull($first)){$result = $ae_db->create($first, $first_id); $end_result = $end_result && $result;}
+		if(Check::notNull($second)){$result = $ae_db->create($second, $second_id); $end_result = $end_result && $result;}
+		if(Check::notNull($third)){$result = $ae_db->create($third, $third_id); $end_result = $end_result && $result;}
 	}
 }
 
@@ -160,7 +145,7 @@ Prep displaying the page
 
 **************************************/
 $title = "Event Achievement Batch Processing";
-$inputs = array("ach_id", "num_players");
+$inputs = array("event_id", "num_players");
 
 $form_method = "post";
 $form_action = $_SERVER[PHP_SELF]."?view=$view";
@@ -181,7 +166,7 @@ if($page->submitIsSet("submit_batch") && $end_result){
 		$success_str .= "Successfully awarded Third Place to ".$third_winner[0][last_name].", ".$third_winner[0][first_name]."<br>";
 	}
 
-	$success_str .= "<br>Successfully awarded ".$achievement[name]." to:<br>";
+	$success_str .= "<br>Successfully awarded points for ".$event["name"]." to:<br>";
 
     foreach($players as $p){
 		if(($p[id] == $first) || ($p[id] == $second) || ($p[id] == $third)) continue;

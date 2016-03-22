@@ -89,11 +89,14 @@ if($page->submitIsSet("submit_batch")){
 		$fourth = $page->getVar("fourth_place");
 
 		//Make sure nothing's null
+		//* - DISABLED to allow processing of supplemental events
+
 		if(Check::isNull($first)){ $errors[] = "Missing First Place Player!"; }
 		if(Check::isNull($second)){ $errors[] = "Missing Second Place Player!"; }
 		if(Check::isNull($third)){ $errors[] = "Missing Third Place Player!"; }
 		if(Check::isNull($fourth)){ $errors[] = "Missing Fourth Place Player!"; }
 
+		// - DISABLED - */
 
 		//If we have four players, check for duplication
 		if(empty($errors)){
@@ -101,6 +104,12 @@ if($page->submitIsSet("submit_batch")){
 			$podium = array($first, $second, $third, $fourth);
 			if(count(array_unique($podium)) != 4){
 				$errors[] = "Same player cannot be awarded two podium spots!";
+			}
+		} else {
+			//Check for supplementary event, which does't award the podium
+			if(Check::isNull($first) && Check::isNull($second) && Check::isNull($third) && Check::isNull($fourth)){
+				$errors = array(); //Reset Errors array
+				$supplemental = true;
 			}
 		}
 	}
@@ -130,10 +139,12 @@ if($page->submitIsSet("submit_batch")){
 		//public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, 
 		//						$faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, 
 		//						$fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $event_id)
-		$first_id =  $a_db->create("1st @ ".$event["name"], 6, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
-		$second_id = $a_db->create("2nd @ ".$event["name"], 5, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
-		$third_id =  $a_db->create("3rd @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
-		$fourth_id = $a_db->create("4th @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		if(!$supplemental){
+			$first_id =  $a_db->create("1st @ ".$event["name"], 6, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+			$second_id = $a_db->create("2nd @ ".$event["name"], 5, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+			$third_id =  $a_db->create("3rd @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+			$fourth_id = $a_db->create("4th @ ".$event["name"], 3, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
+		}
 		$part_id =   $a_db->create($event["name"]." Participation", 2, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, $event_id);
 
 

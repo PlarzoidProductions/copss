@@ -115,7 +115,7 @@ class Page {
 				"Award Achievement"=>"award_ach",
 				"Manage Users"=>"manage_users",
 				"General Configuration"=>"general_config",
-        //        "Achievement Configuration"=>"achievement_config",
+                "Achievement Configuration"=>"achievement_config",
                 "Export & Reset Database"=>"export_reset"
             );
 

@@ -2,19 +2,19 @@
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <?php  echo $meta?>
-    <title>COPSS</title>
-    <link rel="stylesheet"  href="<?php echo $this->getWebRoot()?>styles/iastyle.css">
+    <title><?php echo $tab_title?></title>
+    <link rel="stylesheet"  href="<?php echo $this->getWebRoot()?>styles/style.css">
 </head>
 <body>
 <div id="wrapper">
     <header id="main_header">
         <hgroup>
-            <h1>Privateer Press' Iron Arena</h1>
+            <h1><?php echo $title?></h1>
         </hgroup>
     </header>
     <nav id="header_nav">
         <ul>
-        <li><a href="home.php">Home</a></li>
+        <li><a href="index.php?view=home">Home</a></li>
         <?php  if(Session::isLoggedIn()){?>
             <li>Logged in as: <?php  echo Session::getUsername()?></li>
             <li><a href="login.php?action=logout">Log Out</a></li>

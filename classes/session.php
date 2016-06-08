@@ -1,6 +1,6 @@
 <?php
 
-include_once('db_users.php');
+//include_once('db_users.php');
 
 class Session {
 
@@ -19,7 +19,7 @@ class Session {
 	public static function isNotLoggedIn() {
 		return !$_SESSION[is_logged_in];
 	}
-
+/*
 	public static function isAdmin() {
             if(isset($_SESSION[is_admin])) return $_SESSION[is_admin];
 
@@ -40,24 +40,24 @@ class Session {
 		return !Session::isAdmin();
 	}
 
-        public static function getUsername() {
-                if(Session::isLoggedIn()){
-                        $db = new Users();
-                        $u = $db->getById($_SESSION[sessionuserid]);
+    public static function getUsername() {
+        if(Session::isLoggedIn()){
+            $db = new Users();
+            $u = $db->getById($_SESSION[sessionuserid]);
                         
-                        //Strip array wrapper
-                        if(is_array($u)) $u = $u[0];
+            //Strip array wrapper
+            if(is_array($u)) $u = $u[0];
 
-                        if($u){
-                		return $u[username];
+                if($u){
+               		return $u[username];
 			} else {
-                		return "Failed to find user ".$_SESSION[sessionuserid]." in database!";
+               		return "Failed to find user ".$_SESSION[sessionuserid]." in database!";
 			}
 		} else {
 			return false;
 		}
-        }	
-
+    }	
+*/
 	public static function getUserID() {
 		if(Session::isLoggedIn()){
 			return $_SESSION[sessionuserid];
@@ -67,10 +67,13 @@ class Session {
 
 	public static function isAuthorized($level) {
 		//Firstly, everyone is authorized to see public pages
-                if(!strcmp($level, "PUBLIC")){return true;}//remember, strcmp returns 0 on match :p
+        if(!strcmp($level, "PUBLIC")){return true;}//remember, strcmp returns 0 on match :p
 
 		if(Session::isLoggedIn()){
 			//before we go any further, admins are always authorized
+            return Session::isAdmin();
+        }
+/*
 			if(Session::isAdmin()){return true;}
 
 			$u = new User();
@@ -83,8 +86,10 @@ class Session {
 			}
 		}
 		return false;
+*/
 	}
-	
+
+/*	
 	public static function authenticate($uname, $upass) {
                 $db = new Users();
                 $u = $db->getByUsername($uname);
@@ -100,15 +105,16 @@ class Session {
 		}
 		return false;
 	}
-
+*/
 	public static function login($u) {
 		$_SESSION[sessionuserid] = $u[id];
 		$_SESSION[is_logged_in] = true;
 		$_SESSION[is_admin] = $u[admin];
-
-                $db = new Users();
-                $db->updateUsersById($u[id], array("last_login"=>date("Y-m-d H:i:s", time())));
-        }
+/*
+        $db = new Users();
+        $db->updateUsersById($u[id], array("last_login"=>date("Y-m-d H:i:s", time())));
+*/
+    }
 
 	public static function logout() {
 		unset($_SESSION[sessionuserid]);

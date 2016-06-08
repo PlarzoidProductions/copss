@@ -100,16 +100,15 @@ class Page {
 
     function doTabs(){
 
+//      if(Session::isLoggedIn()){
+
         $tabs = array(
-            "Register Player"=>"register_player",
-            "View Player Profile"=>"view_player",
-            "Report Game"=>"report_game",
-            "Redeem Skulls"=>"redeem",
-            "Event Achievements"=>"batch_processing",
-            "Software Feedback"=>"feedback"
+            "Home"=>"home",
+            "Sample Page"=>"page1",
+            "About"=>"about",
             );
 
-
+/*
         if(Session::isAdmin()){
             $admin_tabs = array(
                 "Leaderboard"=>"leaderboard",
@@ -120,10 +119,12 @@ class Page {
             );
 
         }
-
+*/
         $view = $_REQUEST[view];
 
         include("templates/default_aside.html");
+
+//      }
     }
 
 

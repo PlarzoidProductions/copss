@@ -2,14 +2,28 @@
 
 require_once("classes/session.php");
 
+Session::init();
+
+//If we're here and not logged in, turn and run
 /*
-if(Session::isLoggedIn()){
-    include("home.php");
-} else {
+if(!Session::isLoggedIn()){
     include("login.php");
+    return;
 }
 */
 
-include("home.php");
+//Pull the view from the request variable
+if(isset($_REQUEST["view"])){
+    $view = $_REQUEST["view"];
+} else {
+    $view = "home";
+}
+
+
+//Grab the desired page and show it.
+if((@include("acumen/$view.php")) == false){;
+    include ("acumen/404.php");
+}
+
 
 ?>

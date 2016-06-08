@@ -1,7 +1,7 @@
 <footer id="main_footer">
     <nav id="footer_nav">
         <ul>
-            <li><a href="home.php">Home</a></li>
+            <li><a href="index.php?view=home">Home</a></li>
 	    <?php if(Session::isLoggedIn()){?>
 		<li>Logged in as: <?php echo Session::getUsername()?></li>
 		<li><a href="login.php?action=logout">Log Out</a></li>
@@ -12,8 +12,6 @@
         </ul>
     </nav>
     <section style="font-size:75%">
-        <em>Iron Arena</em>, <em>Warmachine</em>, <em>Hordes</em>, the "Skully" logo and all other intellectual properties of Privateer Press are used with permission.<br/>
-        Iron Arena Software version <?php echo $this->version?><br/>
 		Powered by COPSS, &copy; <a href="mailto:plarzoid@gmail.com">Plarzoid Productions, LLC</a>
 	</section>
 </footer>

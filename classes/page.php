@@ -2,7 +2,7 @@
 
 require_once("session.php");
 require_once("check.php");
-require_once("choices.php");
+require_once("choices.php");//contains Toggl.php
 
 class Page {
 
@@ -47,6 +47,8 @@ class Page {
             $this->displayFooter();
             exit;
         }
+
+        $this->setTogglAPI();
     }
 
     function isNotAuthorized(){
@@ -92,6 +94,21 @@ class Page {
         else return false;
     }
 
+	function setTogglAPI(){
+    	//Retrieve the currently stored api key
+    	$key_loc="database/api.key";
+    	$fptr=fopen($key_loc, 'r');
+
+    	if($fptr){
+        	$key=fgets($fptr);
+        	fclose($fptr);
+    	}
+
+
+    	//Maybe this'll work
+    	Toggl::setKey($key);
+	}
+
     function startTemplate($meta=NULL) {
 
         include("templates/default_header.html");
@@ -104,7 +121,8 @@ class Page {
 
         $tabs = array(
             "Home"=>"home",
-            "Sample Page"=>"page1",
+            "Set API Key"=>"store_api",
+            "Client Report"=>"client_report",
             "About"=>"about",
             );
 
@@ -281,7 +299,7 @@ class Page {
 
         
     //set disp_type to either "form" or "success"
-    function displayVar($varname, $disp_type = false, $args = array()) {
+    function printVar($varname, $disp_type = false, $args = array()) {
 
         if ($disp_type == false) {
             if (!$this->disp_mode) {
@@ -297,46 +315,21 @@ class Page {
         
         switch ($type) {
             //Special cases
-            case "hidden": 
-                $this->printHidden($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "submit": 
-                $this->printSubmit($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "select": 
-                $this->printSelect($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "checkbox_array": 
-                $this->printCheckboxArray($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "radio": 
-                $this->printRadio($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "reset":
-                $this->printReset($varname, $this->vars[$varname], $disp_type);
-                break;
-            case "textarea":
-                $this->printTextarea($varname, $this->vars[$varname], $disp_type);
-                break;
+            case "hidden": return $this->printHidden($varname, $this->vars[$varname], $disp_type);
+            case "submit": return $this->printSubmit($varname, $this->vars[$varname], $disp_type);
+            case "select": return $this->printSelect($varname, $this->vars[$varname], $disp_type);
+            case "checkbox_array": return $this->printCheckboxArray($varname, $this->vars[$varname], $disp_type);
+            case "radio": return $this->printRadio($varname, $this->vars[$varname], $disp_type);
+            case "reset": return $this->printReset($varname, $this->vars[$varname], $disp_type);
+            case "textarea": return $this->printTextarea($varname, $this->vars[$varname], $disp_type);
             //Everything else
-            default: 
-                $this->printGenericInput($varname, $type, $this->vars[$varname], $disp_type);
-                break;
+            default: return $this->printGenericInput($varname, $type, $this->vars[$varname], $disp_type);
         }
     }
 
 
     function getVar($v) {
         global $$v;
-       
-        /* 
-        if(Check::isNull($_REQUEST[$v])){
-            $_REQUEST[$v] = $$v;
-        } else {
-            $$v = $_REQUEST[$v];
-        }
-        */
-
         return stripslashes($$v);
     }
 
@@ -387,32 +380,17 @@ class Page {
         if(($lvar===null) || (empty($lvar) && !is_numeric($lvar))){  //empty(0) == true, but we may want the number 0
             
             //If it's not there, set it to the default
-	    if(in_array("default_val", array_keys($attrs))){
+	        if(in_array("default_val", array_keys($attrs))){
             	$lvar = $attrs["default_val"];
-	    } else {
-		$lvar = null;
-	    }
+	        } else {
+		        $lvar = null;
+	        }
         }
 
         //if we're just showing data, do it and quit now
         if(strcmp($disp_type, "form")){ //returns 0 on true
             echo $lvar;
             return;
-        }
-
-        //else, generate the input form:
-
-        //Use or make up a label for the input
-        if(in_array("label", array_keys($attrs))){
-            $label = $attrs["label"];
-        } else {
-            $label = $this->generateLabel($v);
-        }
-
-        //detect units
-        $units="";
-        if(in_array("units", array_keys($attrs))){
-            $units = $attrs["units"];
         }
         
         //generate the input header
@@ -472,11 +450,35 @@ class Page {
         //Close the input
         $str.="> $units";
 
-	//Detect if this is one of the hidden inputs
-	$is_hidden = false;
-	if(in_array("hidden", array_keys($attrs))){
-		$is_hidden = $attrs["hidden"];
+        return $str;
 	}
+
+    function displayVar($varname, $disp_type=false){
+	
+		//Variable attributes
+		$attrs = $this->vars[$varname];
+
+		//Get the input string
+		$str = $this->printVar($varname);
+
+        //Use or make up a label for the input
+        if(in_array("label", array_keys($attrs))){
+            $label = $attrs["label"];
+        } else {
+            $label = $this->generateLabel($varname);
+        }
+
+        //detect units
+        $units="";
+        if(in_array("units", array_keys($attrs))){
+            $units = $attrs["units"];
+        }
+
+	    //Detect if this is one of the hidden inputs
+	    $is_hidden = false;
+	    if(in_array("hidden", array_keys($attrs))){
+		    $is_hidden = $attrs["hidden"];
+	    }
 
         //Finally, echo the HTML
         $this->printComplexInput($v, $label, $str, $is_hidden);
@@ -538,14 +540,10 @@ class Page {
     }
 
     function printSubmit($v, $attr, $disp_type = "form") {
-        
         global $$v;
 
         if($disp_type == "form") {
-    
-            $str = "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\">";
-            
-            $this->printSimpleInput($str);
+            return "<input type=\"submit\" name=\"$v\" value=\"".$attr["value"]."\">";
         }
     }
 
@@ -553,8 +551,7 @@ class Page {
         global $$v;
         $_REQUEST[$v] = $$v;
         if($disp_type == "form") {
-            $str = "<input type=\"reset\" value=\"".$attr["value"]."\">";
-            $this->printSimpleInput($str);
+            return "<input type=\"reset\" value=\"".$attr["value"]."\">";
         }
     }
 
@@ -613,7 +610,7 @@ class Page {
             //Close the select tag
             $str.= "</select>";
            
-            $this->printComplexInput($v, $label, $str);
+            return $str;
 
         } else {
             foreach($choices as $c) {
@@ -621,7 +618,7 @@ class Page {
                     if($args["lowercase"] == true) $text = strtolower($c["text"]);
                     else $text = $c["text"];
 
-                    $this->printComplexInput($v, $label, $text);
+                    return $text;
                 }
             }            
         }
@@ -666,18 +663,11 @@ class Page {
 
             $str.= "</textarea>";
 
-            //create the Label
-            if($attr["label"]){
-                $label = $attr["label"];
-            } else {
-                $label = $this->generateLabel($v);
-            }
-
             //Print it
-
-            $this->printComplexInput($v, $label, $str);
+			return $str;
+            
         } else {
-            echo $lvar;
+            return $lvar;
         }
     }
 
@@ -708,17 +698,11 @@ class Page {
                 $str.= "<input type=\"radio\" name=\"$v\" value=\"".$c["value"]."\"$reloading$checked>".$c["text"];
             }
 
-            if($attr["label"]){
-                $label = $attr["label"];
-            } else {
-                $label = $this->generateLabel($v);
-            }
-
-            $this->printComplexInput($v, $label, $str);
-        } else {
+        	return $str;
+		} else {
             foreach($choices as $c) {
                 if($_REQUEST[$v] == $c["value"]) {
-                    echo $c["text"];
+                    return $c["text"];
                 }
             }
         }

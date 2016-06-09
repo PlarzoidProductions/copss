@@ -1,15 +1,29 @@
 <?php
 
 require_once("check.php");
+require_once(__DIR__."/../togglSDK/Toggl.php");
 
 class Choices {
+    function Choices(){}
 
 	//choices arrays
 
+    function getTogglWorkspaceChoices(){
+        $workspaces = Toggl::getWorkspaces();
 
-	function Choices() {
-		//do nothing, really
-	}
+        $choices = array(array("text"=>"Please Select...", "value"=>NULL));
+        foreach($workspaces as $w){
+            $choices[] = array("text"=>$w["name"], "value"=>$w["id"]);
+        }
+
+        return $choices;
+    }
+
+    function getTogglClientChoices(){
+        $clients = TogglClient::getClientsVisibleToUser();
+
+        return $this->makeChoices($clients, "name", "id", true);
+    }
 
 	function getYesNoChoices($default="No"){
 		$yes = array("value"=>1, "text"=>"Yes");
@@ -40,6 +54,20 @@ class Choices {
         return array(array("text"=>"Descending", "value"=>"1"),
                      array("text"=>"Ascending", "value"=>"0"));
     }
+
+    private function makeChoices($array, $text, $value, $ps=false){
+        $ret = array();
+        if($ps){
+            $ret[] = array("text"=>"Please Select...", "value"=>NULL);
+        }
+
+        foreach($array as $a){
+            $ret[] = array("value"=>$a[$value], "text"=>$a[$text]);
+        }
+
+        return $ret;
+    }
+
 
 }
 

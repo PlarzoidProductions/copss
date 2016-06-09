@@ -127,6 +127,7 @@ div.input_container {
     width: 660px; /* same as #main_section */
     clear: both;
     text-align: center;
+    margin: 0 auto;
 }
 
 div.label {

@@ -157,29 +157,16 @@ foreach($p_codes as $pcode){
 		} catch (RuntimeException $e){
 			echo $e->getMessage();
 		}
-	}
-
-	if(true){
-
-		$filepath="/home/user/Documents/IronArenaImport.csv";
-
+		
+		
 		//Load the file
 		if(isset($filepath)){
 			$players = file($filepath);
-
-			/*
 
 			//Load the user_inputs
 			$file_mode = $page->getVar("file_format");
     	    $default_country = $page->getVar("default_country");
         	$default_state = $page->getVar("default_state");
-
-			*/
-
-			$file_mode = "FLSC";
-			$default_country = 244;
-			$default_state=47;
-
 
 		    //Prep some lookup data
         	$raw_countries = $c_db->getAll();
@@ -230,20 +217,24 @@ foreach($p_codes as $pcode){
 						$reg_errors[$i] = array("data"=>$pl, "error"=>"First Name doesn't exist!");
 					}
 					//Check for illegal characters in First Name
+					/*	//Removed to better support the international community
 					if(!isset($reg_errors[$i]) && !preg_match("~^[$nameChars]+$~", $pl[$first])){
         	        	$illegalChars = preg_replace("~[$nameChars]~", "", $pl[$first]);
             	    	$reg_errors[$i] = array("data"=>$pl, "error"=>"First Name contains invalid character(s): '$illegalChars'!");
 	            	}
+					*/
 
 					//Check for empty Last Name
 					if(empty($pl[$last]) || (strlen($pl[$last]) == 0)){
 						$reg_errors[$i] = array("data"=>$pl, "error"=>"Last Name doesn't exist!");
 					}
+					/*	//Removed to better support the international community
 					//Check for illegal characters in Last Name					
 	            	if(!isset($reg_errors[$i]) && !preg_match("~^[$nameChars]+$~", $pl[$last])){
     	            	$illegalChars = preg_replace("~[$nameChars]~", "", $pl[$last]);
         	        	$reg_errors[$i] = array("data"=>$pl, "error"=>"Last Name contains invalid character(s): '$illegalChars'!");
             		}
+					*/
 				}
 
 				//Validate Country
@@ -315,7 +306,7 @@ foreach($p_codes as $pcode){
             	    $exists = $p_db->existsByColumns($columns);
 
 	                if($exists){
-						continue;	//rather than report the error, just skip to nect player
+						continue;	//rather than report the error, just skip to next player
             	        //$reg_errors[$i] = array("data"=>$pl, "error"=>"Player with that name & location exists!");
     	            }
         	    }
@@ -329,7 +320,7 @@ foreach($p_codes as $pcode){
 				$i++;
         	}
 		}
-exit;
+
 		$success_str = "Successfully registered ".$successes." players!";
 
 		if($successes != $i){

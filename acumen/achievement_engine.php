@@ -347,7 +347,7 @@ class Ach_Engine {
 						 	AND game_id < :game_id)
 					AND vip=1';
             $played = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
-			$played = array_column($played, "pid");
+			//$played = array_column($played, "pid");
 
 			$count = 0;
             foreach($game[players] as $p){

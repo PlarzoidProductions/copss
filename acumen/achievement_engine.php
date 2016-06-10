@@ -298,7 +298,7 @@ class Ach_Engine {
         }
         if($achievement[unique_opponent_locations]){
 
-			//Get list of DISTINCT opponent IDs for the player
+			//Get list of DISTINCT location IDs for the player
             $sql = 'SELECT DISTINCT(CONCAT(opponents.country, "-", opponents.state)) AS loc
 					FROM (
 						SELECT player_id, country, state
@@ -323,6 +323,7 @@ class Ach_Engine {
                 $gp_loc = $gp[player_details][country]."-".$gp[player_details][state];
 
                 if(!in_array($gp_loc, $locations)){
+					 $locations[] = $gp_loc;	//Add the new location to the list, so we avoid duplicates
                      $new_locs++;
                 }
             }

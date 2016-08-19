@@ -26,9 +26,33 @@ require_once("query.php");
 
 class Tournaments {
 
-var $db=NULL;
-var $table="tournaments";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="tournaments";
 
+//Data storage variables
+public var $id=NULL;
+public var $name=NULL;
+public var $game_system_id=NULL;
+public var $max_num_players=NULL;
+public var $max_num_rounds=NULL;
+public var $num_lists_required=NULL;
+public var $divide_and_conquer=NULL;
+public var $standings_type=NULL;
+public var $final_tables=NULL;
+public var $large_event_scoring=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"name"=>"filterName",
+	"game_system_id"=>"filterGameSystemId",
+	"max_num_players"=>"filterMaxNumPlayers",
+	"max_num_rounds"=>"filterMaxNumRounds",
+	"num_lists_required"=>"filterNumListsRequired",
+	"divide_and_conquer"=>"filterDivideAndConquer",
+	"standings_type"=>"filterStandingsType",
+	"final_tables"=>"filterFinalTables",
+	"large_event_scoring"=>"filterLargeEventScoring");
 
 /***************************************************
 
@@ -44,64 +68,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($name, $game_system_id, $max_num_players, $max_num_rounds, $num_lists_required, $divide_and_conquer, $standings_type, $final_tables, $large_event_scoring){
+public function commit(){
 
-	//Validate the inputs
-	$name = $this->filterName($name); if($name === false){return false;}
-	$game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
-	$max_num_players = $this->filterMaxNumPlayers($max_num_players); if($max_num_players === false){return false;}
-	$max_num_rounds = $this->filterMaxNumRounds($max_num_rounds); if($max_num_rounds === false){return false;}
-	$num_lists_required = $this->filterNumListsRequired($num_lists_required); if($num_lists_required === false){return false;}
-	$divide_and_conquer = $this->filterDivideAndConquer($divide_and_conquer); if($divide_and_conquer === false){return false;}
-	$standings_type = $this->filterStandingsType($standings_type); if($standings_type === false){return false;}
-	$final_tables = $this->filterFinalTables($final_tables); if($final_tables === false){return false;}
-	$large_event_scoring = $this->filterLargeEventScoring($large_event_scoring); if($large_event_scoring === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":name"=>$name,
- 		":game_system_id"=>$game_system_id,
- 		":max_num_players"=>$max_num_players,
- 		":max_num_rounds"=>$max_num_rounds,
- 		":num_lists_required"=>$num_lists_required,
- 		":divide_and_conquer"=>$divide_and_conquer,
- 		":standings_type"=>$standings_type,
- 		":final_tables"=>$final_tables,
- 		":large_event_scoring"=>$large_event_scoring
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				name,
-				game_system_id,
-				max_num_players,
-				max_num_rounds,
-				num_lists_required,
-				divide_and_conquer,
-				standings_type,
-				final_tables,
-				large_event_scoring
-			) VALUES (
-				:name,
-				:game_system_id,
-				:max_num_players,
-				:max_num_rounds,
-				:num_lists_required,
-				:divide_and_conquer,
-				:standings_type,
-				:final_tables,
-				:large_event_scoring)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -129,38 +163,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateTournamentsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -171,12 +183,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -204,88 +210,99 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Tournaments::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByName($name){
 	
     //Validate Inputs
     $name = $this->filterName($name); if($name === false){return false;}
 
-    return $this->queryByColumns(array("name"=>$name));
+    return Tournaments::fromArray($this->queryByColumns(array("name"=>$name)));
 }
-
 
 public function getByGameSystemId($game_system_id){
 	
     //Validate Inputs
     $game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
 
-    return $this->queryByColumns(array("game_system_id"=>$game_system_id));
+    return Tournaments::fromArray($this->queryByColumns(array("game_system_id"=>$game_system_id)));
 }
-
 
 public function getByMaxNumPlayers($max_num_players){
 	
     //Validate Inputs
     $max_num_players = $this->filterMaxNumPlayers($max_num_players); if($max_num_players === false){return false;}
 
-    return $this->queryByColumns(array("max_num_players"=>$max_num_players));
+    return Tournaments::fromArray($this->queryByColumns(array("max_num_players"=>$max_num_players)));
 }
-
 
 public function getByMaxNumRounds($max_num_rounds){
 	
     //Validate Inputs
     $max_num_rounds = $this->filterMaxNumRounds($max_num_rounds); if($max_num_rounds === false){return false;}
 
-    return $this->queryByColumns(array("max_num_rounds"=>$max_num_rounds));
+    return Tournaments::fromArray($this->queryByColumns(array("max_num_rounds"=>$max_num_rounds)));
 }
-
 
 public function getByNumListsRequired($num_lists_required){
 	
     //Validate Inputs
     $num_lists_required = $this->filterNumListsRequired($num_lists_required); if($num_lists_required === false){return false;}
 
-    return $this->queryByColumns(array("num_lists_required"=>$num_lists_required));
+    return Tournaments::fromArray($this->queryByColumns(array("num_lists_required"=>$num_lists_required)));
 }
-
 
 public function getByDivideAndConquer($divide_and_conquer){
 	
     //Validate Inputs
     $divide_and_conquer = $this->filterDivideAndConquer($divide_and_conquer); if($divide_and_conquer === false){return false;}
 
-    return $this->queryByColumns(array("divide_and_conquer"=>$divide_and_conquer));
+    return Tournaments::fromArray($this->queryByColumns(array("divide_and_conquer"=>$divide_and_conquer)));
 }
-
 
 public function getByStandingsType($standings_type){
 	
     //Validate Inputs
     $standings_type = $this->filterStandingsType($standings_type); if($standings_type === false){return false;}
 
-    return $this->queryByColumns(array("standings_type"=>$standings_type));
+    return Tournaments::fromArray($this->queryByColumns(array("standings_type"=>$standings_type)));
 }
-
 
 public function getByFinalTables($final_tables){
 	
     //Validate Inputs
     $final_tables = $this->filterFinalTables($final_tables); if($final_tables === false){return false;}
 
-    return $this->queryByColumns(array("final_tables"=>$final_tables));
+    return Tournaments::fromArray($this->queryByColumns(array("final_tables"=>$final_tables)));
 }
-
 
 public function getByLargeEventScoring($large_event_scoring){
 	
     //Validate Inputs
     $large_event_scoring = $this->filterLargeEventScoring($large_event_scoring); if($large_event_scoring === false){return false;}
 
-    return $this->queryByColumns(array("large_event_scoring"=>$large_event_scoring));
+    return Tournaments::fromArray($this->queryByColumns(array("large_event_scoring"=>$large_event_scoring)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Tournaments();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

@@ -24,9 +24,29 @@ require_once("query.php");
 
 class Tournament_game_details {
 
-var $db=NULL;
-var $table="tournament_game_details";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="tournament_game_details";
 
+//Data storage variables
+public var $id=NULL;
+public var $game_id=NULL;
+public var $player_id=NULL;
+public var $list_played=NULL;
+public var $control_points=NULL;
+public var $destruction_points=NULL;
+public var $assassination_efficiency=NULL;
+public var $timed_out=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"game_id"=>"filterGameId",
+	"player_id"=>"filterPlayerId",
+	"list_played"=>"filterListPlayed",
+	"control_points"=>"filterControlPoints",
+	"destruction_points"=>"filterDestructionPoints",
+	"assassination_efficiency"=>"filterAssassinationEfficiency",
+	"timed_out"=>"filterTimedOut");
 
 /***************************************************
 
@@ -42,56 +62,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($game_id, $player_id, $list_played, $control_points, $destruction_points, $assassination_efficiency, $timed_out){
+public function commit(){
 
-	//Validate the inputs
-	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
-	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
-	$list_played = $this->filterListPlayed($list_played); if($list_played === false){return false;}
-	$control_points = $this->filterControlPoints($control_points); if($control_points === false){return false;}
-	$destruction_points = $this->filterDestructionPoints($destruction_points); if($destruction_points === false){return false;}
-	$assassination_efficiency = $this->filterAssassinationEfficiency($assassination_efficiency); if($assassination_efficiency === false){return false;}
-	$timed_out = $this->filterTimedOut($timed_out); if($timed_out === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":game_id"=>$game_id,
- 		":player_id"=>$player_id,
- 		":list_played"=>$list_played,
- 		":control_points"=>$control_points,
- 		":destruction_points"=>$destruction_points,
- 		":assassination_efficiency"=>$assassination_efficiency,
- 		":timed_out"=>$timed_out
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				game_id,
-				player_id,
-				list_played,
-				control_points,
-				destruction_points,
-				assassination_efficiency,
-				timed_out
-			) VALUES (
-				:game_id,
-				:player_id,
-				:list_played,
-				:control_points,
-				:destruction_points,
-				:assassination_efficiency,
-				:timed_out)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -119,38 +157,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateTournament_game_detailsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -161,12 +177,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -194,70 +204,83 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByGameId($game_id){
 	
     //Validate Inputs
     $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
-    return $this->queryByColumns(array("game_id"=>$game_id));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("game_id"=>$game_id)));
 }
-
 
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
     $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
-    return $this->queryByColumns(array("player_id"=>$player_id));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("player_id"=>$player_id)));
 }
-
 
 public function getByListPlayed($list_played){
 	
     //Validate Inputs
     $list_played = $this->filterListPlayed($list_played); if($list_played === false){return false;}
 
-    return $this->queryByColumns(array("list_played"=>$list_played));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("list_played"=>$list_played)));
 }
-
 
 public function getByControlPoints($control_points){
 	
     //Validate Inputs
     $control_points = $this->filterControlPoints($control_points); if($control_points === false){return false;}
 
-    return $this->queryByColumns(array("control_points"=>$control_points));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("control_points"=>$control_points)));
 }
-
 
 public function getByDestructionPoints($destruction_points){
 	
     //Validate Inputs
     $destruction_points = $this->filterDestructionPoints($destruction_points); if($destruction_points === false){return false;}
 
-    return $this->queryByColumns(array("destruction_points"=>$destruction_points));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("destruction_points"=>$destruction_points)));
 }
-
 
 public function getByAssassinationEfficiency($assassination_efficiency){
 	
     //Validate Inputs
     $assassination_efficiency = $this->filterAssassinationEfficiency($assassination_efficiency); if($assassination_efficiency === false){return false;}
 
-    return $this->queryByColumns(array("assassination_efficiency"=>$assassination_efficiency));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("assassination_efficiency"=>$assassination_efficiency)));
 }
-
 
 public function getByTimedOut($timed_out){
 	
     //Validate Inputs
     $timed_out = $this->filterTimedOut($timed_out); if($timed_out === false){return false;}
 
-    return $this->queryByColumns(array("timed_out"=>$timed_out));
+    return Tournament_game_details::fromArray($this->queryByColumns(array("timed_out"=>$timed_out)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Tournament_game_details();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

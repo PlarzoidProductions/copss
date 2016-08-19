@@ -20,9 +20,21 @@ require_once("query.php");
 
 class Game_sizes {
 
-var $db=NULL;
-var $table="game_sizes";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="game_sizes";
 
+//Data storage variables
+public var $id=NULL;
+public var $parent_game_system=NULL;
+public var $size=NULL;
+public var $name=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"parent_game_system"=>"filterParentGameSystem",
+	"size"=>"filterSize",
+	"name"=>"filterName");
 
 /***************************************************
 
@@ -38,40 +50,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($parent_game_system, $size, $name){
+public function commit(){
 
-	//Validate the inputs
-	$parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
-	$size = $this->filterSize($size); if($size === false){return false;}
-	$name = $this->filterName($name); if($name === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":parent_game_system"=>$parent_game_system,
- 		":size"=>$size,
- 		":name"=>$name
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				parent_game_system,
-				size,
-				name
-			) VALUES (
-				:parent_game_system,
-				:size,
-				:name)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -99,38 +145,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateGame_sizesById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -141,12 +165,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -174,34 +192,51 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Game_sizes::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByParentGameSystem($parent_game_system){
 	
     //Validate Inputs
     $parent_game_system = $this->filterParentGameSystem($parent_game_system); if($parent_game_system === false){return false;}
 
-    return $this->queryByColumns(array("parent_game_system"=>$parent_game_system));
+    return Game_sizes::fromArray($this->queryByColumns(array("parent_game_system"=>$parent_game_system)));
 }
-
 
 public function getBySize($size){
 	
     //Validate Inputs
     $size = $this->filterSize($size); if($size === false){return false;}
 
-    return $this->queryByColumns(array("size"=>$size));
+    return Game_sizes::fromArray($this->queryByColumns(array("size"=>$size)));
 }
-
 
 public function getByName($name){
 	
     //Validate Inputs
     $name = $this->filterName($name); if($name === false){return false;}
 
-    return $this->queryByColumns(array("name"=>$name));
+    return Game_sizes::fromArray($this->queryByColumns(array("name"=>$name)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Game_sizes();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

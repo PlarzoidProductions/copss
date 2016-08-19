@@ -19,9 +19,19 @@ require_once("query.php");
 
 class Shift_registrations {
 
-var $db=NULL;
-var $table="shift_registrations";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="shift_registrations";
 
+//Data storage variables
+public var $id=NULL;
+public var $user_id=NULL;
+public var $shift_id=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"user_id"=>"filterUserId",
+	"shift_id"=>"filterShiftId");
 
 /***************************************************
 
@@ -37,36 +47,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($user_id, $shift_id){
+public function commit(){
 
-	//Validate the inputs
-	$user_id = $this->filterUserId($user_id); if($user_id === false){return false;}
-	$shift_id = $this->filterShiftId($shift_id); if($shift_id === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":user_id"=>$user_id,
- 		":shift_id"=>$shift_id
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				user_id,
-				shift_id
-			) VALUES (
-				:user_id,
-				:shift_id)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -94,38 +142,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateShift_registrationsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -136,12 +162,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -169,25 +189,43 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Shift_registrations::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByUserId($user_id){
 	
     //Validate Inputs
     $user_id = $this->filterUserId($user_id); if($user_id === false){return false;}
 
-    return $this->queryByColumns(array("user_id"=>$user_id));
+    return Shift_registrations::fromArray($this->queryByColumns(array("user_id"=>$user_id)));
 }
-
 
 public function getByShiftId($shift_id){
 	
     //Validate Inputs
     $shift_id = $this->filterShiftId($shift_id); if($shift_id === false){return false;}
 
-    return $this->queryByColumns(array("shift_id"=>$shift_id));
+    return Shift_registrations::fromArray($this->queryByColumns(array("shift_id"=>$shift_id)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Shift_registrations();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

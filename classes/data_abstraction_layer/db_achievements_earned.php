@@ -20,9 +20,21 @@ require_once("query.php");
 
 class Achievements_earned {
 
-var $db=NULL;
-var $table="achievements_earned";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="achievements_earned";
 
+//Data storage variables
+public var $id=NULL;
+public var $player_id=NULL;
+public var $achievement_id=NULL;
+public var $game_id=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"player_id"=>"filterPlayerId",
+	"achievement_id"=>"filterAchievementId",
+	"game_id"=>"filterGameId");
 
 /***************************************************
 
@@ -38,40 +50,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($player_id, $achievement_id, $game_id){
+public function commit(){
 
-	//Validate the inputs
-	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
-	$achievement_id = $this->filterAchievementId($achievement_id); if($achievement_id === false){return false;}
-	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":player_id"=>$player_id,
- 		":achievement_id"=>$achievement_id,
- 		":game_id"=>$game_id
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				player_id,
-				achievement_id,
-				game_id
-			) VALUES (
-				:player_id,
-				:achievement_id,
-				:game_id)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -99,38 +145,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateAchievements_earnedById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -141,12 +165,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -174,34 +192,51 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Achievements_earned::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
     $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
-    return $this->queryByColumns(array("player_id"=>$player_id));
+    return Achievements_earned::fromArray($this->queryByColumns(array("player_id"=>$player_id)));
 }
-
 
 public function getByAchievementId($achievement_id){
 	
     //Validate Inputs
     $achievement_id = $this->filterAchievementId($achievement_id); if($achievement_id === false){return false;}
 
-    return $this->queryByColumns(array("achievement_id"=>$achievement_id));
+    return Achievements_earned::fromArray($this->queryByColumns(array("achievement_id"=>$achievement_id)));
 }
-
 
 public function getByGameId($game_id){
 	
     //Validate Inputs
     $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
-    return $this->queryByColumns(array("game_id"=>$game_id));
+    return Achievements_earned::fromArray($this->queryByColumns(array("game_id"=>$game_id)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Achievements_earned();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

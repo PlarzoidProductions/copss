@@ -20,9 +20,21 @@ require_once("query.php");
 
 class Tournament_games {
 
-var $db=NULL;
-var $table="tournament_games";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="tournament_games";
 
+//Data storage variables
+public var $id=NULL;
+public var $tournament_id=NULL;
+public var $round=NULL;
+public var $winner_id=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"tournament_id"=>"filterTournamentId",
+	"round"=>"filterRound",
+	"winner_id"=>"filterWinnerId");
 
 /***************************************************
 
@@ -38,40 +50,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($tournament_id, $round, $winner_id){
+public function commit(){
 
-	//Validate the inputs
-	$tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
-	$round = $this->filterRound($round); if($round === false){return false;}
-	$winner_id = $this->filterWinnerId($winner_id); if($winner_id === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":tournament_id"=>$tournament_id,
- 		":round"=>$round,
- 		":winner_id"=>$winner_id
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				tournament_id,
-				round,
-				winner_id
-			) VALUES (
-				:tournament_id,
-				:round,
-				:winner_id)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -99,38 +145,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateTournament_gamesById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -141,12 +165,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -174,34 +192,51 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Tournament_games::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByTournamentId($tournament_id){
 	
     //Validate Inputs
     $tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
 
-    return $this->queryByColumns(array("tournament_id"=>$tournament_id));
+    return Tournament_games::fromArray($this->queryByColumns(array("tournament_id"=>$tournament_id)));
 }
-
 
 public function getByRound($round){
 	
     //Validate Inputs
     $round = $this->filterRound($round); if($round === false){return false;}
 
-    return $this->queryByColumns(array("round"=>$round));
+    return Tournament_games::fromArray($this->queryByColumns(array("round"=>$round)));
 }
-
 
 public function getByWinnerId($winner_id){
 	
     //Validate Inputs
     $winner_id = $this->filterWinnerId($winner_id); if($winner_id === false){return false;}
 
-    return $this->queryByColumns(array("winner_id"=>$winner_id));
+    return Tournament_games::fromArray($this->queryByColumns(array("winner_id"=>$winner_id)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Tournament_games();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

@@ -22,9 +22,25 @@ require_once("query.php");
 
 class Tournament_registrations {
 
-var $db=NULL;
-var $table="tournament_registrations";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="tournament_registrations";
 
+//Data storage variables
+public var $id=NULL;
+public var $player_id=NULL;
+public var $tournament_id=NULL;
+public var $faction_id=NULL;
+public var $has_dropped=NULL;
+public var $had_buy=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"player_id"=>"filterPlayerId",
+	"tournament_id"=>"filterTournamentId",
+	"faction_id"=>"filterFactionId",
+	"has_dropped"=>"filterHasDropped",
+	"had_buy"=>"filterHadBuy");
 
 /***************************************************
 
@@ -40,48 +56,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($player_id, $tournament_id, $faction_id, $has_dropped, $had_buy){
+public function commit(){
 
-	//Validate the inputs
-	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
-	$tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
-	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
-	$has_dropped = $this->filterHasDropped($has_dropped); if($has_dropped === false){return false;}
-	$had_buy = $this->filterHadBuy($had_buy); if($had_buy === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":player_id"=>$player_id,
- 		":tournament_id"=>$tournament_id,
- 		":faction_id"=>$faction_id,
- 		":has_dropped"=>$has_dropped,
- 		":had_buy"=>$had_buy
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				player_id,
-				tournament_id,
-				faction_id,
-				has_dropped,
-				had_buy
-			) VALUES (
-				:player_id,
-				:tournament_id,
-				:faction_id,
-				:has_dropped,
-				:had_buy)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -109,38 +151,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateTournament_registrationsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -151,12 +171,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -184,52 +198,67 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
     $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
-    return $this->queryByColumns(array("player_id"=>$player_id));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("player_id"=>$player_id)));
 }
-
 
 public function getByTournamentId($tournament_id){
 	
     //Validate Inputs
     $tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
 
-    return $this->queryByColumns(array("tournament_id"=>$tournament_id));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("tournament_id"=>$tournament_id)));
 }
-
 
 public function getByFactionId($faction_id){
 	
     //Validate Inputs
     $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
-    return $this->queryByColumns(array("faction_id"=>$faction_id));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("faction_id"=>$faction_id)));
 }
-
 
 public function getByHasDropped($has_dropped){
 	
     //Validate Inputs
     $has_dropped = $this->filterHasDropped($has_dropped); if($has_dropped === false){return false;}
 
-    return $this->queryByColumns(array("has_dropped"=>$has_dropped));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("has_dropped"=>$has_dropped)));
 }
-
 
 public function getByHadBuy($had_buy){
 	
     //Validate Inputs
     $had_buy = $this->filterHadBuy($had_buy); if($had_buy === false){return false;}
 
-    return $this->queryByColumns(array("had_buy"=>$had_buy));
+    return Tournament_registrations::fromArray($this->queryByColumns(array("had_buy"=>$had_buy)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Tournament_registrations();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

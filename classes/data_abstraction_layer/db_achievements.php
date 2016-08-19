@@ -34,9 +34,49 @@ require_once("query.php");
 
 class Achievements {
 
-var $db=NULL;
-var $table="achievements";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="achievements";
 
+//Data storage variables
+public var $id=NULL;
+public var $name=NULL;
+public var $points=NULL;
+public var $per_game=NULL;
+public var $is_meta=NULL;
+public var $game_count=NULL;
+public var $game_system_id=NULL;
+public var $game_size_id=NULL;
+public var $faction_id=NULL;
+public var $unique_opponent=NULL;
+public var $unique_opponent_locations=NULL;
+public var $played_theme_force=NULL;
+public var $fully_painted=NULL;
+public var $fully_painted_battle=NULL;
+public var $played_scenario=NULL;
+public var $multiplayer=NULL;
+public var $vs_vip=NULL;
+public var $tournament_id=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"name"=>"filterName",
+	"points"=>"filterPoints",
+	"per_game"=>"filterPerGame",
+	"is_meta"=>"filterIsMeta",
+	"game_count"=>"filterGameCount",
+	"game_system_id"=>"filterGameSystemId",
+	"game_size_id"=>"filterGameSizeId",
+	"faction_id"=>"filterFactionId",
+	"unique_opponent"=>"filterUniqueOpponent",
+	"unique_opponent_locations"=>"filterUniqueOpponentLocations",
+	"played_theme_force"=>"filterPlayedThemeForce",
+	"fully_painted"=>"filterFullyPainted",
+	"fully_painted_battle"=>"filterFullyPaintedBattle",
+	"played_scenario"=>"filterPlayedScenario",
+	"multiplayer"=>"filterMultiplayer",
+	"vs_vip"=>"filterVsVip",
+	"tournament_id"=>"filterTournamentId");
 
 /***************************************************
 
@@ -52,96 +92,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($name, $points, $per_game, $is_meta, $game_count, $game_system_id, $game_size_id, $faction_id, $unique_opponent, $unique_opponent_locations, $played_theme_force, $fully_painted, $fully_painted_battle, $played_scenario, $multiplayer, $vs_vip, $tournament_id){
+public function commit(){
 
-	//Validate the inputs
-	$name = $this->filterName($name); if($name === false){return false;}
-	$points = $this->filterPoints($points); if($points === false){return false;}
-	$per_game = $this->filterPerGame($per_game); if($per_game === false){return false;}
-	$is_meta = $this->filterIsMeta($is_meta); if($is_meta === false){return false;}
-	$game_count = $this->filterGameCount($game_count); if($game_count === false){return false;}
-	$game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
-	$game_size_id = $this->filterGameSizeId($game_size_id); if($game_size_id === false){return false;}
-	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
-	$unique_opponent = $this->filterUniqueOpponent($unique_opponent); if($unique_opponent === false){return false;}
-	$unique_opponent_locations = $this->filterUniqueOpponentLocations($unique_opponent_locations); if($unique_opponent_locations === false){return false;}
-	$played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
-	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
-	$fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
-	$played_scenario = $this->filterPlayedScenario($played_scenario); if($played_scenario === false){return false;}
-	$multiplayer = $this->filterMultiplayer($multiplayer); if($multiplayer === false){return false;}
-	$vs_vip = $this->filterVsVip($vs_vip); if($vs_vip === false){return false;}
-	$tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":name"=>$name,
- 		":points"=>$points,
- 		":per_game"=>$per_game,
- 		":is_meta"=>$is_meta,
- 		":game_count"=>$game_count,
- 		":game_system_id"=>$game_system_id,
- 		":game_size_id"=>$game_size_id,
- 		":faction_id"=>$faction_id,
- 		":unique_opponent"=>$unique_opponent,
- 		":unique_opponent_locations"=>$unique_opponent_locations,
- 		":played_theme_force"=>$played_theme_force,
- 		":fully_painted"=>$fully_painted,
- 		":fully_painted_battle"=>$fully_painted_battle,
- 		":played_scenario"=>$played_scenario,
- 		":multiplayer"=>$multiplayer,
- 		":vs_vip"=>$vs_vip,
- 		":tournament_id"=>$tournament_id
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				name,
-				points,
-				per_game,
-				is_meta,
-				game_count,
-				game_system_id,
-				game_size_id,
-				faction_id,
-				unique_opponent,
-				unique_opponent_locations,
-				played_theme_force,
-				fully_painted,
-				fully_painted_battle,
-				played_scenario,
-				multiplayer,
-				vs_vip,
-				tournament_id
-			) VALUES (
-				:name,
-				:points,
-				:per_game,
-				:is_meta,
-				:game_count,
-				:game_system_id,
-				:game_size_id,
-				:faction_id,
-				:unique_opponent,
-				:unique_opponent_locations,
-				:played_theme_force,
-				:fully_painted,
-				:fully_painted_battle,
-				:played_scenario,
-				:multiplayer,
-				:vs_vip,
-				:tournament_id)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -169,38 +187,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateAchievementsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -211,12 +207,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -244,160 +234,163 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Achievements::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByName($name){
 	
     //Validate Inputs
     $name = $this->filterName($name); if($name === false){return false;}
 
-    return $this->queryByColumns(array("name"=>$name));
+    return Achievements::fromArray($this->queryByColumns(array("name"=>$name)));
 }
-
 
 public function getByPoints($points){
 	
     //Validate Inputs
     $points = $this->filterPoints($points); if($points === false){return false;}
 
-    return $this->queryByColumns(array("points"=>$points));
+    return Achievements::fromArray($this->queryByColumns(array("points"=>$points)));
 }
-
 
 public function getByPerGame($per_game){
 	
     //Validate Inputs
     $per_game = $this->filterPerGame($per_game); if($per_game === false){return false;}
 
-    return $this->queryByColumns(array("per_game"=>$per_game));
+    return Achievements::fromArray($this->queryByColumns(array("per_game"=>$per_game)));
 }
-
 
 public function getByIsMeta($is_meta){
 	
     //Validate Inputs
     $is_meta = $this->filterIsMeta($is_meta); if($is_meta === false){return false;}
 
-    return $this->queryByColumns(array("is_meta"=>$is_meta));
+    return Achievements::fromArray($this->queryByColumns(array("is_meta"=>$is_meta)));
 }
-
 
 public function getByGameCount($game_count){
 	
     //Validate Inputs
     $game_count = $this->filterGameCount($game_count); if($game_count === false){return false;}
 
-    return $this->queryByColumns(array("game_count"=>$game_count));
+    return Achievements::fromArray($this->queryByColumns(array("game_count"=>$game_count)));
 }
-
 
 public function getByGameSystemId($game_system_id){
 	
     //Validate Inputs
     $game_system_id = $this->filterGameSystemId($game_system_id); if($game_system_id === false){return false;}
 
-    return $this->queryByColumns(array("game_system_id"=>$game_system_id));
+    return Achievements::fromArray($this->queryByColumns(array("game_system_id"=>$game_system_id)));
 }
-
 
 public function getByGameSizeId($game_size_id){
 	
     //Validate Inputs
     $game_size_id = $this->filterGameSizeId($game_size_id); if($game_size_id === false){return false;}
 
-    return $this->queryByColumns(array("game_size_id"=>$game_size_id));
+    return Achievements::fromArray($this->queryByColumns(array("game_size_id"=>$game_size_id)));
 }
-
 
 public function getByFactionId($faction_id){
 	
     //Validate Inputs
     $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
-    return $this->queryByColumns(array("faction_id"=>$faction_id));
+    return Achievements::fromArray($this->queryByColumns(array("faction_id"=>$faction_id)));
 }
-
 
 public function getByUniqueOpponent($unique_opponent){
 	
     //Validate Inputs
     $unique_opponent = $this->filterUniqueOpponent($unique_opponent); if($unique_opponent === false){return false;}
 
-    return $this->queryByColumns(array("unique_opponent"=>$unique_opponent));
+    return Achievements::fromArray($this->queryByColumns(array("unique_opponent"=>$unique_opponent)));
 }
-
 
 public function getByUniqueOpponentLocations($unique_opponent_locations){
 	
     //Validate Inputs
     $unique_opponent_locations = $this->filterUniqueOpponentLocations($unique_opponent_locations); if($unique_opponent_locations === false){return false;}
 
-    return $this->queryByColumns(array("unique_opponent_locations"=>$unique_opponent_locations));
+    return Achievements::fromArray($this->queryByColumns(array("unique_opponent_locations"=>$unique_opponent_locations)));
 }
-
 
 public function getByPlayedThemeForce($played_theme_force){
 	
     //Validate Inputs
     $played_theme_force = $this->filterPlayedThemeForce($played_theme_force); if($played_theme_force === false){return false;}
 
-    return $this->queryByColumns(array("played_theme_force"=>$played_theme_force));
+    return Achievements::fromArray($this->queryByColumns(array("played_theme_force"=>$played_theme_force)));
 }
-
 
 public function getByFullyPainted($fully_painted){
 	
     //Validate Inputs
     $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
-    return $this->queryByColumns(array("fully_painted"=>$fully_painted));
+    return Achievements::fromArray($this->queryByColumns(array("fully_painted"=>$fully_painted)));
 }
-
 
 public function getByFullyPaintedBattle($fully_painted_battle){
 	
     //Validate Inputs
     $fully_painted_battle = $this->filterFullyPaintedBattle($fully_painted_battle); if($fully_painted_battle === false){return false;}
 
-    return $this->queryByColumns(array("fully_painted_battle"=>$fully_painted_battle));
+    return Achievements::fromArray($this->queryByColumns(array("fully_painted_battle"=>$fully_painted_battle)));
 }
-
 
 public function getByPlayedScenario($played_scenario){
 	
     //Validate Inputs
     $played_scenario = $this->filterPlayedScenario($played_scenario); if($played_scenario === false){return false;}
 
-    return $this->queryByColumns(array("played_scenario"=>$played_scenario));
+    return Achievements::fromArray($this->queryByColumns(array("played_scenario"=>$played_scenario)));
 }
-
 
 public function getByMultiplayer($multiplayer){
 	
     //Validate Inputs
     $multiplayer = $this->filterMultiplayer($multiplayer); if($multiplayer === false){return false;}
 
-    return $this->queryByColumns(array("multiplayer"=>$multiplayer));
+    return Achievements::fromArray($this->queryByColumns(array("multiplayer"=>$multiplayer)));
 }
-
 
 public function getByVsVip($vs_vip){
 	
     //Validate Inputs
     $vs_vip = $this->filterVsVip($vs_vip); if($vs_vip === false){return false;}
 
-    return $this->queryByColumns(array("vs_vip"=>$vs_vip));
+    return Achievements::fromArray($this->queryByColumns(array("vs_vip"=>$vs_vip)));
 }
-
 
 public function getByTournamentId($tournament_id){
 	
     //Validate Inputs
     $tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
 
-    return $this->queryByColumns(array("tournament_id"=>$tournament_id));
+    return Achievements::fromArray($this->queryByColumns(array("tournament_id"=>$tournament_id)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Achievements();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

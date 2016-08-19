@@ -23,9 +23,27 @@ require_once("query.php");
 
 class Game_players {
 
-var $db=NULL;
-var $table="game_players";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="game_players";
 
+//Data storage variables
+public var $id=NULL;
+public var $game_id=NULL;
+public var $player_id=NULL;
+public var $faction_id=NULL;
+public var $game_size=NULL;
+public var $theme_force=NULL;
+public var $fully_painted=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"game_id"=>"filterGameId",
+	"player_id"=>"filterPlayerId",
+	"faction_id"=>"filterFactionId",
+	"game_size"=>"filterGameSize",
+	"theme_force"=>"filterThemeForce",
+	"fully_painted"=>"filterFullyPainted");
 
 /***************************************************
 
@@ -41,52 +59,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($game_id, $player_id, $faction_id, $game_size, $theme_force, $fully_painted){
+public function commit(){
 
-	//Validate the inputs
-	$game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
-	$player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
-	$faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
-	$game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
-	$theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
-	$fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":game_id"=>$game_id,
- 		":player_id"=>$player_id,
- 		":faction_id"=>$faction_id,
- 		":game_size"=>$game_size,
- 		":theme_force"=>$theme_force,
- 		":fully_painted"=>$fully_painted
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				game_id,
-				player_id,
-				faction_id,
-				game_size,
-				theme_force,
-				fully_painted
-			) VALUES (
-				:game_id,
-				:player_id,
-				:faction_id,
-				:game_size,
-				:theme_force,
-				:fully_painted)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -114,38 +154,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateGame_playersById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -156,12 +174,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -189,61 +201,75 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Game_players::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByGameId($game_id){
 	
     //Validate Inputs
     $game_id = $this->filterGameId($game_id); if($game_id === false){return false;}
 
-    return $this->queryByColumns(array("game_id"=>$game_id));
+    return Game_players::fromArray($this->queryByColumns(array("game_id"=>$game_id)));
 }
-
 
 public function getByPlayerId($player_id){
 	
     //Validate Inputs
     $player_id = $this->filterPlayerId($player_id); if($player_id === false){return false;}
 
-    return $this->queryByColumns(array("player_id"=>$player_id));
+    return Game_players::fromArray($this->queryByColumns(array("player_id"=>$player_id)));
 }
-
 
 public function getByFactionId($faction_id){
 	
     //Validate Inputs
     $faction_id = $this->filterFactionId($faction_id); if($faction_id === false){return false;}
 
-    return $this->queryByColumns(array("faction_id"=>$faction_id));
+    return Game_players::fromArray($this->queryByColumns(array("faction_id"=>$faction_id)));
 }
-
 
 public function getByGameSize($game_size){
 	
     //Validate Inputs
     $game_size = $this->filterGameSize($game_size); if($game_size === false){return false;}
 
-    return $this->queryByColumns(array("game_size"=>$game_size));
+    return Game_players::fromArray($this->queryByColumns(array("game_size"=>$game_size)));
 }
-
 
 public function getByThemeForce($theme_force){
 	
     //Validate Inputs
     $theme_force = $this->filterThemeForce($theme_force); if($theme_force === false){return false;}
 
-    return $this->queryByColumns(array("theme_force"=>$theme_force));
+    return Game_players::fromArray($this->queryByColumns(array("theme_force"=>$theme_force)));
 }
-
 
 public function getByFullyPainted($fully_painted){
 	
     //Validate Inputs
     $fully_painted = $this->filterFullyPainted($fully_painted); if($fully_painted === false){return false;}
 
-    return $this->queryByColumns(array("fully_painted"=>$fully_painted));
+    return Game_players::fromArray($this->queryByColumns(array("fully_painted"=>$fully_painted)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Game_players();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

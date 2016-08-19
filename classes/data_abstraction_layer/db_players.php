@@ -23,9 +23,27 @@ require_once("query.php");
 
 class Players {
 
-var $db=NULL;
-var $table="players";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="players";
 
+//Data storage variables
+public var $id=NULL;
+public var $first_name=NULL;
+public var $last_name=NULL;
+public var $country=NULL;
+public var $state=NULL;
+public var $vip=NULL;
+public var $creation_date=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"first_name"=>"filterFirstName",
+	"last_name"=>"filterLastName",
+	"country"=>"filterCountry",
+	"state"=>"filterState",
+	"vip"=>"filterVip",
+	"creation_date"=>"filterCreationDate");
 
 /***************************************************
 
@@ -41,50 +59,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($first_name, $last_name, $country, $state, $vip){
+public function commit(){
 
-	//Validate the inputs
-	$first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
-	$last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
-	$country = $this->filterCountry($country); if($country === false){return false;}
-	$state = $this->filterState($state); if($state === false){return false;}
-	$vip = $this->filterVip($vip); if($vip === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":first_name"=>$first_name,
- 		":last_name"=>$last_name,
- 		":country"=>$country,
- 		":state"=>$state,
- 		":vip"=>$vip
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				first_name,
-				last_name,
-				country,
-				state,
-				vip,
-				creation_date
-			) VALUES (
-				:first_name,
-				:last_name,
-				:country,
-				:state,
-				:vip,
-				NOW())";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -112,38 +154,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updatePlayersById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -154,12 +174,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -187,61 +201,75 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Players::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByFirstName($first_name){
 	
     //Validate Inputs
     $first_name = $this->filterFirstName($first_name); if($first_name === false){return false;}
 
-    return $this->queryByColumns(array("first_name"=>$first_name));
+    return Players::fromArray($this->queryByColumns(array("first_name"=>$first_name)));
 }
-
 
 public function getByLastName($last_name){
 	
     //Validate Inputs
     $last_name = $this->filterLastName($last_name); if($last_name === false){return false;}
 
-    return $this->queryByColumns(array("last_name"=>$last_name));
+    return Players::fromArray($this->queryByColumns(array("last_name"=>$last_name)));
 }
-
 
 public function getByCountry($country){
 	
     //Validate Inputs
     $country = $this->filterCountry($country); if($country === false){return false;}
 
-    return $this->queryByColumns(array("country"=>$country));
+    return Players::fromArray($this->queryByColumns(array("country"=>$country)));
 }
-
 
 public function getByState($state){
 	
     //Validate Inputs
     $state = $this->filterState($state); if($state === false){return false;}
 
-    return $this->queryByColumns(array("state"=>$state));
+    return Players::fromArray($this->queryByColumns(array("state"=>$state)));
 }
-
 
 public function getByVip($vip){
 	
     //Validate Inputs
     $vip = $this->filterVip($vip); if($vip === false){return false;}
 
-    return $this->queryByColumns(array("vip"=>$vip));
+    return Players::fromArray($this->queryByColumns(array("vip"=>$vip)));
 }
-
 
 public function getByCreationDate($creation_date){
 	
     //Validate Inputs
     $creation_date = $this->filterCreationDate($creation_date); if($creation_date === false){return false;}
 
-    return $this->queryByColumns(array("creation_date"=>$creation_date));
+    return Players::fromArray($this->queryByColumns(array("creation_date"=>$creation_date)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Players();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

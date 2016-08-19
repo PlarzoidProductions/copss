@@ -21,9 +21,23 @@ require_once("query.php");
 
 class Shifts {
 
-var $db=NULL;
-var $table="shifts";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="shifts";
 
+//Data storage variables
+public var $id=NULL;
+public var $description=NULL;
+public var $start_time=NULL;
+public var $stop_time=NULL;
+public var $tournament_id=NULL;
+
+//List of variables for sanitization
+private var $varlist = array(
+	"description"=>"filterDescription",
+	"start_time"=>"filterStartTime",
+	"stop_time"=>"filterStopTime",
+	"tournament_id"=>"filterTournamentId");
 
 /***************************************************
 
@@ -39,44 +53,74 @@ public function __destruct(){}
 
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-public function create($description, $start_time, $stop_time, $tournament_id){
+public function commit(){
 
-	//Validate the inputs
-	$description = $this->filterDescription($description); if($description === false){return false;}
-	$start_time = $this->filterStartTime($start_time); if($start_time === false){return false;}
-	$stop_time = $this->filterStopTime($stop_time); if($stop_time === false){return false;}
-	$tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
-
-	//Create the values Array
-	$values = array(
-		":description"=>$description,
- 		":start_time"=>$start_time,
- 		":stop_time"=>$stop_time,
- 		":tournament_id"=>$tournament_id
-	);
-
-	//Build the query
-	$sql = "INSERT INTO $this->table (
-				description,
-				start_time,
-				stop_time,
-				tournament_id
-			) VALUES (
-				:description,
-				:start_time,
-				:stop_time,
-				:tournament_id)";
-
-	return $this->db->insert($sql, $values);
+    if($this->filterId($this->id)){
+        return $this->updateRow();
+    } else {
+        return $this->insertRow();
+    }
 }
 
+private function insertRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
 
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 public function deleteByColumns($columns){
@@ -104,38 +148,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
 
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-public function updateShiftsById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
+    return false;
 }
 
 
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 public function getAll(){
@@ -146,12 +168,6 @@ public function getAll(){
     return $this->db->query($sql, array());
 }
 
-
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
 public function queryByColumns($columns){
 
     //Values Array
@@ -179,43 +195,59 @@ public function getById($id){
     //Validate Inputs
     $id = $this->filterId($id); if($id === false){return false;}
 
-    return $this->queryByColumns(array("id"=>$id));
+    return Shifts::fromArray($this->queryByColumns(array("id"=>$id)));
 }
-
 
 public function getByDescription($description){
 	
     //Validate Inputs
     $description = $this->filterDescription($description); if($description === false){return false;}
 
-    return $this->queryByColumns(array("description"=>$description));
+    return Shifts::fromArray($this->queryByColumns(array("description"=>$description)));
 }
-
 
 public function getByStartTime($start_time){
 	
     //Validate Inputs
     $start_time = $this->filterStartTime($start_time); if($start_time === false){return false;}
 
-    return $this->queryByColumns(array("start_time"=>$start_time));
+    return Shifts::fromArray($this->queryByColumns(array("start_time"=>$start_time)));
 }
-
 
 public function getByStopTime($stop_time){
 	
     //Validate Inputs
     $stop_time = $this->filterStopTime($stop_time); if($stop_time === false){return false;}
 
-    return $this->queryByColumns(array("stop_time"=>$stop_time));
+    return Shifts::fromArray($this->queryByColumns(array("stop_time"=>$stop_time)));
 }
-
 
 public function getByTournamentId($tournament_id){
 	
     //Validate Inputs
     $tournament_id = $this->filterTournamentId($tournament_id); if($tournament_id === false){return false;}
 
-    return $this->queryByColumns(array("tournament_id"=>$tournament_id));
+    return Shifts::fromArray($this->queryByColumns(array("tournament_id"=>$tournament_id)));
+}
+
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new Shifts();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
 }
 
 

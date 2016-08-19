@@ -1,6 +1,6 @@
 <?php
 
-include_once('data_abstraction_layer/db_users.php');
+include_once('db_users.php');
 
 class Session {
 

@@ -5,17 +5,6 @@
 error_reporting(E_ERROR & ~E_NOTICE);
 
 /*************************************************
-
-Test Zone
-
-*************************************************/
-
-/*************************************************
-//END Test Zone
-*/
-
-
-/*************************************************
 **************************************************
 
 Command Line Input Checking
@@ -63,7 +52,7 @@ if(!is_dir($class_dir)){
 } 
 
 if(!is_writable($class_dir)){
-    echo "Unable to read file: $class_dir.\n";
+    echo "Unable to write to output dir: $class_dir.\n";
     return;
 }
 

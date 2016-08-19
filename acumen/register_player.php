@@ -1,12 +1,10 @@
 <?php
 
     require_once("classes/page.php");
-    require_once("classes/db_players.php");
-    require_once("classes/db_states.php");
-    require_once("classes/db_countries.php");
 
     $page = new Page();
 	$p_db = new Players();
+
 
     /***************************************
 

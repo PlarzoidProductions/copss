@@ -33,8 +33,8 @@ INSERT INTO achievements (name, points, per_game, is_meta, game_system_id) VALUE
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (18, 2, 25);
 
 
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 25pt Game", 1, 1, 0, 1, 1);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 35pt Game", 1, 1, 0, 1, 2);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 15pt Game", 1, 1, 0, 1, 1);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 25pt Game", 1, 1, 0, 1, 2);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 50pt Game", 2, 1, 0, 1, 3);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 75pt Game", 3, 1, 0, 1, 4);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id) VALUES ("Played All Game Sizes", 3, 0, 1, 1);
@@ -44,25 +44,27 @@ INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, co
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (23, 22, 1);
 
 
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES ("Played 5 Games", 1, 0, 0, 1, 5);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES ("Played 10 Games", 2, 0, 0, 1, 10);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES ("Played 15 Games", 3, 0, 0, 1, 15);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES ("Played 20 Games", 4, 0, 0, 1, 20);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES ("Played 25 Games", 5, 0, 0, 1, 25);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_count) VALUES 
+("Played 5 Games", 1, 0, 0, 1, 5),
+("Played 10 Games", 2, 0, 0, 1, 10),
+("Played 15 Games", 3, 0, 0, 1, 15),
+("Played 20 Games", 4, 0, 0, 1, 20),
+("Played 25 Games", 5, 0, 0, 1, 25);
 
 
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Cyg", 0, 0, 0, 1, 1);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Kha", 0, 0, 0, 1, 2);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against PoM", 0, 0, 0, 1, 3);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Crx", 0, 0, 0, 1, 4);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Mer", 0, 0, 0, 1, 5);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Ret", 0, 0, 0, 1, 6);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Con", 0, 0, 0, 1, 7);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against LoE", 0, 0, 0, 1, 8);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against CoO", 0, 0, 0, 1, 9);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Sko", 0, 0, 0, 1, 10);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Tro", 0, 0, 0, 1, 11);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES ("Played against Min", 0, 0, 0, 1, 12);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, faction_id) VALUES 
+("Played against Cyg", 0, 0, 0, 1, 1),
+("Played against Kha", 0, 0, 0, 1, 2),
+("Played against PoM", 0, 0, 0, 1, 3),
+("Played against Crx", 0, 0, 0, 1, 4),
+("Played against Mer", 0, 0, 0, 1, 5),
+("Played against Ret", 0, 0, 0, 1, 6),
+("Played against Con", 0, 0, 0, 1, 7),
+("Played against LoE", 0, 0, 0, 1, 8),
+("Played against CoO", 0, 0, 0, 1, 9),
+("Played against Sko", 0, 0, 0, 1, 10),
+("Played against Tro", 0, 0, 0, 1, 11),
+("Played against Min", 0, 0, 0, 1, 12);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id) VALUES ("Played against All Factions", 5, 0, 1, 1);
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (41, 29, 1);
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (41, 30, 1);

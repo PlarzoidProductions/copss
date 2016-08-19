@@ -1,11 +1,14 @@
 <?php
 
-//##########################################
-//
-//Choices class is only ever called via the Page class, so the Page class' autoloader should handle the class loads for us...
-//
-//##########################################
-
+require_once("check.php");
+require_once("db_players.php");
+require_once("db_countries.php");
+require_once("db_states.php");
+require_once("db_game_systems.php");
+require_once("db_game_system_factions.php");
+require_once("db_game_sizes.php");
+require_once("db_events.php");
+require_once("db_achievements.php");
 
 class Choices {
 

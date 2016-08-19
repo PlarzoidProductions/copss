@@ -2,6 +2,7 @@
 
 require_once("session.php");
 require_once("check.php");
+require_once("choices.php");
 
 class Page {
 
@@ -10,18 +11,19 @@ class Page {
     var $vars;
     var $root=null;
 
-    var $version = "v1.1.0";
+    var $version = "v1.0.2";
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
-
-		Session::init();
+        Session::init();
 
         //set the webroot
         $this->servername = $_SERVER["HTTP_HOST"];
 
         if (preg_match("/\/~(\w+)\//", $_SERVER["PHP_SELF"], $matches)) {
             $this->root = "/~" . $matches["1"] . "/";
-        } 
+        } else {
+            //$this->root = "/";
+        }
 
         //set the vars array to empty
         $vars = array();
@@ -103,21 +105,20 @@ class Page {
             "View Player Profile"=>"view_player",
             "Report Game"=>"report_game",
             "Redeem Skulls"=>"redeem",
-            "Tournaments"=>"tournament_manager",
+            "Event Achievements"=>"batch_processing",
             "Software Feedback"=>"feedback"
             );
 
 
         if(Session::isAdmin()){
             $admin_tabs = array(
-				"General Configuration"=>"general_config",
-				"Achievement Configuration"=>"achievement_config",
-				"Bulk Registration"=>"bulk_registration",
-                "Manage Users"=>"manage_users",
-                "Shift Management"=>"shift_management"
+                "Bulk Registration"=>"bulk_registration",
 				"Leaderboard"=>"leaderboard",
-				"Export & Reset Database"=>"export_reset",
-			);
+                "Manage Users"=>"manage_users",
+                "General Configuration"=>"general_config",
+                "Achievement Configuration"=>"achievement_config",
+                "Export & Reset Database"=>"export_reset"
+            );
 
         }
 
@@ -136,6 +137,9 @@ class Page {
 
         include("templates/default_footer.html");
 
+    }
+    
+    function closeDatabase() {
     }
     
     function pageName() {

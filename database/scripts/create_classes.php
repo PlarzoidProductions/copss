@@ -5,17 +5,6 @@
 error_reporting(E_ERROR & ~E_NOTICE);
 
 /*************************************************
-
-Test Zone
-
-*************************************************/
-
-/*************************************************
-//END Test Zone
-*/
-
-
-/*************************************************
 **************************************************
 
 Command Line Input Checking
@@ -27,50 +16,50 @@ Command Line Input Checking
 1. Check for the right number of inputs
 */
 
-$inputs = $argv;
-if(count($inputs) != 3){
-    echo "Usage: create_classes.php <sql script> <output directory>\n";
-    return;
-}
+    $inputs = $argv;
+    if(count($inputs) != 3){
+        echo "Usage: create_classes.php <sql script> <output directory>\n";
+        return;
+    }
 
 
 /***********************************************
 2. Check accessability of SQL file
 */
-$sql_file = $inputs[1];
+    $sql_file = $inputs[1];
 
-if(!file_exists($sql_file)){
-    echo "Unable to locate file: $sql_file.\n";
-    return;
-}
+    if(!file_exists($sql_file)){
+        echo "Unable to locate file: $sql_file.\n";
+        return;
+    }
 
-if(!is_readable($sql_file)){
-    echo "Unable to read file: $sql_file.\n";
-    return;
-}
+    if(!is_readable($sql_file)){
+        echo "Unable to read file: $sql_file.\n";
+        return;
+    }
 
-$sql_fptr = fopen($sql_file, "r");
+    $sql_fptr = fopen($sql_file, "r");
 
 
 /************************************************
 3. Check accessability of Class directory
 */
-$class_dir = $inputs[2];
+    $class_dir = $inputs[2];
 
-if(!is_dir($class_dir)){
-    echo "Directory does not exist: $class_dir.\n";
-    return;
-} 
+    if(!is_dir($class_dir)){
+        echo "Directory does not exist: $class_dir.\n";
+        return;
+    } 
 
-if(!is_writable($class_dir)){
-    echo "Unable to read file: $class_dir.\n";
-    return;
-}
+    if(!is_writable($class_dir)){
+        echo "Unable to write to output dir: $class_dir.\n";
+        return;
+    }
 
-echo "Command: $inputs[0]\n";
-echo "Time: ".date("Y-m-d H:i:s")."\n\n";
+    echo "Command: $inputs[0]\n";
+    echo "Time: ".date("Y-m-d H:i:s")."\n\n";
 
-echo "Opening files...\n";
+    echo "Opening files...\n";
 
 
 /****************************************************
@@ -303,9 +292,28 @@ require_once("query.php");
 
 class '.$table_Fn_name.' {
 
-var $db=NULL;
-var $table="'.$table_name.'";
+//DB Interaction variables
+private var $db=NULL;
+private var $table="'.$table_name.'";
 
+//Data storage variables
+';
+
+foreach($columns as $c){
+    $class_header.="public var $".$c[name]."=NULL;\n";
+}
+
+
+$class_header .= '
+//List of variables for sanitization
+private var $varlist = array(';
+foreach($columns as $c){
+    if($c[primary_key]) continue;   //Skip the PK (id)
+
+    $class_header.="\n\t\"".$c[name].'"=>"filter'.$c[fnName].'"';
+    if($c != end($columns)) $class_header.=",";
+}
+$class_header.=');
 
 /***************************************************
 
@@ -325,82 +333,80 @@ fputs($class_fptr, $class_header);
 
 
 /*************************************************
-6. Write the create function
+6. Write the commit function
 */
-$createFn = '
+
+$commitFns = '
 /**************************************************
 
-Create Function
+Commit (Insert/Update) to DB Function(s)
 
 **************************************************/
-';
-$createFn.= "public function create(";
-$started=false;
-foreach($columns as $k=>$c){
-    //Exclude from create if it's the primary key
-    if($c[primary_key] || preg_match("~creation~", $c[name])){continue;}
-    
-    if($started){$createFn.=", ";}
+public function commit(){
 
-    $createFn.=$c[varname];
-               
-    $started=true;
-}
-$createFn.="){\n";
-
-
-$createFn.="\n\t//Validate the inputs\n";
-foreach($columns as $c){
-    if(!$c[primary_key] && (strlen($c[validateFn]) > 0) && !preg_match("~creation~", $c[name])){
-         $createFn.="\t".$c[validateFn]."\n";
-    }
-}
-$createFn.="\n";
-
-
-$createFn.="\t//Create the values Array\n";
-$createFn.="\t\$values = array(\n";
-$started=false;
-foreach($columns as $k=>$c){
-    if($c[primary_key] || preg_match("~creation~", $c[name])){continue;}
-    
-    if($started){$createFn.=",\n ";}
-
-    $createFn.="\t\t\":".$c[name]."\"=>".$c[varname];
-    $started=true;
-}
-$createFn.="\n\t);\n\n";
-
-
-$createFn.="\t//Build the query\n";
-$createFn.="\t\$sql = \"INSERT INTO \$this->table (\n";
-foreach($columns as $k=>$c){
-    if($c[primary_key]){continue;}
-
-    $createFn.="\t\t\t\t".$c[name];
-    if($k != end(array_keys($columns))){$createFn.=",\n";}
-}
-$createFn.="\n";
-$createFn.="\t\t\t) VALUES (\n";
-foreach($columns as $k=>$c){
-    if($c[primary_key]){continue;}
-    if(preg_match("~creation~", $c[name])){
-        $createFn.="\t\t\t\tNOW()";
+    if($this->filterId($this->id)){
+        return $this->updateRow();
     } else {
-        $createFn.="\t\t\t\t:".$c[name];
+        return $this->insertRow();
     }
-    if($k != end(array_keys($columns))){$createFn.=",\n";}
-    
 }
-$createFn.=')";';
-$createFn.="\n\n";
 
-$createFn.="\treturn \$this->db->insert(\$sql, \$values);";
-$createFn.="\n}\n\n";
+private function insertRow(){
 
-echo "Writing create function...\n";
-fputs($class_fptr, $createFn);
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
 
+    //Create the array of variables names and value calls
+    $c_names = "";
+    $v_calls = "";
+    $values = array();
+    foreach(array_keys($varlist) as $v){
+        $c_names .= "$v";
+        $v_calls .= ":$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_names .= ", ";
+            $v_calls .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "INSERT INTO $this->table ($c_names) VALUES ($v_calls)";
+
+    return $this->db->insert($sql, $values);
+}
+
+private function updateRow(){
+
+    //Check for good data, first
+    foreach($varlist as $vname=>$valFn){
+        if(!$this->$valFn($this->$vname)) return false;
+    }
+
+    //Create the array of variables names and value calls
+    $c_str = "";
+    $values = array(":id"=>$this->id);
+    foreach(array_keys($varlist) as $v){
+        $c_str .= "$v=:$v";
+        $values[":$v"] = $this->$v;
+
+        if($v != end(array_keys($varlist)){
+            $c_str .= ", ";
+        }
+    }
+
+    //Build the query
+    $sql = "UPDATE $this->table SET $c_str WHERE id=:id";
+
+    return $this->db->update($sql, $values);
+}
+';
+
+echo "Writing commit (insert/update) function...\n";
+fputs($class_fptr, $commitFns);
 
 /**************************
 * Delete function
@@ -408,7 +414,7 @@ fputs($class_fptr, $createFn);
 $deleteFn = '
 /**************************************************
 
-Delete Function
+Delete Functions
 
 **************************************************/
 ';
@@ -437,49 +443,16 @@ public function deleteById($id){
     return $this->deleteByColumns(array("id"=>$id));
 }
 
+public function delete(){
+    if($this->id) return $this->deleteById($this->id);
+
+    return false;
+}
+
 ';
 
 echo "Writing delete function...\n";
 fputs($class_fptr, $deleteFn);
-
-
-/**************************
-* Individual Update functions
-**************************/
-$masterUpdateFnHeader = '
-/**************************************************
-
-Update Record By ID Function(s)
-
-**************************************************/
-';
-fputs($class_fptr, $masterUpdateFnHeader);
-
-$masterUpdateFn='public function update'.$table_Fn_name.'ById($id, $columns){
-
-    //Values Array
-    $values = array(":id"=>$id);
-    foreach($columns as $column=>$value){
-        $values[":".$column]=$value;
-    }
-
-    //Generate the query
-    $sql = "UPDATE $this->table SET ";
-    $keys = array_keys($columns);
-    foreach($keys as $column){
-        $sql.= "$column=:$column";
-        if(strcmp($column, end($keys))){
-            $sql.= ", ";
-        }
-    }
-    $sql.= " WHERE id=:id";
-
-    return $this->db->update($sql, $values);
-}';
-$masterUpdateFn.="\n\n";
- 
-echo "Writing master update function...\n";
-fputs($class_fptr, $masterUpdateFn);
 
 
 /**************************
@@ -488,7 +461,7 @@ fputs($class_fptr, $masterUpdateFn);
 $allHeader = '
 /**************************************************
 
-Query Everything
+Query Functions
 
 **************************************************/
 ';
@@ -509,15 +482,6 @@ fputs($class_fptr, $allFn);
 /**************************
 * Query by Columns function
 **************************/
-$masterQueryFnHeader = '
-/**************************************************
-
-Query by Column(s) Function
-
-**************************************************/
-';
-fputs($class_fptr, $masterQueryFnHeader);
-
 $masterQueryFn='public function queryByColumns($columns){
 
     //Values Array
@@ -545,20 +509,46 @@ fputs($class_fptr, $masterQueryFn);
 
 foreach($columns as $column){
 
-$columnFn = '
+    $columnFn = '
 public function getBy'.$column[fnName].'('.$column[varname].'){
 	
     //Validate Inputs
     '.$column[validateFn].'
 
-    return $this->queryByColumns(array("'.$column[name].'"=>'.$column[varname].'));
+    return '.$table_Fn_name.'::fromArray($this->queryByColumns(array("'.$column[name].'"=>'.$column[varname].')));
 }';
-$columnFn.="\n\n";
+    $columnFn.="\n";
 
-echo "Writing column function for $column[name]...\n";
-fputs($class_fptr, $columnFn);
+    echo "Writing column function for $column[name]...\n";
+    fputs($class_fptr, $columnFn);
 
 }
+
+/*************************
+*   From Array
+*************************/
+$arrayFn = '
+public static function fromArray($array){
+
+    $output = new array();
+
+    foreach($array as $a){
+
+        $new = new '.$table_Fn_name.'();
+    
+        if($array[id]) $new->id=$a[id];
+
+        foreach($this->varlist as $v){
+            $new->$v = $a[$v];
+        }
+
+        $output[] = $new;
+    }
+
+    return $output;
+}'."\n\n";
+echo "Writing column function for $column[name]...\n";
+fputs($class_fptr, $arrayFn);
 
 
 /*************************

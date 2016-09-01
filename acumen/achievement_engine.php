@@ -278,14 +278,17 @@ class Ach_Engine {
 					 	 WHERE player_id = :player_id
 						 	AND game_id < :game_id)';
 			$r_opponents = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id]));
-			//$opponents = array_column($opponents, "pid"); //Doesn't work with Server2Go
-			$opponents = array();
-			foreach($r_opponents as $ro){ $opponents[] = $ro["pid"]; }
-
+			$opponents = array_column($opponents, "pid"); //Doesn't work for PHP5 < 5.5.0
+			
+			//Get IDs for the players in this game
+			$new_opponents = array_column(array_column($game, "player"), "player_id");
+			//$opponents = array();
+			//foreach($r_opponents as $ro){ $opponents[] = $ro["pid"]; }
+			
             //detect new opponents by querying against history
             $new_opponents = 0;
             foreach($game[players] as $gp){
-                if($gp[player_id] == $player[player_id]) continue; //why strcmp???
+                if($gp[player_id] == $player[player_id]) continue;
                 
 				if(!in_array($gp[player_id], $opponents)){
                     $new_opponents++;
@@ -310,10 +313,9 @@ class Ach_Engine {
 								AND game_id < :game_id)
 						AND player_id != :player_id2) AS opponents';
             $r_locations = $this->views->customQuery($sql, array(":player_id"=>$player[player_id], ":game_id"=>$game[id], ":player_id2"=>$player[player_id]));
-	    //$locations = array_column($locations, "loc"); //Doesn't work with Server2Go
-	    $locations = array();
-	    foreach($r_locations as $rl){ $locations[] = $rl["loc"]; }
-	    
+	    	$locations = array_column($locations, "loc"); //Doesn't work with PHP5 < 5.5.0
+	    	//$locations = array();
+	    	//foreach($r_locations as $rl){ $locations[] = $rl["loc"]; }
 
             //detect new
             $new_locs = 0;
@@ -360,6 +362,8 @@ class Ach_Engine {
                 }
             }
 
+
+			//If someone made a combo of this and another multi-win, take the min
             if(is_numeric($earned)){
                 $earned = min($earned, $count);
             } else {

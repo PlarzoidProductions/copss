@@ -33,8 +33,8 @@ INSERT INTO achievements (name, points, per_game, is_meta, game_system_id) VALUE
 INSERT INTO meta_achievement_criteria (parent_achievement, child_achievement, count) VALUES (18, 2, 25);
 
 
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 25pt Game", 1, 1, 0, 1, 1);
-INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 35pt Game", 1, 1, 0, 1, 2);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 15pt Game", 1, 1, 0, 1, 1);
+INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 25pt Game", 1, 1, 0, 1, 2);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 50pt Game", 2, 1, 0, 1, 3);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id, game_size_id) VALUES ("Played 75pt Game", 3, 1, 0, 1, 4);
 INSERT INTO achievements (name, points, per_game, is_meta, game_system_id) VALUES ("Played All Game Sizes", 3, 0, 1, 1);

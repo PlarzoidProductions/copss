@@ -1,8 +1,13 @@
 #!/usr/bin/php
 <?php
 
+require_once("class_engine.php");
+
+
 //turn off notices
-error_reporting(E_ERROR & ~E_NOTICE);
+//error_reporting(E_ERROR & ~E_NOTICE);
+
+
 
 /*************************************************
 **************************************************
@@ -22,44 +27,33 @@ Command Line Input Checking
         return;
     }
 
-
+    
 /***********************************************
-2. Check accessability of SQL file
+2. Start Class Engine, Check inputs
 */
+
+    $engine = new Class_Engine();
+
     $sql_file = $inputs[1];
-
-    if(!file_exists($sql_file)){
-        echo "Unable to locate file: $sql_file.\n";
-        return;
-    }
-
-    if(!is_readable($sql_file)){
-        echo "Unable to read file: $sql_file.\n";
-        return;
-    }
-
-    $sql_fptr = fopen($sql_file, "r");
-
-
-/************************************************
-3. Check accessability of Class directory
-*/
     $class_dir = $inputs[2];
 
-    if(!is_dir($class_dir)){
-        echo "Directory does not exist: $class_dir.\n";
-        return;
-    } 
 
-    if(!is_writable($class_dir)){
-        echo "Unable to write to output dir: $class_dir.\n";
-        return;
+    //Check that we can read the file 
+    try{ $engine->isFileReadable($sql_file); }
+    catch (Exception $e) { 
+        echo $e->getMessage(); 
+        exit;    
     }
+    
+    //Open it
+    $sql_fptr = fopen($sql_file, "r");
 
-    echo "Command: $inputs[0]\n";
-    echo "Time: ".date("Y-m-d H:i:s")."\n\n";
-
-    echo "Opening files...\n";
+    //Check the output directory
+    try { $engine->isDirWriteable($class_dir); }
+    catch (Exception $e) { 
+        echo $e->getMessage(); 
+        exit;
+    }
 
 
 /****************************************************

@@ -37,23 +37,45 @@ Command Line Input Checking
     $sql_file = $inputs[1];
     $class_dir = $inputs[2];
 
+    //Check the output directory
+    try { $engine->isDirWriteable($class_dir); }
+    catch (Exception $e) {
+        echo $e->getMessage();
+        exit;
+    }
 
     //Check that we can read the file 
-    try{ $engine->isFileReadable($sql_file); }
+    try { $engine->isFileReadable($sql_file); }
     catch (Exception $e) { 
         echo $e->getMessage(); 
         exit;    
     }
-    
-    //Open it
-    $sql_fptr = fopen($sql_file, "r");
+   
 
-    //Check the output directory
-    try { $engine->isDirWriteable($class_dir); }
-    catch (Exception $e) { 
-        echo $e->getMessage(); 
-        exit;
-    }
+/***********************************************
+3. Open SQL and parse the file
+*/
+
+    //Open it
+    try { $engine->openSQL($sql_file); }
+	catch (Exception $e) {
+		echo $e->getMessage();
+		exit;
+	}
+
+    $engine->parseFile();
+    $engine->closeSQL();
+
+/***********************************************
+4. Write class files for tables
+*/
+
+    //Write files
+    $engine->writeClasses($class_dir);
+
+    exit;
+
+
 
 
 /****************************************************

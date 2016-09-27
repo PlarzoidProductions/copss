@@ -11,10 +11,10 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// player_id - INT
-// tournament_id - INT
-// faction_id - INT
+// id - INT - PRIMARY KEY
+// player_id - INT - FK: players, id
+// tournament_id - INT - FK: tournaments, id
+// faction_id - INT - FK: game_system_factions, id
 // has_dropped - TINYINT
 // had_buy - TINYINT
 //
@@ -33,14 +33,14 @@ class TournamentRegistrations {
     private $had_buy = null;
 
     private $varlist = array(
-        "id",
         "player_id",
         "tournament_id",
         "faction_id",
         "has_dropped",
         "had_buy");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -74,7 +74,7 @@ class TournamentRegistrations {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -102,7 +102,7 @@ class TournamentRegistrations {
     }
 
     public function getPlayerId($player_id){
-        return $this->player_id = $player_id;
+        return $this->player_id;
     }
 
 
@@ -130,7 +130,7 @@ class TournamentRegistrations {
     }
 
     public function getTournamentId($tournament_id){
-        return $this->tournament_id = $tournament_id;
+        return $this->tournament_id;
     }
 
 
@@ -158,7 +158,7 @@ class TournamentRegistrations {
     }
 
     public function getFactionId($faction_id){
-        return $this->faction_id = $faction_id;
+        return $this->faction_id;
     }
 
 
@@ -186,7 +186,7 @@ class TournamentRegistrations {
     }
 
     public function getHasDropped($has_dropped){
-        return $this->has_dropped = $has_dropped;
+        return $this->has_dropped;
     }
 
 
@@ -214,7 +214,7 @@ class TournamentRegistrations {
     }
 
     public function getHadBuy($had_buy){
-        return $this->had_buy = $had_buy;
+        return $this->had_buy;
     }
 
 
@@ -286,6 +286,103 @@ class TournamentRegistrations {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = TournamentRegistrations::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return TournamentRegistrations::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = TournamentRegistrations::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$tournament_registrations = new TournamentRegistrations();
+
+	    $tournament_registrations->setId($row["id"]);
+	    $tournament_registrations->setPlayerId($row["player_id"]);
+	    $tournament_registrations->setTournamentId($row["tournament_id"]);
+	    $tournament_registrations->setFactionId($row["faction_id"]);
+	    $tournament_registrations->setHasDropped($row["has_dropped"]);
+	    $tournament_registrations->setHadBuy($row["had_buy"]);
+	
+		return $tournament_registrations;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -293,6 +390,11 @@ class TournamentRegistrations {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

@@ -11,7 +11,7 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // name - VARCHAR
 //
 ///////////////////////////////////////////////
@@ -25,10 +25,10 @@ class Countries {
     private $name = null;
 
     private $varlist = array(
-        "id",
         "name");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -62,7 +62,7 @@ class Countries {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -90,7 +90,7 @@ class Countries {
     }
 
     public function getName($name){
-        return $this->name = $name;
+        return $this->name;
     }
 
 
@@ -162,6 +162,99 @@ class Countries {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Countries::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Countries::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Countries::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$countries = new Countries();
+
+	    $countries->setId($row["id"]);
+	    $countries->setName($row["name"]);
+	
+		return $countries;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -169,6 +262,11 @@ class Countries {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

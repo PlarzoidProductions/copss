@@ -11,9 +11,9 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// parent_achievement - INT
-// child_achievement - INT
+// id - INT - PRIMARY KEY
+// parent_achievement - INT - FK: achievements, id
+// child_achievement - INT - FK: achievements, id
 // count - INT
 //
 ///////////////////////////////////////////////
@@ -29,12 +29,12 @@ class MetaAchievementCriteria {
     private $count = null;
 
     private $varlist = array(
-        "id",
         "parent_achievement",
         "child_achievement",
         "count");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -68,7 +68,7 @@ class MetaAchievementCriteria {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -96,7 +96,7 @@ class MetaAchievementCriteria {
     }
 
     public function getParentAchievement($parent_achievement){
-        return $this->parent_achievement = $parent_achievement;
+        return $this->parent_achievement;
     }
 
 
@@ -124,7 +124,7 @@ class MetaAchievementCriteria {
     }
 
     public function getChildAchievement($child_achievement){
-        return $this->child_achievement = $child_achievement;
+        return $this->child_achievement;
     }
 
 
@@ -152,7 +152,7 @@ class MetaAchievementCriteria {
     }
 
     public function getCount($count){
-        return $this->count = $count;
+        return $this->count;
     }
 
 
@@ -224,6 +224,101 @@ class MetaAchievementCriteria {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = MetaAchievementCriteria::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return MetaAchievementCriteria::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = MetaAchievementCriteria::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$meta_achievement_criteria = new MetaAchievementCriteria();
+
+	    $meta_achievement_criteria->setId($row["id"]);
+	    $meta_achievement_criteria->setParentAchievement($row["parent_achievement"]);
+	    $meta_achievement_criteria->setChildAchievement($row["child_achievement"]);
+	    $meta_achievement_criteria->setCount($row["count"]);
+	
+		return $meta_achievement_criteria;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -231,6 +326,11 @@ class MetaAchievementCriteria {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

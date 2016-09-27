@@ -11,11 +11,11 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // description - VARCHAR
 // start_time - DATETIME
 // stop_time - DATETIME
-// tournament_id - INT
+// tournament_id - INT - FK: tournaments, id
 //
 ///////////////////////////////////////////////
 
@@ -31,13 +31,13 @@ class Shifts {
     private $tournament_id = null;
 
     private $varlist = array(
-        "id",
         "description",
         "start_time",
         "stop_time",
         "tournament_id");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -71,7 +71,7 @@ class Shifts {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -99,7 +99,7 @@ class Shifts {
     }
 
     public function getDescription($description){
-        return $this->description = $description;
+        return $this->description;
     }
 
 
@@ -122,7 +122,7 @@ class Shifts {
     }
 
     public function getStartTime($start_time){
-        return $this->start_time = $start_time;
+        return $this->start_time;
     }
 
 
@@ -145,7 +145,7 @@ class Shifts {
     }
 
     public function getStopTime($stop_time){
-        return $this->stop_time = $stop_time;
+        return $this->stop_time;
     }
 
 
@@ -173,7 +173,7 @@ class Shifts {
     }
 
     public function getTournamentId($tournament_id){
-        return $this->tournament_id = $tournament_id;
+        return $this->tournament_id;
     }
 
 
@@ -245,6 +245,102 @@ class Shifts {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Shifts::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Shifts::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Shifts::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$shifts = new Shifts();
+
+	    $shifts->setId($row["id"]);
+	    $shifts->setDescription($row["description"]);
+	    $shifts->setStartTime($row["start_time"]);
+	    $shifts->setStopTime($row["stop_time"]);
+	    $shifts->setTournamentId($row["tournament_id"]);
+	
+		return $shifts;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -252,6 +348,11 @@ class Shifts {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

@@ -11,15 +11,15 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY - FK: tournaments, id
 // name - VARCHAR
 // points - INT
 // per_game - TINYINT
 // is_meta - TINYINT
 // game_count - INT
-// game_system_id - INT
-// game_size_id - INT
-// faction_id - INT
+// game_system_id - INT - FK: game_systems, id
+// game_size_id - INT - FK: game_sizes, id
+// faction_id - INT - FK: game_system_factions, id
 // unique_opponent - TINYINT
 // unique_opponent_locations - TINYINT
 // played_theme_force - TINYINT
@@ -57,7 +57,6 @@ class Achievements {
     private $tournament_id = null;
 
     private $varlist = array(
-        "id",
         "name",
         "points",
         "per_game",
@@ -76,7 +75,8 @@ class Achievements {
         "vs_vip",
         "tournament_id");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -110,7 +110,7 @@ class Achievements {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -138,7 +138,7 @@ class Achievements {
     }
 
     public function getName($name){
-        return $this->name = $name;
+        return $this->name;
     }
 
 
@@ -166,7 +166,7 @@ class Achievements {
     }
 
     public function getPoints($points){
-        return $this->points = $points;
+        return $this->points;
     }
 
 
@@ -194,7 +194,7 @@ class Achievements {
     }
 
     public function getPerGame($per_game){
-        return $this->per_game = $per_game;
+        return $this->per_game;
     }
 
 
@@ -222,7 +222,7 @@ class Achievements {
     }
 
     public function getIsMeta($is_meta){
-        return $this->is_meta = $is_meta;
+        return $this->is_meta;
     }
 
 
@@ -248,7 +248,7 @@ class Achievements {
     }
 
     public function getGameCount($game_count){
-        return $this->game_count = $game_count;
+        return $this->game_count;
     }
 
 
@@ -274,7 +274,7 @@ class Achievements {
     }
 
     public function getGameSystemId($game_system_id){
-        return $this->game_system_id = $game_system_id;
+        return $this->game_system_id;
     }
 
 
@@ -300,7 +300,7 @@ class Achievements {
     }
 
     public function getGameSizeId($game_size_id){
-        return $this->game_size_id = $game_size_id;
+        return $this->game_size_id;
     }
 
 
@@ -326,7 +326,7 @@ class Achievements {
     }
 
     public function getFactionId($faction_id){
-        return $this->faction_id = $faction_id;
+        return $this->faction_id;
     }
 
 
@@ -352,7 +352,7 @@ class Achievements {
     }
 
     public function getUniqueOpponent($unique_opponent){
-        return $this->unique_opponent = $unique_opponent;
+        return $this->unique_opponent;
     }
 
 
@@ -378,7 +378,7 @@ class Achievements {
     }
 
     public function getUniqueOpponentLocations($unique_opponent_locations){
-        return $this->unique_opponent_locations = $unique_opponent_locations;
+        return $this->unique_opponent_locations;
     }
 
 
@@ -404,7 +404,7 @@ class Achievements {
     }
 
     public function getPlayedThemeForce($played_theme_force){
-        return $this->played_theme_force = $played_theme_force;
+        return $this->played_theme_force;
     }
 
 
@@ -430,7 +430,7 @@ class Achievements {
     }
 
     public function getFullyPainted($fully_painted){
-        return $this->fully_painted = $fully_painted;
+        return $this->fully_painted;
     }
 
 
@@ -456,7 +456,7 @@ class Achievements {
     }
 
     public function getFullyPaintedBattle($fully_painted_battle){
-        return $this->fully_painted_battle = $fully_painted_battle;
+        return $this->fully_painted_battle;
     }
 
 
@@ -482,7 +482,7 @@ class Achievements {
     }
 
     public function getPlayedScenario($played_scenario){
-        return $this->played_scenario = $played_scenario;
+        return $this->played_scenario;
     }
 
 
@@ -508,7 +508,7 @@ class Achievements {
     }
 
     public function getMultiplayer($multiplayer){
-        return $this->multiplayer = $multiplayer;
+        return $this->multiplayer;
     }
 
 
@@ -534,7 +534,7 @@ class Achievements {
     }
 
     public function getVsVip($vs_vip){
-        return $this->vs_vip = $vs_vip;
+        return $this->vs_vip;
     }
 
 
@@ -560,7 +560,7 @@ class Achievements {
     }
 
     public function getTournamentId($tournament_id){
-        return $this->tournament_id = $tournament_id;
+        return $this->tournament_id;
     }
 
 
@@ -632,6 +632,115 @@ class Achievements {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Achievements::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Achievements::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Achievements::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$achievements = new Achievements();
+
+	    $achievements->setId($row["id"]);
+	    $achievements->setName($row["name"]);
+	    $achievements->setPoints($row["points"]);
+	    $achievements->setPerGame($row["per_game"]);
+	    $achievements->setIsMeta($row["is_meta"]);
+	    $achievements->setGameCount($row["game_count"]);
+	    $achievements->setGameSystemId($row["game_system_id"]);
+	    $achievements->setGameSizeId($row["game_size_id"]);
+	    $achievements->setFactionId($row["faction_id"]);
+	    $achievements->setUniqueOpponent($row["unique_opponent"]);
+	    $achievements->setUniqueOpponentLocations($row["unique_opponent_locations"]);
+	    $achievements->setPlayedThemeForce($row["played_theme_force"]);
+	    $achievements->setFullyPainted($row["fully_painted"]);
+	    $achievements->setFullyPaintedBattle($row["fully_painted_battle"]);
+	    $achievements->setPlayedScenario($row["played_scenario"]);
+	    $achievements->setMultiplayer($row["multiplayer"]);
+	    $achievements->setVsVip($row["vs_vip"]);
+	    $achievements->setTournamentId($row["tournament_id"]);
+	
+		return $achievements;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -639,6 +748,11 @@ class Achievements {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

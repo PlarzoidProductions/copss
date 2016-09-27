@@ -11,10 +11,10 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// player_id - INT
-// achievement_id - INT
-// game_id - INT
+// id - INT - PRIMARY KEY
+// player_id - INT - FK: players, id
+// achievement_id - INT - FK: achievements, id
+// game_id - INT - FK: games, id
 //
 ///////////////////////////////////////////////
 
@@ -29,12 +29,12 @@ class AchievementsEarned {
     private $game_id = null;
 
     private $varlist = array(
-        "id",
         "player_id",
         "achievement_id",
         "game_id");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -68,7 +68,7 @@ class AchievementsEarned {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -96,7 +96,7 @@ class AchievementsEarned {
     }
 
     public function getPlayerId($player_id){
-        return $this->player_id = $player_id;
+        return $this->player_id;
     }
 
 
@@ -124,7 +124,7 @@ class AchievementsEarned {
     }
 
     public function getAchievementId($achievement_id){
-        return $this->achievement_id = $achievement_id;
+        return $this->achievement_id;
     }
 
 
@@ -150,7 +150,7 @@ class AchievementsEarned {
     }
 
     public function getGameId($game_id){
-        return $this->game_id = $game_id;
+        return $this->game_id;
     }
 
 
@@ -222,6 +222,101 @@ class AchievementsEarned {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = AchievementsEarned::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return AchievementsEarned::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = AchievementsEarned::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$achievements_earned = new AchievementsEarned();
+
+	    $achievements_earned->setId($row["id"]);
+	    $achievements_earned->setPlayerId($row["player_id"]);
+	    $achievements_earned->setAchievementId($row["achievement_id"]);
+	    $achievements_earned->setGameId($row["game_id"]);
+	
+		return $achievements_earned;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -229,6 +324,11 @@ class AchievementsEarned {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

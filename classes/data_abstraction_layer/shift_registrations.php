@@ -11,9 +11,9 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// user_id - INT
-// shift_id - INT
+// id - INT - PRIMARY KEY
+// user_id - INT - FK: users, id
+// shift_id - INT - FK: shifts, id
 //
 ///////////////////////////////////////////////
 
@@ -27,11 +27,11 @@ class ShiftRegistrations {
     private $shift_id = null;
 
     private $varlist = array(
-        "id",
         "user_id",
         "shift_id");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -65,7 +65,7 @@ class ShiftRegistrations {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -93,7 +93,7 @@ class ShiftRegistrations {
     }
 
     public function getUserId($user_id){
-        return $this->user_id = $user_id;
+        return $this->user_id;
     }
 
 
@@ -121,7 +121,7 @@ class ShiftRegistrations {
     }
 
     public function getShiftId($shift_id){
-        return $this->shift_id = $shift_id;
+        return $this->shift_id;
     }
 
 
@@ -193,6 +193,100 @@ class ShiftRegistrations {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = ShiftRegistrations::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return ShiftRegistrations::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = ShiftRegistrations::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$shift_registrations = new ShiftRegistrations();
+
+	    $shift_registrations->setId($row["id"]);
+	    $shift_registrations->setUserId($row["user_id"]);
+	    $shift_registrations->setShiftId($row["shift_id"]);
+	
+		return $shift_registrations;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -200,6 +294,11 @@ class ShiftRegistrations {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

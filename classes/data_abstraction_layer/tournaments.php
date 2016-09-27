@@ -11,9 +11,9 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // name - VARCHAR
-// game_system_id - INT
+// game_system_id - INT - FK: game_systems, id
 // max_num_players - INT
 // max_num_rounds - INT
 // num_lists_required - INT
@@ -41,7 +41,6 @@ class Tournaments {
     private $large_event_scoring = null;
 
     private $varlist = array(
-        "id",
         "name",
         "game_system_id",
         "max_num_players",
@@ -52,7 +51,8 @@ class Tournaments {
         "final_tables",
         "large_event_scoring");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -86,7 +86,7 @@ class Tournaments {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -114,7 +114,7 @@ class Tournaments {
     }
 
     public function getName($name){
-        return $this->name = $name;
+        return $this->name;
     }
 
 
@@ -142,7 +142,7 @@ class Tournaments {
     }
 
     public function getGameSystemId($game_system_id){
-        return $this->game_system_id = $game_system_id;
+        return $this->game_system_id;
     }
 
 
@@ -170,7 +170,7 @@ class Tournaments {
     }
 
     public function getMaxNumPlayers($max_num_players){
-        return $this->max_num_players = $max_num_players;
+        return $this->max_num_players;
     }
 
 
@@ -196,7 +196,7 @@ class Tournaments {
     }
 
     public function getMaxNumRounds($max_num_rounds){
-        return $this->max_num_rounds = $max_num_rounds;
+        return $this->max_num_rounds;
     }
 
 
@@ -224,7 +224,7 @@ class Tournaments {
     }
 
     public function getNumListsRequired($num_lists_required){
-        return $this->num_lists_required = $num_lists_required;
+        return $this->num_lists_required;
     }
 
 
@@ -252,7 +252,7 @@ class Tournaments {
     }
 
     public function getDivideAndConquer($divide_and_conquer){
-        return $this->divide_and_conquer = $divide_and_conquer;
+        return $this->divide_and_conquer;
     }
 
 
@@ -280,7 +280,7 @@ class Tournaments {
     }
 
     public function getStandingsType($standings_type){
-        return $this->standings_type = $standings_type;
+        return $this->standings_type;
     }
 
 
@@ -308,7 +308,7 @@ class Tournaments {
     }
 
     public function getFinalTables($final_tables){
-        return $this->final_tables = $final_tables;
+        return $this->final_tables;
     }
 
 
@@ -336,7 +336,7 @@ class Tournaments {
     }
 
     public function getLargeEventScoring($large_event_scoring){
-        return $this->large_event_scoring = $large_event_scoring;
+        return $this->large_event_scoring;
     }
 
 
@@ -408,6 +408,107 @@ class Tournaments {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Tournaments::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Tournaments::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Tournaments::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$tournaments = new Tournaments();
+
+	    $tournaments->setId($row["id"]);
+	    $tournaments->setName($row["name"]);
+	    $tournaments->setGameSystemId($row["game_system_id"]);
+	    $tournaments->setMaxNumPlayers($row["max_num_players"]);
+	    $tournaments->setMaxNumRounds($row["max_num_rounds"]);
+	    $tournaments->setNumListsRequired($row["num_lists_required"]);
+	    $tournaments->setDivideAndConquer($row["divide_and_conquer"]);
+	    $tournaments->setStandingsType($row["standings_type"]);
+	    $tournaments->setFinalTables($row["final_tables"]);
+	    $tournaments->setLargeEventScoring($row["large_event_scoring"]);
+	
+		return $tournaments;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -415,6 +516,11 @@ class Tournaments {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

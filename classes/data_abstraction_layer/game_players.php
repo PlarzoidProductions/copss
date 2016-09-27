@@ -11,11 +11,11 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// game_id - INT
-// player_id - INT
-// faction_id - INT
-// game_size - INT
+// id - INT - PRIMARY KEY
+// game_id - INT - FK: games, id
+// player_id - INT - FK: players, id
+// faction_id - INT - FK: game_system_factions, id
+// game_size - INT - FK: game_sizes, id
 // theme_force - TINYINT
 // fully_painted - TINYINT
 //
@@ -35,7 +35,6 @@ class GamePlayers {
     private $fully_painted = null;
 
     private $varlist = array(
-        "id",
         "game_id",
         "player_id",
         "faction_id",
@@ -43,7 +42,8 @@ class GamePlayers {
         "theme_force",
         "fully_painted");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -77,7 +77,7 @@ class GamePlayers {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -105,7 +105,7 @@ class GamePlayers {
     }
 
     public function getGameId($game_id){
-        return $this->game_id = $game_id;
+        return $this->game_id;
     }
 
 
@@ -133,7 +133,7 @@ class GamePlayers {
     }
 
     public function getPlayerId($player_id){
-        return $this->player_id = $player_id;
+        return $this->player_id;
     }
 
 
@@ -159,7 +159,7 @@ class GamePlayers {
     }
 
     public function getFactionId($faction_id){
-        return $this->faction_id = $faction_id;
+        return $this->faction_id;
     }
 
 
@@ -185,7 +185,7 @@ class GamePlayers {
     }
 
     public function getGameSize($game_size){
-        return $this->game_size = $game_size;
+        return $this->game_size;
     }
 
 
@@ -213,7 +213,7 @@ class GamePlayers {
     }
 
     public function getThemeForce($theme_force){
-        return $this->theme_force = $theme_force;
+        return $this->theme_force;
     }
 
 
@@ -241,7 +241,7 @@ class GamePlayers {
     }
 
     public function getFullyPainted($fully_painted){
-        return $this->fully_painted = $fully_painted;
+        return $this->fully_painted;
     }
 
 
@@ -313,6 +313,104 @@ class GamePlayers {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = GamePlayers::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return GamePlayers::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = GamePlayers::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$game_players = new GamePlayers();
+
+	    $game_players->setId($row["id"]);
+	    $game_players->setGameId($row["game_id"]);
+	    $game_players->setPlayerId($row["player_id"]);
+	    $game_players->setFactionId($row["faction_id"]);
+	    $game_players->setGameSize($row["game_size"]);
+	    $game_players->setThemeForce($row["theme_force"]);
+	    $game_players->setFullyPainted($row["fully_painted"]);
+	
+		return $game_players;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -320,6 +418,11 @@ class GamePlayers {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

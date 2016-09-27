@@ -11,7 +11,7 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // type - VARCHAR
 // comment - LONGTEXT
 //
@@ -27,11 +27,11 @@ class Feedback {
     private $comment = null;
 
     private $varlist = array(
-        "id",
         "type",
         "comment");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -65,7 +65,7 @@ class Feedback {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -93,7 +93,7 @@ class Feedback {
     }
 
     public function getType($type){
-        return $this->type = $type;
+        return $this->type;
     }
 
 
@@ -121,7 +121,7 @@ class Feedback {
     }
 
     public function getComment($comment){
-        return $this->comment = $comment;
+        return $this->comment;
     }
 
 
@@ -193,6 +193,100 @@ class Feedback {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Feedback::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Feedback::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Feedback::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$feedback = new Feedback();
+
+	    $feedback->setId($row["id"]);
+	    $feedback->setType($row["type"]);
+	    $feedback->setComment($row["comment"]);
+	
+		return $feedback;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -200,6 +294,11 @@ class Feedback {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

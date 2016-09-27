@@ -11,11 +11,11 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // first_name - VARCHAR
 // last_name - VARCHAR
-// country - INT
-// state - INT
+// country - INT - FK: countries, id
+// state - INT - FK: states, id
 // vip - TINYINT
 // creation_date - DATETIME
 //
@@ -35,7 +35,6 @@ class Players {
     private $creation_date = null;
 
     private $varlist = array(
-        "id",
         "first_name",
         "last_name",
         "country",
@@ -43,7 +42,8 @@ class Players {
         "vip",
         "creation_date");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -77,7 +77,7 @@ class Players {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -105,7 +105,7 @@ class Players {
     }
 
     public function getFirstName($first_name){
-        return $this->first_name = $first_name;
+        return $this->first_name;
     }
 
 
@@ -133,7 +133,7 @@ class Players {
     }
 
     public function getLastName($last_name){
-        return $this->last_name = $last_name;
+        return $this->last_name;
     }
 
 
@@ -161,7 +161,7 @@ class Players {
     }
 
     public function getCountry($country){
-        return $this->country = $country;
+        return $this->country;
     }
 
 
@@ -187,7 +187,7 @@ class Players {
     }
 
     public function getState($state){
-        return $this->state = $state;
+        return $this->state;
     }
 
 
@@ -213,7 +213,7 @@ class Players {
     }
 
     public function getVip($vip){
-        return $this->vip = $vip;
+        return $this->vip;
     }
 
 
@@ -236,7 +236,7 @@ class Players {
     }
 
     public function getCreationDate($creation_date){
-        return $this->creation_date = $creation_date;
+        return $this->creation_date;
     }
 
 
@@ -308,6 +308,104 @@ class Players {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Players::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Players::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Players::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$players = new Players();
+
+	    $players->setId($row["id"]);
+	    $players->setFirstName($row["first_name"]);
+	    $players->setLastName($row["last_name"]);
+	    $players->setCountry($row["country"]);
+	    $players->setState($row["state"]);
+	    $players->setVip($row["vip"]);
+	    $players->setCreationDate($row["creation_date"]);
+	
+		return $players;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -315,6 +413,11 @@ class Players {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

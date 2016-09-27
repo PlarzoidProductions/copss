@@ -1,1 +1,1 @@
-../query.php
+query.php

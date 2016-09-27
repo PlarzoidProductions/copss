@@ -11,8 +11,8 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// parent_game_system - INT
+// id - INT - PRIMARY KEY
+// parent_game_system - INT - FK: game_systems, id
 // size - INT
 // name - VARCHAR
 //
@@ -29,12 +29,12 @@ class GameSizes {
     private $name = null;
 
     private $varlist = array(
-        "id",
         "parent_game_system",
         "size",
         "name");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -68,7 +68,7 @@ class GameSizes {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -96,7 +96,7 @@ class GameSizes {
     }
 
     public function getParentGameSystem($parent_game_system){
-        return $this->parent_game_system = $parent_game_system;
+        return $this->parent_game_system;
     }
 
 
@@ -124,7 +124,7 @@ class GameSizes {
     }
 
     public function getSize($size){
-        return $this->size = $size;
+        return $this->size;
     }
 
 
@@ -150,7 +150,7 @@ class GameSizes {
     }
 
     public function getName($name){
-        return $this->name = $name;
+        return $this->name;
     }
 
 
@@ -222,6 +222,101 @@ class GameSizes {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = GameSizes::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return GameSizes::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = GameSizes::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$game_sizes = new GameSizes();
+
+	    $game_sizes->setId($row["id"]);
+	    $game_sizes->setParentGameSystem($row["parent_game_system"]);
+	    $game_sizes->setSize($row["size"]);
+	    $game_sizes->setName($row["name"]);
+	
+		return $game_sizes;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -229,6 +324,11 @@ class GameSizes {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

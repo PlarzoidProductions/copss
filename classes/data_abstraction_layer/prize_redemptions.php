@@ -11,8 +11,8 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// player_id - INT
+// id - INT - PRIMARY KEY - FK: prizes, id
+// player_id - INT - FK: players, id
 // prize_id - INT
 // creation_time - DATETIME
 //
@@ -29,12 +29,12 @@ class PrizeRedemptions {
     private $creation_time = null;
 
     private $varlist = array(
-        "id",
         "player_id",
         "prize_id",
         "creation_time");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -68,7 +68,7 @@ class PrizeRedemptions {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -96,7 +96,7 @@ class PrizeRedemptions {
     }
 
     public function getPlayerId($player_id){
-        return $this->player_id = $player_id;
+        return $this->player_id;
     }
 
 
@@ -124,7 +124,7 @@ class PrizeRedemptions {
     }
 
     public function getPrizeId($prize_id){
-        return $this->prize_id = $prize_id;
+        return $this->prize_id;
     }
 
 
@@ -147,7 +147,7 @@ class PrizeRedemptions {
     }
 
     public function getCreationTime($creation_time){
-        return $this->creation_time = $creation_time;
+        return $this->creation_time;
     }
 
 
@@ -219,6 +219,101 @@ class PrizeRedemptions {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = PrizeRedemptions::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return PrizeRedemptions::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = PrizeRedemptions::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$prize_redemptions = new PrizeRedemptions();
+
+	    $prize_redemptions->setId($row["id"]);
+	    $prize_redemptions->setPlayerId($row["player_id"]);
+	    $prize_redemptions->setPrizeId($row["prize_id"]);
+	    $prize_redemptions->setCreationTime($row["creation_time"]);
+	
+		return $prize_redemptions;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -226,6 +321,11 @@ class PrizeRedemptions {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

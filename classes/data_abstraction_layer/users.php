@@ -11,7 +11,7 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // name - VARCHAR
 // username - VARCHAR
 // password - CHAR
@@ -35,7 +35,6 @@ class Users {
     private $admin = null;
 
     private $varlist = array(
-        "id",
         "name",
         "username",
         "password",
@@ -43,7 +42,8 @@ class Users {
         "last_login",
         "admin");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -77,7 +77,7 @@ class Users {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -103,7 +103,7 @@ class Users {
     }
 
     public function getName($name){
-        return $this->name = $name;
+        return $this->name;
     }
 
 
@@ -131,7 +131,7 @@ class Users {
     }
 
     public function getUsername($username){
-        return $this->username = $username;
+        return $this->username;
     }
 
 
@@ -159,7 +159,7 @@ class Users {
     }
 
     public function getPassword($password){
-        return $this->password = $password;
+        return $this->password;
     }
 
 
@@ -182,7 +182,7 @@ class Users {
     }
 
     public function getCreationDate($creation_date){
-        return $this->creation_date = $creation_date;
+        return $this->creation_date;
     }
 
 
@@ -203,7 +203,7 @@ class Users {
     }
 
     public function getLastLogin($last_login){
-        return $this->last_login = $last_login;
+        return $this->last_login;
     }
 
 
@@ -231,7 +231,7 @@ class Users {
     }
 
     public function getAdmin($admin){
-        return $this->admin = $admin;
+        return $this->admin;
     }
 
 
@@ -303,6 +303,104 @@ class Users {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Users::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Users::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Users::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$users = new Users();
+
+	    $users->setId($row["id"]);
+	    $users->setName($row["name"]);
+	    $users->setUsername($row["username"]);
+	    $users->setPassword($row["password"]);
+	    $users->setCreationDate($row["creation_date"]);
+	    $users->setLastLogin($row["last_login"]);
+	    $users->setAdmin($row["admin"]);
+	
+		return $users;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -310,6 +408,11 @@ class Users {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

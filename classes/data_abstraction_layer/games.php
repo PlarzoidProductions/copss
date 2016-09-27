@@ -11,9 +11,9 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
+// id - INT - PRIMARY KEY
 // creation_time - TIMESTAMP
-// game_system - INT
+// game_system - INT - FK: game_systems, id
 // scenario - TINYINT
 //
 ///////////////////////////////////////////////
@@ -29,12 +29,12 @@ class Games {
     private $scenario = null;
 
     private $varlist = array(
-        "id",
         "creation_time",
         "game_system",
         "scenario");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -68,7 +68,7 @@ class Games {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -91,7 +91,7 @@ class Games {
     }
 
     public function getCreationTime($creation_time){
-        return $this->creation_time = $creation_time;
+        return $this->creation_time;
     }
 
 
@@ -119,7 +119,7 @@ class Games {
     }
 
     public function getGameSystem($game_system){
-        return $this->game_system = $game_system;
+        return $this->game_system;
     }
 
 
@@ -147,7 +147,7 @@ class Games {
     }
 
     public function getScenario($scenario){
-        return $this->scenario = $scenario;
+        return $this->scenario;
     }
 
 
@@ -219,6 +219,101 @@ class Games {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = Games::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return Games::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = Games::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$games = new Games();
+
+	    $games->setId($row["id"]);
+	    $games->setCreationTime($row["creation_time"]);
+	    $games->setGameSystem($row["game_system"]);
+	    $games->setScenario($row["scenario"]);
+	
+		return $games;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -226,6 +321,11 @@ class Games {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

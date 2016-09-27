@@ -11,9 +11,9 @@ require_once("query.php");
 //
 //     Table Description
 //
-// id - INT
-// game_id - INT
-// player_id - INT
+// id - INT - PRIMARY KEY
+// game_id - INT - FK: tournament_games, id
+// player_id - INT - FK: tournament_registrations, id
 // list_played - INT
 // control_points - INT
 // destruction_points - INT
@@ -37,7 +37,6 @@ class TournamentGameDetails {
     private $timed_out = null;
 
     private $varlist = array(
-        "id",
         "game_id",
         "player_id",
         "list_played",
@@ -46,7 +45,8 @@ class TournamentGameDetails {
         "assassination_efficiency",
         "timed_out");
 
-    public function __construct(){
+    public function __construct($id=null){
+        $this->id = $id;
         $this->db = Query::getInstance();
     }
 
@@ -80,7 +80,7 @@ class TournamentGameDetails {
     }
 
     public function getId($id){
-        return $this->id = $id;
+        return $this->id;
     }
 
 
@@ -108,7 +108,7 @@ class TournamentGameDetails {
     }
 
     public function getGameId($game_id){
-        return $this->game_id = $game_id;
+        return $this->game_id;
     }
 
 
@@ -136,7 +136,7 @@ class TournamentGameDetails {
     }
 
     public function getPlayerId($player_id){
-        return $this->player_id = $player_id;
+        return $this->player_id;
     }
 
 
@@ -164,7 +164,7 @@ class TournamentGameDetails {
     }
 
     public function getListPlayed($list_played){
-        return $this->list_played = $list_played;
+        return $this->list_played;
     }
 
 
@@ -192,7 +192,7 @@ class TournamentGameDetails {
     }
 
     public function getControlPoints($control_points){
-        return $this->control_points = $control_points;
+        return $this->control_points;
     }
 
 
@@ -220,7 +220,7 @@ class TournamentGameDetails {
     }
 
     public function getDestructionPoints($destruction_points){
-        return $this->destruction_points = $destruction_points;
+        return $this->destruction_points;
     }
 
 
@@ -246,7 +246,7 @@ class TournamentGameDetails {
     }
 
     public function getAssassinationEfficiency($assassination_efficiency){
-        return $this->assassination_efficiency = $assassination_efficiency;
+        return $this->assassination_efficiency;
     }
 
 
@@ -274,7 +274,7 @@ class TournamentGameDetails {
     }
 
     public function getTimedOut($timed_out){
-        return $this->timed_out = $timed_out;
+        return $this->timed_out;
     }
 
 
@@ -346,6 +346,105 @@ class TournamentGameDetails {
     	return $this->db->update($sql, $values);
 	}
 
+    ///////////////////////////////////////////////////
+    //
+    //  Delete from DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+	public function deleteByColumns($columns){
+
+	    //Create the values array
+    	$values = array();
+    	foreach($columns as $c=>$v){
+        	$values[":".$c]=$v;
+    	}
+
+	    //Create Query\n";
+    	$sql = "DELETE FROM $this->table WHERE ";
+    	$keys = array_keys($columns);
+	    foreach($keys as $column){
+    	    $sql.= "$column=:$column";
+        	if(strcmp($column, end($keys))){
+            	$sql.= " AND ";
+        	}
+    	}
+
+    	return $this->db->delete($sql, $values);
+	}
+
+	public function delete(){
+    	if($this->id) return $this->deleteByColumns(array("id"=>$id));
+    	return false;
+	}
+
+    ///////////////////////////////////////////////////
+    //
+    //  Query DB Function(s)
+    //
+    ///////////////////////////////////////////////////
+
+
+	public static function getAll(){
+    	//Generate the query
+    	$sql = "SELECT * FROM $this->table";
+
+    	$rows = $this->db->query($sql, array());
+
+		$data = array();
+		foreach($rows as $r){
+			$data[] = TournamentGameDetails::parseRow($r);
+		}
+
+		return $data;
+	}
+
+	public static function getbyId($id){
+		return TournamentGameDetails::queryByColumns(array("id"=>$id));
+	}
+
+    public static function queryByColumns($columns){
+
+        //Create the values array
+        $values = array();
+        foreach($columns as $c=>$v){
+            $values[":".$c]=$v;
+        }
+
+        //Create Query\n";
+        $sql = "SELECT FROM $this->table WHERE ";
+        $keys = array_keys($columns);
+        foreach($keys as $column){
+            $sql.= "$column=:$column";
+            if(strcmp($column, end($keys))){
+                $sql.= " AND ";
+            }
+        }
+
+        $rows = $this->db->query($sql, $values);
+
+		$data = array();
+		foreach($rows as $r){
+            $data[] = TournamentGameDetails::parseRow($r);
+        }
+
+        return $data;
+    }
+
+	private static function parseRow($row){
+		$tournament_game_details = new TournamentGameDetails();
+
+	    $tournament_game_details->setId($row["id"]);
+	    $tournament_game_details->setGameId($row["game_id"]);
+	    $tournament_game_details->setPlayerId($row["player_id"]);
+	    $tournament_game_details->setListPlayed($row["list_played"]);
+	    $tournament_game_details->setControlPoints($row["control_points"]);
+	    $tournament_game_details->setDestructionPoints($row["destruction_points"]);
+	    $tournament_game_details->setAssassinationEfficiency($row["assassination_efficiency"]);
+	    $tournament_game_details->setTimedOut($row["timed_out"]);
+	
+		return $tournament_game_details;
+	}
  ///////////////////////////////////////////////////////////
  //
  //     END OF AUTOMATED PORTION OF FILE
@@ -353,6 +452,11 @@ class TournamentGameDetails {
  //     DO NOT DELETE THIS COMMENT
  //
  ///////////////////////////////////////////////////////////
+
+
+
+
+
 
  ///////////////////////////////////////////////////////////
  //

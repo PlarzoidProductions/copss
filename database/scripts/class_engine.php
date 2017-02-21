@@ -15,20 +15,20 @@ class Class_Engine{
     private $tables = array();
     private $sql_fptr;
 
-    private $user_func_start = " ///////////////////////////////////////////////////////////\n".
-                               " //\n".
-                               " //     END OF AUTOMATED PORTION OF FILE\n".
-                               " //     Put any custom functions below.\n".
-                               " //     DO NOT DELETE THIS COMMENT\n".
-                               " //\n".
-                               " ///////////////////////////////////////////////////////////\n";
+    private $user_func_start = "    ///////////////////////////////////////////////////////////\n".
+                               "    //\n".
+                               "    //     END OF AUTOMATED PORTION OF FILE\n".
+                               "    //     Put any custom functions below.\n".
+                               "    //     DO NOT DELETE THIS COMMENT\n".
+                               "    //\n".
+                               "    ///////////////////////////////////////////////////////////\n";
 
-    private $user_func_stop  = " ///////////////////////////////////////////////////////////\n".
-                               " //\n".
-                               " //     END OF FILE.  ANYTHING AFTER THIS WILL BE LOST.\n".
-                               " //     DO NOT DELETE THIS COMMENT\n".
-                               " //\n".
-                               " ///////////////////////////////////////////////////////////\n";
+    private $user_func_stop  = "    ///////////////////////////////////////////////////////////\n".
+                               "    //\n".
+                               "    //     END OF FILE.  ANYTHING AFTER THIS WILL BE LOST.\n".
+                               "    //     DO NOT DELETE THIS COMMENT\n".
+                               "    //\n".
+                               "    ///////////////////////////////////////////////////////////\n";
 
     private $create_table_pattern = "~`[a-z_]+`\.`([a-z_]+)`~";
     private $column_pattern = "~`([a-zA-Z_]+)`\s+([A-Z]+)~";
@@ -200,15 +200,16 @@ class Class_Engine{
 			fwrite($fptr, $this->getFileHeader());
 			fwrite($fptr, $this->getTableDescription($t));
 			fwrite($fptr, $this->openTableClass($t));
+
+			fwrite($fptr, $this->user_func_start."\n\n");
+            if(strlen($user_fns) > 0) {fwrite($fptr, "    ".$user_fns."\n");}
+            fwrite($fptr, "\n\n".$this->user_func_stop."\n\n");
+
 			fwrite($fptr, $this->getAccessFns($t));
 			fwrite($fptr, $this->getCommitFns());
 			fwrite($fptr, $this->getDeleteFns());	
 			fwrite($fptr, $this->getQueryFns($t));
 	
-			fwrite($fptr, $this->user_func_start."\n\n\n");
-			if(strlen($user_fns) > 0) {fwrite($fptr, $user_fns);}
-			fwrite($fptr, "\n\n\n".$this->user_func_stop);
-
 			fwrite($fptr, $this->closeTableClass());
 
 			fclose($fptr);
@@ -285,7 +286,10 @@ class Class_Engine{
             "    public function __construct(\$id=null){\n".
             "        \$this->id = \$id;\n".
             "        \$this->db = Query::getInstance();\n".
-            "    }\n\n";
+            "    }\n\n".
+			"    public function getVarList(){\n".
+			"	   return \$this->varlist;\n".
+			"    }\n\n";
         
         return $output;
     }
@@ -390,7 +394,7 @@ class Class_Engine{
 
         $check_fn .=
             "       $ret\n".
-            "   }\n\n";
+            "    }\n\n";
 
         return $check_fn;
     } 

@@ -142,7 +142,8 @@ for($i=1; $i <= $num_players; $i++){
     
     if($uses_sizes)
         $page->register("player_".$i."_size", "select", 
-            array("default_val"=>$defaults[players][$i-1][game_size],                                                     "get_choices_array_func"=>"getGameSizes",
+            array("default_val"=>$defaults[players][$i-1][game_size],
+			"get_choices_array_func"=>"getGameSizes",
                 "get_choices_array_func_args"=>array($game_system)));
 
     if($uses_theme)            
@@ -259,7 +260,6 @@ if($page->submitIsSet("submit_game")){
                                                 $player[theme_force], $player[fully_painted]);
             $result = $result && $creation;
         }
-
 
         if($game_id){
             $engine->recalculateAchievements($parent_game_id);

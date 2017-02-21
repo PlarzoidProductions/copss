@@ -94,7 +94,9 @@ class Ach_Engine {
            
         //Detect & award achievements
         foreach($achievements as $a){
-            foreach($players as $p){
+        	var_dump($a[id]);
+		    exit;
+			foreach($players as $p){
                 $this->detectAndAward($p, $game, $a);
             }
         }
@@ -524,16 +526,18 @@ class Ach_Engine {
 
     function getAchievements(){
         $standard_achs = $this->ach_db->queryByColumns(array("is_meta"=>0));
-	$meta_achievements = $this->ach_db->queryByColumns(array("is_meta"=>1));
+		$meta_achievements = $this->ach_db->queryByColumns(array("is_meta"=>1));
        
         $achievements = array();
         foreach($standard_achs as $a){
             $achievements[] = $this->getAchievementDetails($a[id]);
         }
+
 		foreach($meta_achievements as $a){
 			$achievements[] = $this->getAchievementDetails($a[id]);
 		}
 
+var_dump("here"); exit;
         return $achievements;
 
     }

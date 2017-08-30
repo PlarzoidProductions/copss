@@ -4,11 +4,13 @@ require_once("classes/page.php");
 require_once("classes/db_achievements.php");
 require_once("classes/db_achievements_earned.php");
 require_once("classes/db_players.php");
+require_once("classes/db_events.php");
 
 $page = new Page();
 $a_db = new Achievements();
 $ae_db = new Achievements_earned();
 $p_db = new Players();
+$e_db = new Events();
 
 
 /**************************************
@@ -38,9 +40,10 @@ if(!strcmp($action, "delete")){
 Basic Inputs
 
 **************************************/
-$page->register("ach_id", "select", array("label"=>"Achievement",
+$page->register("ach_id", "select", array("label"=>"Achievement", "reloading"=>1,
                                           "get_choices_array_func"=>"getEventAchievementChoices",
                                           "get_choices_array_func_args"=>array()));
+
 
 $page->register("num_players", "select", array( "reloading"=>true, "default_val"=>5,
                                                 "get_choices_array_func"=>"getIntegerChoices",
@@ -70,7 +73,29 @@ for($i=1; $i <= $num_players; $i++){
                                                         "get_choices_array_func"=>"getPlayerChoices",
                                                         "get_choices_array_func_args"=>array()));
 }
+
+$page->register("first_player_id", "select", array("label"=>"Player $i", "label"=>"First Place",
+                                                    "get_choices_array_func"=>"getPlayerChoices",
+                                                    "get_choices_array_func_args"=>array()));
+$page->register("second_player_id", "select", array("label"=>"Player $i", "label"=>"Second Place",
+                                                    "get_choices_array_func"=>"getPlayerChoices",
+                                                    "get_choices_array_func_args"=>array()));
+$page->register("third_player_id", "select", array("label"=>"Player $i", "label"=>"Third Place",
+                                                    "get_choices_array_func"=>"getPlayerChoices",
+                                                    "get_choices_array_func_args"=>array()));
+
 $page->getChoices();
+
+
+$ach_id = $page->getVar("ach_id");
+
+if(!Check::isNull($ach_id)){
+	$achievement = $a_db->getById($ach_id);
+	$achievement = $achievement[0];
+
+	$event = $e_db->getById($achievement["event_id"]);
+	$event = $event[0];
+}
 
 
 /**************************************
@@ -81,7 +106,6 @@ Handle the Submit
 if($page->submitIsSet("submit_batch")){
 
     //First, extract all our inputs
-    $ach_id = $page->getVar("ach_id");
 
 	if(empty($ach_id)){
 		$errors[] = "Must pick an Achievement!";
@@ -102,8 +126,26 @@ if($page->submitIsSet("submit_batch")){
 
     	$end_result = true;
 
-	$achievement = $a_db->getById($ach_id);
-        $achievement = $achievement[0];
+		if($event["is_tournament"]){
+
+			$first_player_id = $page->getVar("first_player_id");
+			if(!Check::isNull($first_player_id)){
+				$first_ach_id = $a_db->create($event["name"]." (1st)", $achievement["points"]+15, 0, 0, 0, 1, null, null, 0, 0, 0, 0, 0, 0, 0, 0, $event["id"]);
+				$ae_db->create($first_player_id, $first_ach_id);
+			}
+			
+			$second_player_id = $page->getVar("second_player_id");
+			if(!Check::isNull($second_player_id)){
+				$second_ach_id = $a_db->create($event["name"]." (2nd)", $achievement["points"]+10, 0, 0, 0, 1, null, null, 0, 0, 0, 0, 0, 0, 0, 0, $event["id"]);
+				$ae_db->create($second_player_id, $second_ach_id);
+			}
+
+			$third_player_id = $page->getVar("third_player_id");
+			if(!Check::isNull($third_player_id)){
+				$third_ach_id = $a_db->create($event["name"]." (3rd)", $achievement["points"]+5, 0, 0, 0, 1, null, null, 0, 0, 0, 0, 0, 0, 0, 0, $event["id"]);
+				$ae_db->create($third_player_id, $second_ach_id);
+			}
+		}
 
     	foreach($players as $id=>$p){
 

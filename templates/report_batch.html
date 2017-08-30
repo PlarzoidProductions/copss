@@ -30,6 +30,12 @@
             <?php }?>
 			<em>Any player slots left set to "Please select..." will be skipped</em>
             <hr>
+			<?php if($event["is_tournament"]){?>
+				<?php echo $page->displayVar("first_player_id")?>
+				<?php echo $page->displayVar("second_player_id")?>
+				<?php echo $page->displayVar("third_player_id")?>
+				<hr>
+			<?php } ?>
             <?php  for($i=1; $i <= $num_players; $i++){?>
                 <?php  echo $page->displayVar("player_".$i."_id")?>
             <?php }?>

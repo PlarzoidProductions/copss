@@ -11,7 +11,7 @@ class Page {
     var $vars;
     var $root=null;
 
-    var $version = "v1.0.2";
+    var $version = "v1.0.3";
 
     public function Page($authentication_level="Public", $pageid=false, $title=false) {
         Session::init();
